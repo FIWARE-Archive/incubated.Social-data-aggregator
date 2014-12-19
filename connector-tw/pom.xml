@@ -1,0 +1,182 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>connector-tw</artifactId>
+    <name>Twitter Stream Connector</name>
+    <description>A connector to twitter stream for the Social Data Aggregator (SDA)</description>
+  
+    <properties>
+        <twitter4j.core.version>4.0.3-SNAPSHOT</twitter4j.core.version>
+        <twitter4j.stream.version>4.0.2</twitter4j.stream.version>
+    </properties>
+    
+    <parent>
+        <groupId>com.tilab.ca.sda</groupId>
+        <artifactId>social-data-aggregator</artifactId>
+        <version>4.1.3.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+  
+    <dependencies>
+        
+        <dependency>
+            <groupId>com.tilab.ca.sda</groupId>
+            <artifactId>sda-utils</artifactId>
+            <version>4.1.3.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.10</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.10</artifactId>			
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.aeonbits.owner</groupId>
+            <artifactId>owner</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId> 
+        </dependency>
+
+        <dependency>
+            <groupId>com.tilab.ca</groupId>
+            <artifactId>hibutils</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.tilab.ca</groupId>
+            <artifactId>spark_test_lib</artifactId>
+        </dependency>
+        
+         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+         </dependency>
+        
+        <!--
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-core</artifactId>
+            <version>${twitter4j.core.version}</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>com.tilab.ca</groupId>
+            <artifactId>twitter4j-core-modprospark</artifactId>
+            <version>${twitter4j.core.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-stream</artifactId>
+            <version>${twitter4j.stream.version}</version>
+        </dependency>
+    </dependencies>
+    
+    <build>
+         <filters>
+            <filter>profiles/${build.profile.id}/config.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>all</shadedClassifierName>
+                            <finalName>uber-${project.artifactId}-${project.version}-${build.profile.id}</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <!-- Profile configuration -->
+    <profiles>
+       
+        <profile>
+            <id>dev</id>
+            <!-- The development profile is active by default -->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <build.profile.id>dev</build.profile.id>
+            </properties>
+        </profile>
+        
+        <profile>
+            <id>prod</id>
+            <properties>
+                <build.profile.id>prod</build.profile.id>
+            </properties>
+        </profile>
+        
+        <profile>
+            <id>test</id>
+            <properties>
+                <build.profile.id>test</build.profile.id>
+            </properties>
+        </profile>
+    </profiles>
+  
+    <repositories>
+        
+        <repository>
+            <!-- Central Repository -->
+            <id>central</id>
+            <url>http://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+		
+        <repository>
+            <!-- Twitter4j Repository -->
+            <id>tw4j</id>
+            <url>http://twitter4j.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+</project>
