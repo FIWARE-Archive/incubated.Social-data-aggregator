@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaRDD;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 
 public class TwStatsDaoDefaultImpl implements TwStatsDao {
@@ -22,6 +23,18 @@ public class TwStatsDaoDefaultImpl implements TwStatsDao {
     private static final String TIME_STR_TREE_PATH="yyyy-MM-dd-HH-mm";
     private static final DateTimeFormatter PATH_FORMATTER = DateTimeFormatter.ofPattern(TIME_STR_TREE_PATH);
     
+    
+    //TEST------------------------------------
+    private final SessionFactory TW_STATS_SESSION_FACTORY;
+
+    
+    public TwStatsDaoDefaultImpl(SessionFactory sessionFactory) {
+        TW_STATS_SESSION_FACTORY=sessionFactory;
+    }
+    
+    //--------------------------------------
+    
+    
     @Override
     public List<String> getOnMonKeys(String nodeName) throws Exception {
        
@@ -30,7 +43,7 @@ public class TwStatsDaoDefaultImpl implements TwStatsDao {
                 .from(OnMonitoringKey.class)
                 .retClass(String.class)
                 .where(Restrictions.eq("monitorFromNode", nodeName))
-                .listResult(TwStatsSession.getSessionFactory());
+                .listResult(TW_STATS_SESSION_FACTORY);
     }
 
     @Override
@@ -39,7 +52,7 @@ public class TwStatsDaoDefaultImpl implements TwStatsDao {
         return new HibQueryExecutor<OnMonitoringGeo>()
                 .from(OnMonitoringGeo.class)
                 .where(Restrictions.eq("monitorFromNode", nodeName))
-                .listResult(TwStatsSession.getSessionFactory())
+                .listResult(TW_STATS_SESSION_FACTORY) //TwStatsSession.getSessionFactory()
                 .stream()
                 .map((onMonGeoElem) -> new GeoBox(onMonGeoElem.getLatitudeFrom(),onMonGeoElem.getLatitudeTo(),
                                                   onMonGeoElem.getLongitudeFrom(),onMonGeoElem.getLongitudeTo()))

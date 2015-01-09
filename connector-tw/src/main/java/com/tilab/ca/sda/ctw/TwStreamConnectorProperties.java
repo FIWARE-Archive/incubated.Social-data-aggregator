@@ -2,8 +2,11 @@ package com.tilab.ca.sda.ctw;
 
 import org.aeonbits.owner.Config;
 import org.aeonbits.owner.Config.DefaultValue;
+import org.aeonbits.owner.Config.LoadPolicy;
+import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
 
+@LoadPolicy(LoadType.MERGE)
 @Sources({
     "classpath:TwStreamConnector.properties"
 })

@@ -5,27 +5,54 @@ import com.tilab.ca.sda.ctw.dao.TwStatsDaoDefaultImpl;
 import com.tilab.ca.sda.ctw.handlers.ReStartHandler;
 import com.tilab.ca.sda.ctw.handlers.StartHandler;
 import com.tilab.ca.sda.ctw.handlers.StopHandler;
+import com.tilab.ca.sda.ctw.hibernate.TwStatsSession;
 import com.tilab.ca.sda.ctw.utils.JettyServerManager;
 import com.tilab.ca.sda.ctw.utils.stream.SparkStreamingManager;
 import com.tilab.ca.sda.ctw.utils.stream.SparkStreamingSystemSettings;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.spark.SparkConf;
 
 public class TwStreamConnectorMain {
 
     private static final Logger log = Logger.getLogger(TwStreamConnectorMain.class);
    
+   
+    
+    public static void printUsage(){
+         System.out.println("twStreamConnector - Java Spark Streaming application that retrieve tweets from twitter and save them on storage");
+         System.out.println();
+         System.out.println( "usage:");
+         System.out.println( "<jar> <SDA_HOME>");
+         System.out.println("<SDA_HOME>. Path where SocialDataAggregator is installed");
+         System.out.println();
+    }
 
     public static void main(String[] args) {
         log.debug(String.format("[%s] STARTING %s application",Constants.SDA_TW_CONNECTOR_LOG_TAG,Constants.SDA_TW_CONNECTOR_APP_NAME));
         try {
+            if(args.length<1 || args[0].equals("--help")){
+                printUsage();
+                System.exit(1);
+            }
+                
+            String sdaHomePath=args[0];
+            String log4jPropsFilePath=sdaHomePath+File.separator+Constants.LOG4jPROPS_FILE_NAME;
+            PropertyConfigurator.configure(log4jPropsFilePath);
+            
             log.debug(String.format("[%s] loading properties..",Constants.SDA_TW_CONNECTOR_LOG_TAG));
-            TwStreamConnectorProperties twProps = ConfigFactory.create(TwStreamConnectorProperties.class);
+            Properties props = new Properties();
+            props.load(new FileInputStream(new File(sdaHomePath+File.separator+Constants.PROPS_FILE_NAME)));
+            TwStreamConnectorProperties twProps = ConfigFactory.create(TwStreamConnectorProperties.class, props);
+            
             
             log.debug(String.format("[%s] loading DAO..",Constants.SDA_TW_CONNECTOR_LOG_TAG));
-            TwStatsDao twStatDao = getTwStatsDaoImpl(twProps.daoClass());
+            TwStatsDao twStatDao = getTwStatsDaoImpl(twProps.daoClass(),sdaHomePath);
             
             
             String ttl = twProps.sparkCleanTTL();
@@ -40,7 +67,7 @@ public class TwStreamConnectorMain {
                 log.debug(String.format("[%s] setting numMaxCore for this streaming application to %s..",Constants.SDA_TW_CONNECTOR_LOG_TAG,twProps.numMaxCore()));
                 sparkConf = sparkConf.set(SparkStreamingSystemSettings.SPARK_CORES_MAX_PROPERTY, twProps.numMaxCore());
             }
-            
+                    
             log.debug(String.format("[%s] Setting up streaming manager..",Constants.SDA_TW_CONNECTOR_LOG_TAG));
             SparkStreamingManager strManager = SparkStreamingManager.$newStreamingManager()
                     .withBatchDurationMillis(twProps.sparkBatchDurationMillis())
@@ -48,7 +75,7 @@ public class TwStreamConnectorMain {
                     .withCheckpointPath(twProps.checkpointDir())
                     .setUpSparkStreaming();
 
-            log.info(String.format("[%s] Starting jetty serve for restart connector from api",
+            log.info(String.format("[%s] Starting jetty serve to restart connector from api",
                                                                             Constants.SDA_TW_CONNECTOR_LOG_TAG));
             JettyServerManager.newInstance()
                                .port(twProps.serverPort())
@@ -70,11 +97,15 @@ public class TwStreamConnectorMain {
     }
 
 
-    private static TwStatsDao getTwStatsDaoImpl(String daoClassString) throws Exception{
+    private static TwStatsDao getTwStatsDaoImpl(String daoClassString,String sdaHomePath) throws Exception{
         
         if(StringUtils.isBlank(daoClassString)){
              log.info(String.format("[%s] No custom implementation found for TwStatsDao. Using default.. ",Constants.SDA_TW_CONNECTOR_LOG_TAG));
-             return new TwStatsDaoDefaultImpl();
+             //loading hibernate confs..
+             String hibConfFilePath=sdaHomePath+File.separator+Constants.HIB_CONFIG_FILE_NAME;
+             TwStatsSession.setHibConfFilePath(hibConfFilePath);
+             
+             return new TwStatsDaoDefaultImpl(TwStatsSession.getSessionFactory());
         }else{
             log.info(String.format("[%s] Custom implementation found for TwStatsDao. Using %s",Constants.SDA_TW_CONNECTOR_LOG_TAG,daoClassString));
             Class<?> daoImplClass=Class.forName(daoClassString);

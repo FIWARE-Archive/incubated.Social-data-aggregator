@@ -14,25 +14,48 @@ To deploy Social Data Aggregator you have to do the following steps:
 git clone https://github.com/FiwareTIConsoft/social-data-aggregator.git
 ```
 
-* In social-data-aggregator/connector-tw folder there are 3 folders:
- * dev
- * test
- * prod
+* build the project: 
+```
+mvn clean package
+```
+Once builded SocialDataAggregator with Maven, under the folder **scripts/your_os_env/** there is a script called make-dist. Run it with the following syntax (e.g. linux):
+```
+./make-dist.sh <output_folder>
+```
+where output_folder is the folder inside which you want to create the SDA GE folder tree. 
+When the script finish to run, you should find the following dir tree:
+```
+sda
+ |
+ | -  bin (contains all the binaries of sda in their respective folder)
+ |
+ | - confs (contains the configurations of each specific sub-component)
+ |
+ | - scripts (contains the launch scripts for each sub-component and a start-all script to start all components)
+ ```
  
- and a **config.properties.template** file. This file has to be copied on the folder that corresponds to the profile you want to use for the build. All the fields have to be filled (only the ones in which is specified can be left blank). To avoid that the system won't work properly don't comment or delete any property. 
-* build the project with the choosen profile: 
-```
-mvn clean package -P test
-```
+##Setting up the start-all script
+This script can be used if you don't have an instance of spark already running. With this script Spark will run in standalone mode.
+Under the **/scripts** folder there is a file called **confs.cfg.template**. Remove the **.template** extension and modify the file providing:
+ ```
+SPARK_HOME -> the location of your spark installation
+SPARK_MASTER_WEBUI_PORT -> if you want a different port for the webui modify this param otherwise leave 8080  
+SPARK_MASTER_IP -> ip of spark master 
+SPARK_MASTER_PORT -> spark master port
+SPARK_WORKER_INSTANCES -> number of worker instances: default 3
+SDA_HOME -> home of social-data-aggregator GE.
+ ```
+ 
+ 
+##Setting up connector-tw
 
-* start the applications:
- * Fill all the requested properties in the configuration files under scripts/linux/confs.cfg and scripts/linux/connector-tw/tw-connector-confs.cfg 
- * start single components:
-    * Environment:  start-spark-env.sh, stop-spark-env.sh
-    * connector-tw : start-tw-connector.sh
- * All the components:
-    *  start-all.sh
+* **Script:**  *sda\scripts\connector-tw* -> **tw-connector-confs.cfg.template**: modify the file removing the extension **.template**. If the default settings are fine for your installation leave them as is, otherwise modify them following your needs.
 
+* **Confs:** under the folder *sda\confs\connector-tw* you will find 3 configuration files:
+ * **log4j.properties:** the properties for log4j. Set where you want the connector log. Modify this file following your needs.
+ * **twstats.cfg.xml:** configuration file for hibernate. Modify it if you compiled the GE with the DAO default implementation. If you provide a different implementation you can leave this file as is or delete it.
+ * **TwStreamConnector.properties:** properties of the component. If you want to use a custom DAO put the name (as well the package) of your custom implementation class (e.g com.mypackage.otherstuff.MyDaoImpl).
+ 
 Source
 ------
 The source code of this project can be cloned from the [GitHub Repository].
