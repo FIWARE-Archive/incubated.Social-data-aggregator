@@ -7,11 +7,12 @@ then
 	echo "SDA_HOME variable not setted. Try to retrieve from script param.."
 	if [ "x$1" == "x" ]
 	then
-		echo "Both SDA_HOME and <sda_home> from script param are missing. start-all script cannot be executed."
-		echo "Exiting.."
-		exit 1
+		echo "Both SDA_HOME and <sda_home> from script param are missing. Guessing from script path..."
+		SDA_HOME="$(cd "`dirname "$0"`";cd ..; pwd)"
+		echo SDA_HOME is $SDA_HOME
+	else
+		SDA_HOME=$1
 	fi
-	SDA_HOME=$1
 fi
 export SDA_HOME
 #####

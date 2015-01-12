@@ -40,7 +40,9 @@ done
 
 if [ "x$SDA_HOME" == "x" ]
 then 
-	echo "Missing SDA_HOME"
+	echo "Missing SDA_HOME from params. Guessing it from script path.."
+	SDA_HOME="$(cd "`dirname "$0"`";cd ../..; pwd)"
+	echo SDA_HOME is $SDA_HOME
 	display_usage_and_exit	
 fi
 if [ "x$MASTER" == "x" ]
