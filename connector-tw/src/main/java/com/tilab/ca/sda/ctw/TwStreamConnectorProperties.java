@@ -61,4 +61,16 @@ public interface TwStreamConnectorProperties extends Config{
     int twitterInserterWindowSlidingInterval();
     
     String daoClass();
+    
+    String brokersList();
+    
+    String kafkaSerializationClass();
+    
+    int kafkaRequiredAcks();
+    
+    @DefaultValue("10")
+    int maxTotalConnections();
+    
+    @DefaultValue("10")
+    int maxIdleConnections();
 }

@@ -1,9 +1,18 @@
 package com.tilab.ca.sda.ctw;
 
+import com.tilab.ca.sda.ctw.bus.BusConnection;
+import com.tilab.ca.sda.ctw.bus.BusConnectionPool;
+import com.tilab.ca.sda.ctw.bus.BusConnectionPool.BusConnPoolConf;
+import com.tilab.ca.sda.ctw.bus.ProducerFactory;
 import com.tilab.ca.sda.ctw.connector.TwitterReceiverBuilder;
 import com.tilab.ca.sda.ctw.connector.TwitterStream;
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
 import com.tilab.ca.sda.ctw.data.GeoBox;
+import com.tilab.ca.sda.ctw.data.GeoStatus;
+import com.tilab.ca.sda.ctw.data.HtsStatus;
+import com.tilab.ca.sda.ctw.data.TwStatus;
+import com.tilab.ca.sda.ctw.utils.JsonUtils;
+import com.tilab.ca.sda.ctw.utils.TwUtils;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -12,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
@@ -25,16 +35,44 @@ public class TwitterStreamConnector implements Serializable{
     private final TwStreamConnectorProperties twProps;
     private final TwStatsDao twStatDao;
     private Set<String> langFilter = null;
-
+    
+    
+    //private Broadcast<BusConnectionPool<String,String>> broadcastBusConnPool;
+    
+    private ProducerFactory<String,String> producerFactory=null;
+    private BusConnPoolConf busConnPoolConf=null;
+    
+    
+    private static final String TW_TOPIC = "tw";
+    private static final String GEO_LABEL = "geo";
+    private static final String HT_LABEL = "ht";
+    private static final String TW_STATUS_LABEL = "status";
+    private static final String RAW_LABEL = "raw";
+    
     //private int BATCH_CICLE_NUM = 0;
 
-    public TwitterStreamConnector(TwStreamConnectorProperties twProps,TwStatsDao twStatDao) {
+//    public TwitterStreamConnector(TwStreamConnectorProperties twProps,TwStatsDao twStatDao,  
+//                                 Broadcast<BusConnectionPool<String,String>> broadcastBusConnPoolOpt){
+    
+    public TwitterStreamConnector(TwStreamConnectorProperties twProps,TwStatsDao twStatDao){
         this.twProps = twProps;
         this.twStatDao=twStatDao;
         if (twProps.langFilter() != null) {
             log.info(String.format("[%s] lang filter enabled on %s", Constants.SDA_TW_CONNECTOR_LOG_TAG, twProps.langFilter()));
             langFilter = new HashSet<>(Arrays.asList(twProps.langFilter().split(",")));
         }
+        //this.broadcastBusConnPool=broadcastBusConnPoolOpt;
+    }
+    
+    
+    public TwitterStreamConnector withProducerFactory(ProducerFactory producerFactory){
+        this.producerFactory=producerFactory;
+        return this;
+    }
+    
+    public TwitterStreamConnector withProducerPoolConf(BusConnPoolConf busConnPoolConf){
+        this.busConnPoolConf=busConnPoolConf;
+        return this;
     }
 
     public void executeMainOperations(JavaStreamingContext jssc) throws Exception {
@@ -46,6 +84,12 @@ public class TwitterStreamConnector implements Serializable{
         }
         log.info(String.format("[%s] starting collecting tweets...", Constants.SDA_TW_CONNECTOR_APP_NAME));
         collectAndSaveTweets(tweetsDStream);
+        
+        //if(broadcastBusConnPool!=null)
+        if(producerFactory!=null){
+             log.info(String.format("[%s] BusConnectionPool is configured!", Constants.SDA_TW_CONNECTOR_APP_NAME));
+            generateModelAndSendDataOnBus(tweetsDStream);
+        }
     }
 
     public void collectAndSaveTweets(JavaDStream<Status> tweetsDStream) {
@@ -54,13 +98,94 @@ public class TwitterStreamConnector implements Serializable{
                 new Duration(twProps.twitterInserterWindowDuration()),
                 new Duration(twProps.twitterInserterWindowSlidingInterval()));
         
-        JavaDStream<Status> coalesced = twWind.transform((rdd, time) -> rdd.coalesce(1)); 
-        coalesced.foreach((rdd, time) -> {
+        //JavaDStream<Status> coalesced = twWind.transform((rdd, time) -> rdd.coalesce(1)); 
+//        coalesced.foreach((rdd, time) -> {
+//            twStatDao.saveRddData(rdd, twProps.dataOutputFolder(), twProps.dataRootFolder());
+//            return null;
+//        });
+        twWind.foreach((rdd, time) -> {
             twStatDao.saveRddData(rdd, twProps.dataOutputFolder(), twProps.dataRootFolder());
             return null;
         });
     }
     
+    public void generateModelAndSendDataOnBus(JavaDStream<Status> tweetsDStream){
+       //send raw tweets
+       tweetsDStream.foreachRDD((rdd) -> {
+         sendRddContent(rdd,TW_TOPIC, RAW_LABEL);
+         return null;
+       });
+       //MAP to internal model and send through the bus
+       //GEO TWEETS
+       JavaDStream<GeoStatus> geoStatusDStream=getTwGeoStatusFromStatus(tweetsDStream);
+       geoStatusDStream.foreachRDD((rdd) -> {
+           sendRddContent(rdd,TW_TOPIC, GEO_LABEL);
+           return null;
+       });
+       //Tweets containing hashtags
+       JavaDStream<HtsStatus> htsStatusDStream=getTwHtsStatusFromStatus(tweetsDStream);
+       htsStatusDStream.foreachRDD((rdd) -> {
+           sendRddContent(rdd,TW_TOPIC, HT_LABEL);
+           return null;
+       });
+       JavaDStream<TwStatus> twStatusDStream=getTwStatusFromStatus(tweetsDStream);
+       twStatusDStream.foreachRDD((rdd) -> {
+           sendRddContent(rdd,TW_TOPIC, TW_STATUS_LABEL);
+           return null;
+       });
+    }
+    
+    
+    
+    /*
+     PRIVATE METHODS
+    */
+    
+    private JavaDStream<GeoStatus> getTwGeoStatusFromStatus(JavaDStream<Status> tweets){
+        return tweets.filter((status) -> TwUtils.isGeoLocStatus(status))
+                .map((status) -> GeoStatus.geoStatusFromStatus(status));
+    }
+    
+    private JavaDStream<HtsStatus> getTwHtsStatusFromStatus(JavaDStream<Status> tweets){
+        return tweets.filter((status) -> TwUtils.statusContainsHashTags(status))
+                .flatMap((status) -> HtsStatus.htsStatusesFromStatus(status));
+    }
+    
+    private JavaDStream<TwStatus> getTwStatusFromStatus(JavaDStream<Status> tweets){
+        return tweets.filter((status) -> TwUtils.isGeoLocStatus(status))
+                .map((status) -> TwStatus.twStatusFromStatus(status));
+    }
+    
+    
+    
+    private void sendRddContent(JavaRDD<?> rdd,
+            String topic,
+            String topicKey){
+        
+        long objNum=rdd.count(); 
+        if(objNum>0){
+            log.info(String.format("[%s] sending %d data on bus with topic %s and key %s",Constants.SDA_TW_CONNECTOR_APP_NAME,objNum,topic,topicKey));  
+            //BusConnectionPool busConnectionPool=broadcastBusConnPool.value();
+            final  ProducerFactory<String,String> pf=producerFactory;
+            final BusConnPoolConf bcpConf=busConnPoolConf;
+            rdd.foreachPartition((partitionOfRecordsIterator ) ->{
+                if(partitionOfRecordsIterator.hasNext()){
+                    BusConnectionPool.initOnce(pf,bcpConf);
+                    
+                    //BusConnection<String,String> conn=BusConnectionPool.getConnection();
+                    BusConnection<String,String> conn=BusConnectionPool.getConnection();
+//                    BusConnection<String,String> conn=busConnectionPool.getConnection();
+                    partitionOfRecordsIterator.forEachRemaining((elem) -> 
+                    {
+                        System.out.println("Sending elem...");
+                        conn.send(topic, JsonUtils.serialize(elem),topicKey);
+                     });
+                    BusConnectionPool.returnConnection(conn);
+//                    busConnectionPool.returnConnection(conn);
+                }
+            });
+        }
+    }
     
     private TwitterReceiverBuilder getTwitterReceiverBuilderFromConfigurations(TwStreamConnectorProperties twProps,
             TwStatsDao twStatDao) throws Exception {

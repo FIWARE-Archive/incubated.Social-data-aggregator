@@ -1,5 +1,6 @@
 package com.tilab.ca.sda.ctw;
 
+import com.tilab.ca.sda.ctw.bus.BusConnectionPool;
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
 import com.tilab.ca.spark_test_lib.streaming.SparkStreamingTest;
 import com.tilab.ca.spark_test_lib.streaming.annotations.SparkTestConfig;
@@ -7,6 +8,8 @@ import com.tilab.ca.spark_test_lib.streaming.interfaces.ExpectedOutputHandler;
 import com.tilab.ca.spark_test_lib.streaming.utils.TestStreamUtils;
 import java.io.File;
 import java.io.Serializable;
+import java.util.Optional;
+import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -45,6 +48,7 @@ public class GenericTestCase extends SparkStreamingTest implements Serializable 
                                             .map((rawJson) -> TwitterObjectFactory.createStatus(rawJson));
                 
                     
+//                    new TwitterStreamConnector(props, twsd,null)
                     new TwitterStreamConnector(props, twsd)
                             .collectAndSaveTweets(mockTwStream);
                     
@@ -86,6 +90,7 @@ public class GenericTestCase extends SparkStreamingTest implements Serializable 
     public void simpleTestOneWindow() {
         twsd = new TwStatsDaoTestImpl(6);
         int windowNumBatches=2;
+        
         $newTest()
                 .expectedOutputHandler((ExpectedOutputHandler)twsd)
                 .sparkStreamJob((jssc) -> {
@@ -95,6 +100,7 @@ public class GenericTestCase extends SparkStreamingTest implements Serializable 
                                             .map((rawJson) -> TwitterObjectFactory.createStatus(rawJson));
                 
                     
+//                    new TwitterStreamConnector(props, twsd,null)
                     new TwitterStreamConnector(props, twsd)
                             .collectAndSaveTweets(mockTwStream);
                     

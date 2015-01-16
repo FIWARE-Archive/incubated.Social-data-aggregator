@@ -1,5 +1,9 @@
 package com.tilab.ca.sda.ctw;
 
+import com.tilab.ca.sda.ctw.bus.BusConnectionPool;
+import com.tilab.ca.sda.ctw.bus.ProducerFactory;
+import com.tilab.ca.sda.ctw.bus.kafka.KafkaProducerFactoryBuilder;
+import com.tilab.ca.sda.ctw.bus.kafka.KafkaProducerFactory;
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
 import com.tilab.ca.sda.ctw.dao.TwStatsDaoDefaultImpl;
 import com.tilab.ca.sda.ctw.handlers.ReStartHandler;
@@ -54,9 +58,10 @@ public class TwStreamConnectorMain {
             log.debug(String.format("[%s] loading DAO..",Constants.SDA_TW_CONNECTOR_LOG_TAG));
             TwStatsDao twStatDao = getTwStatsDaoImpl(twProps.daoClass(),sdaHomePath);
             
-            
             String ttl = twProps.sparkCleanTTL();
-            log.trace(String.format("[%s] sparkCleanTTL value is %s",Constants.SDA_TW_CONNECTOR_LOG_TAG,ttl));
+            
+            //Create a Bus connection pool if supplied in props to send the produced data across the bus
+            //BusConnectionPool<String,String> connectionPool=createBusConnectionPool(twProps);
             
             //setup spark configuration
             SparkConf sparkConf = new SparkConf().setAppName(Constants.SDA_TW_CONNECTOR_APP_NAME)
@@ -79,14 +84,30 @@ public class TwStreamConnectorMain {
                                                                             Constants.SDA_TW_CONNECTOR_LOG_TAG));
             JettyServerManager.newInstance()
                                .port(twProps.serverPort())
+                               //.addContextHandler("/startCollector", new StartHandler(strManager, twProps, twStatDao,connectionPool))
                                .addContextHandler("/startCollector", new StartHandler(strManager, twProps, twStatDao))
                                .addContextHandler("/stopCollector", new StopHandler(strManager))
                                .addContextHandler("/restartCollector", new ReStartHandler(strManager))
                                .startServerOnNewThread();
             
             log.info(String.format("[%s] Starting twitter connector..",Constants.SDA_TW_CONNECTOR_LOG_TAG));
+            
+            /*
+                START SPARK STREAMING
+            */
             strManager.startSparkStream((jssc) -> {
+                //Broadcast<BusConnectionPool<String,String>> broadcastBusConnPoolOpt=null;
+                //if the busConnector is setted
+                //broadcast the connection pool with the configuration over the cluster
+                //if(connectionPool!=null){
+                   // broadcastBusConnPoolOpt=jssc.sparkContext().broadcast(connectionPool);
+                //} 
+//                TwitterStreamConnector tsc=new TwitterStreamConnector(twProps, twStatDao,broadcastBusConnPoolOpt);
                 TwitterStreamConnector tsc=new TwitterStreamConnector(twProps, twStatDao);
+                if (StringUtils.isNotBlank(twProps.brokersList())){
+                    log.info(String.format("[%s] Bus enabled. Data will be sent on it", Constants.SDA_TW_CONNECTOR_LOG_TAG));
+                    tsc=tsc.withProducerFactory(createProducerFactory(twProps)).withProducerPoolConf(createBusConnectionPoolConfiguration(twProps));
+                }
                 tsc.executeMainOperations(jssc);
             });
 
@@ -117,4 +138,46 @@ public class TwStreamConnectorMain {
             }
         }
     }
+    
+    public static ProducerFactory createProducerFactory(TwStreamConnectorProperties twProps) { 
+            KafkaProducerFactory<String, String> producerFactory = new KafkaProducerFactoryBuilder<String, String>()
+                    .brokersList(twProps.brokersList())
+                    .withSerializerClass(twProps.kafkaSerializationClass())
+                    .requiredAcks(twProps.kafkaRequiredAcks())
+                    .buildProducerFactory();
+            
+            return producerFactory;
+    }
+    
+    public static BusConnectionPool.BusConnPoolConf createBusConnectionPoolConfiguration(TwStreamConnectorProperties twProps){
+       
+        return new BusConnectionPool.BusConnPoolConf().withMaxConnections(twProps.maxTotalConnections())
+                                                      .withMaxIdleConnections(twProps.maxIdleConnections());   
+        
+    }
+    
+//    private static BusConnectionPool<String,String> createBusConnectionPool(TwStreamConnectorProperties twProps) {
+//
+//        BusConnectionPool<String, String> connectionPool = null;
+//
+//        if (StringUtils.isNotBlank(twProps.brokersList())) {
+//            log.info(String.format("[%s] Bus enabled. Data will be sent on it", Constants.SDA_TW_CONNECTOR_LOG_TAG));
+//            KafkaProducerFactory<String, String> producerFactory = new KafkaProducerFactoryBuilder<String, String>()
+//                    .brokersList(twProps.brokersList())
+//                    .withSerializerClass(twProps.kafkaSerializationClass())
+//                    .requiredAcks(twProps.kafkaRequiredAcks())
+//                    .buildProducerFactory();
+//
+//            KafkaProducerPool<String, String> kafkaProducerPool = new KafkaProducerPool<>(producerFactory);
+//            connectionPool = new BusConnectionPool(kafkaProducerPool, new BusConnectionPool.BusConnPoolConf().withMaxConnections(twProps.maxTotalConnections())
+//                    .withMaxIdleConnections(twProps.maxIdleConnections()));
+//            
+//             //GenericObjectPoolConfig config=new GenericObjectPoolConfig();
+//            //config.setMaxTotal(twProps.maxTotalConnections());
+//            //config.setMaxIdle(twProps.maxIdleConnections());
+//            //connectionPool=Optional.of(new BusConnectionPool(new GenericObjectPool<>(kafkaProducerPool,config)));
+//        }
+//
+//        return connectionPool;
+//    }
 }

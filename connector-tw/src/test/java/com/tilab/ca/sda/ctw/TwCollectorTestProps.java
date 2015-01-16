@@ -55,5 +55,24 @@ public class TwCollectorTestProps implements TwStreamConnectorProperties{
 
     @Override
     public String daoClass() {return null;}
+
+    @Override
+    public String brokersList() {
+        return "";
+    }
+
+    @Override
+    public String kafkaSerializationClass() {
+        return null;
+    }
+
+    @Override
+    public int kafkaRequiredAcks() {return 1;}
+
+    @Override
+    public int maxTotalConnections() {return 10;}
+
+    @Override
+    public int maxIdleConnections() {return 10;}
     
 }
