@@ -6,8 +6,6 @@
 package com.tilab.ca.sda.ctw.connector;
 
 import com.tilab.ca.sda.ctw.Constants;
-import com.tilab.ca.sda.ctw.utils.Utils;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.spark.streaming.receiver.Receiver;
 import twitter4j.FilterQuery;
@@ -19,10 +17,7 @@ import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.Configuration;
 
-/**
- *
- * @author Administrator
- */
+
 public class TwitterReceiver extends Receiver<Status> {
 
     private static final Logger log = Logger.getLogger(TwitterReceiver.class);

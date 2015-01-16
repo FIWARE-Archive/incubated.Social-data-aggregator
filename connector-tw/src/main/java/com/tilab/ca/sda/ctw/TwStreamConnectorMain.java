@@ -60,9 +60,6 @@ public class TwStreamConnectorMain {
             
             String ttl = twProps.sparkCleanTTL();
             
-            //Create a Bus connection pool if supplied in props to send the produced data across the bus
-            //BusConnectionPool<String,String> connectionPool=createBusConnectionPool(twProps);
-            
             //setup spark configuration
             SparkConf sparkConf = new SparkConf().setAppName(Constants.SDA_TW_CONNECTOR_APP_NAME)
                     .set(SparkStreamingSystemSettings.SPARK_CLEANER_TTL_PROPERTY, ttl); // Enable meta-data cleaning in Spark (so this can run forever)
@@ -84,7 +81,6 @@ public class TwStreamConnectorMain {
                                                                             Constants.SDA_TW_CONNECTOR_LOG_TAG));
             JettyServerManager.newInstance()
                                .port(twProps.serverPort())
-                               //.addContextHandler("/startCollector", new StartHandler(strManager, twProps, twStatDao,connectionPool))
                                .addContextHandler("/startCollector", new StartHandler(strManager, twProps, twStatDao))
                                .addContextHandler("/stopCollector", new StopHandler(strManager))
                                .addContextHandler("/restartCollector", new ReStartHandler(strManager))
@@ -96,13 +92,6 @@ public class TwStreamConnectorMain {
                 START SPARK STREAMING
             */
             strManager.startSparkStream((jssc) -> {
-                //Broadcast<BusConnectionPool<String,String>> broadcastBusConnPoolOpt=null;
-                //if the busConnector is setted
-                //broadcast the connection pool with the configuration over the cluster
-                //if(connectionPool!=null){
-                   // broadcastBusConnPoolOpt=jssc.sparkContext().broadcast(connectionPool);
-                //} 
-//                TwitterStreamConnector tsc=new TwitterStreamConnector(twProps, twStatDao,broadcastBusConnPoolOpt);
                 TwitterStreamConnector tsc=new TwitterStreamConnector(twProps, twStatDao);
                 if (StringUtils.isNotBlank(twProps.brokersList())){
                     log.info(String.format("[%s] Bus enabled. Data will be sent on it", Constants.SDA_TW_CONNECTOR_LOG_TAG));
@@ -156,28 +145,4 @@ public class TwStreamConnectorMain {
         
     }
     
-//    private static BusConnectionPool<String,String> createBusConnectionPool(TwStreamConnectorProperties twProps) {
-//
-//        BusConnectionPool<String, String> connectionPool = null;
-//
-//        if (StringUtils.isNotBlank(twProps.brokersList())) {
-//            log.info(String.format("[%s] Bus enabled. Data will be sent on it", Constants.SDA_TW_CONNECTOR_LOG_TAG));
-//            KafkaProducerFactory<String, String> producerFactory = new KafkaProducerFactoryBuilder<String, String>()
-//                    .brokersList(twProps.brokersList())
-//                    .withSerializerClass(twProps.kafkaSerializationClass())
-//                    .requiredAcks(twProps.kafkaRequiredAcks())
-//                    .buildProducerFactory();
-//
-//            KafkaProducerPool<String, String> kafkaProducerPool = new KafkaProducerPool<>(producerFactory);
-//            connectionPool = new BusConnectionPool(kafkaProducerPool, new BusConnectionPool.BusConnPoolConf().withMaxConnections(twProps.maxTotalConnections())
-//                    .withMaxIdleConnections(twProps.maxIdleConnections()));
-//            
-//             //GenericObjectPoolConfig config=new GenericObjectPoolConfig();
-//            //config.setMaxTotal(twProps.maxTotalConnections());
-//            //config.setMaxIdle(twProps.maxIdleConnections());
-//            //connectionPool=Optional.of(new BusConnectionPool(new GenericObjectPool<>(kafkaProducerPool,config)));
-//        }
-//
-//        return connectionPool;
-//    }
 }

@@ -3,10 +3,6 @@ package com.tilab.ca.sda.ctw.bus.kafka;
 import java.io.Serializable;
 import java.util.Properties;
 
-/**
- * 
- * 
- */
 public class KafkaProducerFactoryBuilder<K,V> implements Serializable{
     
     private static final long serialVersionUID = -5594486589791539226L;

@@ -37,8 +37,6 @@ public class TwitterStreamConnector implements Serializable{
     private Set<String> langFilter = null;
     
     
-    //private Broadcast<BusConnectionPool<String,String>> broadcastBusConnPool;
-    
     private ProducerFactory<String,String> producerFactory=null;
     private BusConnPoolConf busConnPoolConf=null;
     
@@ -50,9 +48,6 @@ public class TwitterStreamConnector implements Serializable{
     private static final String RAW_LABEL = "raw";
     
     //private int BATCH_CICLE_NUM = 0;
-
-//    public TwitterStreamConnector(TwStreamConnectorProperties twProps,TwStatsDao twStatDao,  
-//                                 Broadcast<BusConnectionPool<String,String>> broadcastBusConnPoolOpt){
     
     public TwitterStreamConnector(TwStreamConnectorProperties twProps,TwStatsDao twStatDao){
         this.twProps = twProps;
@@ -85,7 +80,6 @@ public class TwitterStreamConnector implements Serializable{
         log.info(String.format("[%s] starting collecting tweets...", Constants.SDA_TW_CONNECTOR_APP_NAME));
         collectAndSaveTweets(tweetsDStream);
         
-        //if(broadcastBusConnPool!=null)
         if(producerFactory!=null){
              log.info(String.format("[%s] BusConnectionPool is configured!", Constants.SDA_TW_CONNECTOR_APP_NAME));
             generateModelAndSendDataOnBus(tweetsDStream);
@@ -165,23 +159,14 @@ public class TwitterStreamConnector implements Serializable{
         long objNum=rdd.count(); 
         if(objNum>0){
             log.info(String.format("[%s] sending %d data on bus with topic %s and key %s",Constants.SDA_TW_CONNECTOR_APP_NAME,objNum,topic,topicKey));  
-            //BusConnectionPool busConnectionPool=broadcastBusConnPool.value();
             final  ProducerFactory<String,String> pf=producerFactory;
             final BusConnPoolConf bcpConf=busConnPoolConf;
             rdd.foreachPartition((partitionOfRecordsIterator ) ->{
                 if(partitionOfRecordsIterator.hasNext()){
                     BusConnectionPool.initOnce(pf,bcpConf);
-                    
-                    //BusConnection<String,String> conn=BusConnectionPool.getConnection();
                     BusConnection<String,String> conn=BusConnectionPool.getConnection();
-//                    BusConnection<String,String> conn=busConnectionPool.getConnection();
-                    partitionOfRecordsIterator.forEachRemaining((elem) -> 
-                    {
-                        System.out.println("Sending elem...");
-                        conn.send(topic, JsonUtils.serialize(elem),topicKey);
-                     });
+                    partitionOfRecordsIterator.forEachRemaining((elem) -> conn.send(topic, JsonUtils.serialize(elem),topicKey));
                     BusConnectionPool.returnConnection(conn);
-//                    busConnectionPool.returnConnection(conn);
                 }
             });
         }

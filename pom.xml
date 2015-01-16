@@ -3,7 +3,7 @@
   
     <groupId>com.tilab.ca.sda</groupId>
     <artifactId>social-data-aggregator</artifactId>
-    <version>4.1.3.0</version>
+    <version>4.2.1.0</version>
     <name>Social Data Aggregator Parent POM</name>
     <packaging>pom</packaging>
 

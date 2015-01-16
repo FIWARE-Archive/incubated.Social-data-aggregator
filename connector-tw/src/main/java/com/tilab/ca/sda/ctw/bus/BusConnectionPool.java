@@ -5,10 +5,8 @@ import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
-//public class BusConnectionPool<K, V> implements Serializable {
 public class BusConnectionPool implements Serializable {
 
-    //private ObjectPool<BusConnection<K, V>> pool=null;
     private static ObjectPool<BusConnection<String,String>> pool=null;
     
     private static BusConnPoolConf conf=null;
@@ -27,11 +25,10 @@ public class BusConnectionPool implements Serializable {
     
     /**
      * Initialize the parameters that are necessary to create the connection pool 
-     * if they are not initialized, otherwise do nothing
-     * @param producerPool obj pool factory for create pool objects 
-     * @param conf pool configuration
+     * if they are not initialized, otherwise do nothing 
+     * @param pFactory the ProducerFactory
+     * @param bConf Configurations for the bus connection pool
      */
-    
     public static void initOnce(ProducerFactory<String,String> pFactory,BusConnPoolConf bConf){
         if(conf==null){
             System.err.println("conf is null. Set new Conf..");

@@ -7,10 +7,7 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 
 
-/**
- *
- * 
- */
+
 public class ProducerPool<K,V> extends BasePooledObjectFactory<BusConnection<K,V>>{
 
     private final ProducerFactory<K,V> producerFactory;
