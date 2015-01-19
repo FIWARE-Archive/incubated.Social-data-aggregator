@@ -1,4 +1,6 @@
-package com.tilab.ca.sda.ctw;
+package com.tilab.ca.sda.ctw.mocks;
+
+import com.tilab.ca.sda.ctw.TwStreamConnectorProperties;
 
 public class TwCollectorTestProps implements TwStreamConnectorProperties{
 
@@ -82,7 +84,7 @@ public class TwCollectorTestProps implements TwStreamConnectorProperties{
     
     @Override
     public String customProducerFactoryImpl(){
-        return null;
+        return "com.tilab.ca.sda.ctw.mocks.ProducerFactoryTestImpl";
     }
 
 

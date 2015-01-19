@@ -38,7 +38,6 @@ public interface TwStreamConnectorProperties extends Config{
     @DefaultValue("8088")
     int serverPort();
 
-    @DefaultValue("3")
     int savePartitions();
     
     //root folder on which will be saved raw tweets

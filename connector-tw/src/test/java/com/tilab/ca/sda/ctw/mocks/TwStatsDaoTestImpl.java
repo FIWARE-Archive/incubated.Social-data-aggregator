@@ -1,4 +1,4 @@
-package com.tilab.ca.sda.ctw;
+package com.tilab.ca.sda.ctw.mocks;
 
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
 import com.tilab.ca.sda.ctw.data.GeoBox;

@@ -4,9 +4,12 @@ import java.io.Serializable;
 import org.apache.commons.pool2.ObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.jboss.logging.Logger;
 
 public class BusConnectionPool implements Serializable {
 
+    private static final Logger log=Logger.getLogger(BusConnectionPool.class);
+    
     private static ObjectPool<BusConnection<String,String>> pool=null;
     
     private static BusConnPoolConf conf=null;
@@ -14,8 +17,8 @@ public class BusConnectionPool implements Serializable {
     
 
     
-    public static void setConf(BusConnPoolConf conf) {
-        BusConnectionPool.conf = conf;
+    public static void setConf(BusConnPoolConf bconf) {
+        BusConnectionPool.conf = bconf;
     }
 
     public static void setProducerFactory(ProducerFactory<String,String> producerFactory) {
@@ -31,11 +34,11 @@ public class BusConnectionPool implements Serializable {
      */
     public static void initOnce(ProducerFactory<String,String> pFactory,BusConnPoolConf bConf){
         if(conf==null){
-            System.err.println("conf is null. Set new Conf..");
+            log.info("conf is null.Setting new Conf..");
             setConf(bConf);
         }
         if(producerFactory==null){
-            System.err.println("producerFactory is null. Set new producerFactory..");
+            log.info("producerFactory is null. Setting new producerFactory..");
             setProducerFactory(pFactory);
         }
     }
@@ -59,9 +62,10 @@ public class BusConnectionPool implements Serializable {
     }
 
     private static synchronized ObjectPool<BusConnection<String, String>> createPool(){
-         System.out.println("Creating new pool...");
+        log.info("Creating new pool...");
          
          if(conf!=null){
+            log.info("Creating new pool with custom configurations..");
             GenericObjectPoolConfig config=new GenericObjectPoolConfig();
             config.setMaxTotal(conf.maxConnections);
             config.setMaxIdle(conf.maxIdleConnections);

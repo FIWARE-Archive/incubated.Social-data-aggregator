@@ -1,5 +1,7 @@
 package com.tilab.ca.sda.ctw;
 
+import com.tilab.ca.sda.ctw.mocks.TwStatsDaoTestImpl;
+import com.tilab.ca.sda.ctw.mocks.TwCollectorTestProps;
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
 import com.tilab.ca.spark_test_lib.streaming.SparkStreamingTest;
 import com.tilab.ca.spark_test_lib.streaming.annotations.SparkTestConfig;
