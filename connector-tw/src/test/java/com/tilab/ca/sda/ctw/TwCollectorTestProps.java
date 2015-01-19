@@ -74,5 +74,17 @@ public class TwCollectorTestProps implements TwStreamConnectorProperties{
 
     @Override
     public int maxIdleConnections() {return 10;}
+
+    @Override
+    public int savePartitions() {
+        return 3;
+    }
+    
+    @Override
+    public String customProducerFactoryImpl(){
+        return null;
+    }
+
+
     
 }

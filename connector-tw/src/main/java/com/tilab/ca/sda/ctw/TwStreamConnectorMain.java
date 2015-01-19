@@ -3,7 +3,6 @@ package com.tilab.ca.sda.ctw;
 import com.tilab.ca.sda.ctw.bus.BusConnectionPool;
 import com.tilab.ca.sda.ctw.bus.ProducerFactory;
 import com.tilab.ca.sda.ctw.bus.kafka.KafkaProducerFactoryBuilder;
-import com.tilab.ca.sda.ctw.bus.kafka.KafkaProducerFactory;
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
 import com.tilab.ca.sda.ctw.dao.TwStatsDaoDefaultImpl;
 import com.tilab.ca.sda.ctw.handlers.ReStartHandler;
@@ -81,7 +80,7 @@ public class TwStreamConnectorMain {
                                                                             Constants.SDA_TW_CONNECTOR_LOG_TAG));
             JettyServerManager.newInstance()
                                .port(twProps.serverPort())
-                               .addContextHandler("/startCollector", new StartHandler(strManager, twProps, twStatDao))
+                               .addContextHandler("/startCollector", new StartHandler(strManager, twProps, twStatDao,props))
                                .addContextHandler("/stopCollector", new StopHandler(strManager))
                                .addContextHandler("/restartCollector", new ReStartHandler(strManager))
                                .startServerOnNewThread();
@@ -95,7 +94,7 @@ public class TwStreamConnectorMain {
                 TwitterStreamConnector tsc=new TwitterStreamConnector(twProps, twStatDao);
                 if (StringUtils.isNotBlank(twProps.brokersList())){
                     log.info(String.format("[%s] Bus enabled. Data will be sent on it", Constants.SDA_TW_CONNECTOR_LOG_TAG));
-                    tsc=tsc.withProducerFactory(createProducerFactory(twProps)).withProducerPoolConf(createBusConnectionPoolConfiguration(twProps));
+                    tsc=tsc.withProducerFactory(createProducerFactory(twProps,props)).withProducerPoolConf(createBusConnectionPoolConfiguration(twProps));
                 }
                 tsc.executeMainOperations(jssc);
             });
@@ -128,14 +127,25 @@ public class TwStreamConnectorMain {
         }
     }
     
-    public static ProducerFactory createProducerFactory(TwStreamConnectorProperties twProps) { 
-            KafkaProducerFactory<String, String> producerFactory = new KafkaProducerFactoryBuilder<String, String>()
+    public static ProducerFactory createProducerFactory(TwStreamConnectorProperties twProps,Properties props) throws Exception {
+        ProducerFactory producerFactory = null;
+        if (StringUtils.isBlank(twProps.customProducerFactoryImpl())) {
+            producerFactory = new KafkaProducerFactoryBuilder<String, String>()
                     .brokersList(twProps.brokersList())
                     .withSerializerClass(twProps.kafkaSerializationClass())
                     .requiredAcks(twProps.kafkaRequiredAcks())
                     .buildProducerFactory();
-            
-            return producerFactory;
+        } else {
+            log.info(String.format("[%s] Custom implementation found for producerFactory. Using %s..", Constants.SDA_TW_CONNECTOR_LOG_TAG, twProps.customProducerFactoryImpl()));
+            Class<?> producerFactoryImplClass = Class.forName(twProps.customProducerFactoryImpl());
+            if (ProducerFactory.class.isAssignableFrom(producerFactoryImplClass)) {
+                producerFactory=(ProducerFactory) producerFactoryImplClass.getConstructor(Properties.class).newInstance(props);
+            } else {
+                throw new IllegalArgumentException("cannot instantiate custom producerFactory impl class " + twProps.customProducerFactoryImpl() + "."
+                        + " Custom class must implement ProducerFactory interface.");
+            }
+        }
+        return producerFactory;
     }
     
     public static BusConnectionPool.BusConnPoolConf createBusConnectionPoolConfiguration(TwStreamConnectorProperties twProps){

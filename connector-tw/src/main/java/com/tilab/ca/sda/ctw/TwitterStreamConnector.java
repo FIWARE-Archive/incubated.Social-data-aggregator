@@ -91,16 +91,13 @@ public class TwitterStreamConnector implements Serializable{
         JavaDStream<Status> twWind = tweetsDStream.window(
                 new Duration(twProps.twitterInserterWindowDuration()),
                 new Duration(twProps.twitterInserterWindowSlidingInterval()));
-        
-        //JavaDStream<Status> coalesced = twWind.transform((rdd, time) -> rdd.coalesce(1)); 
-//        coalesced.foreach((rdd, time) -> {
-//            twStatDao.saveRddData(rdd, twProps.dataOutputFolder(), twProps.dataRootFolder());
-//            return null;
-//        });
-        twWind.foreach((rdd, time) -> {
+    
+        JavaDStream<Status> coalesced = twWind.transform((rdd, time) -> rdd.coalesce(twProps.savePartitions())); 
+        coalesced.foreach((rdd, time) -> {
             twStatDao.saveRddData(rdd, twProps.dataOutputFolder(), twProps.dataRootFolder());
             return null;
         });
+       
     }
     
     public void generateModelAndSendDataOnBus(JavaDStream<Status> tweetsDStream){
@@ -128,7 +125,6 @@ public class TwitterStreamConnector implements Serializable{
            return null;
        });
     }
-    
     
     
     /*

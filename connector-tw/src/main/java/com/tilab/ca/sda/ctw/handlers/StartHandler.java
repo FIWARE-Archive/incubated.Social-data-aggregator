@@ -7,6 +7,7 @@ import com.tilab.ca.sda.ctw.TwitterStreamConnector;
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
 import com.tilab.ca.sda.ctw.utils.stream.SparkStreamingManager;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,16 +23,17 @@ public class StartHandler extends AbstractHandler {
     private final SparkStreamingManager sparkStreamingManager;
     private final TwStreamConnectorProperties twProps;
     private final TwStatsDao twStatDao;
+    private final Properties props;
     //private final BusConnectionPool<String, String> connectionPool;
 
     public StartHandler(SparkStreamingManager sparkStreamingManager,
             TwStreamConnectorProperties twProps,
-            TwStatsDao twStatDao) {
-        //BusConnectionPool<String, String> connectionPool
+            TwStatsDao twStatDao,
+            Properties props) {
         this.sparkStreamingManager = sparkStreamingManager;
         this.twProps = twProps;
         this.twStatDao = twStatDao;
-//        this.connectionPool = connectionPool;
+        this.props=props;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class StartHandler extends AbstractHandler {
                         TwitterStreamConnector tsc=new TwitterStreamConnector(twProps, twStatDao);
                         if (StringUtils.isNotBlank(twProps.brokersList())){
                             log.info(String.format("[%s] Bus enabled. Data will be sent on it", Constants.SDA_TW_CONNECTOR_LOG_TAG));
-                            tsc=tsc.withProducerFactory(TwStreamConnectorMain.createProducerFactory(twProps))
+                            tsc=tsc.withProducerFactory(TwStreamConnectorMain.createProducerFactory(twProps,props))
                                    .withProducerPoolConf(TwStreamConnectorMain.createBusConnectionPoolConfiguration(twProps));
                         }
                         tsc.executeMainOperations(jssc);
