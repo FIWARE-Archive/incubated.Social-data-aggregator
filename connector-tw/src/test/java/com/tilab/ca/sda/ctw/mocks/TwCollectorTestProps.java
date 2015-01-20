@@ -4,6 +4,12 @@ import com.tilab.ca.sda.ctw.TwStreamConnectorProperties;
 
 public class TwCollectorTestProps implements TwStreamConnectorProperties{
 
+    private String brokersList=null;
+
+    public void setBrokersList(String brokersList) {
+        this.brokersList = brokersList;
+    }
+    
     @Override
     public int proxyPort() {return 0;}
 
@@ -60,7 +66,7 @@ public class TwCollectorTestProps implements TwStreamConnectorProperties{
 
     @Override
     public String brokersList() {
-        return "";
+        return brokersList;
     }
 
     @Override
@@ -82,6 +88,9 @@ public class TwCollectorTestProps implements TwStreamConnectorProperties{
         return 3;
     }
     
+    /*
+    a custom producer factory different from the default implementation 
+    */
     @Override
     public String customProducerFactoryImpl(){
         return "com.tilab.ca.sda.ctw.mocks.ProducerFactoryTestImpl";
