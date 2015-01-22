@@ -25,38 +25,50 @@ public class TwStatus implements Serializable {
     private boolean reply = false;
     private String lang = null;
     private Set<String> hts = null;
-
-    public String getOriginalPostText() {
-        return originalPostText;
-    }
-
-    public void setOriginalPostText(String originalPostText) {
-        this.originalPostText = originalPostText;
-    }
-
+    
     private String originalPostText = null;
     private String originalPostDisplayName = null;
     private String originalPostScreenName = null;
     private String originalPostProfileImageURL = null;
     private long originalPostId;
-
-    public long getOriginalPostId() {
-        return originalPostId;
-    }
-
-    public void setOriginalPostId(long originalPostId) {
-        this.originalPostId = originalPostId;
-    }
-
-    public Set<String> getHts() {
-        return hts;
-    }
-
-    public void setHts(Set<String> hts) {
-        this.hts = hts;
-    }
+    
     private int retweetCount;
     private int replyCount;
+    
+    public static TwStatus twStatusFromStatus(Status status) {
+        TwStatus tws = new TwStatus();
+        tws.setLang(status.getLang());
+        tws.setPostId(status.getId());
+        tws.setReply(TwUtils.isReply(status));
+        tws.setRetweet(TwUtils.isRetweet(status));
+        tws.setRetweetCount(0);
+        tws.setReplyCount(0);
+        GeoLocation gl = status.getGeoLocation();
+
+        if (gl != null) {
+            tws.setLatitude(gl.getLatitude());
+            tws.setLongitude(gl.getLongitude());
+            tws.setLatTrunc(Utils.truncateDouble(gl.getLatitude(), 3));
+            tws.setLongTrunc(Utils.truncateDouble(gl.getLongitude(), 3));
+        }
+
+        tws.setSentTime(status.getCreatedAt());
+        tws.setSource(TwUtils.getSourceFromHTML(status.getSource()));
+        tws.setText(status.getText());
+        tws.setUserId(status.getUser().getId());
+
+        tws.setHts(TwUtils.getUniqueHtsFromHtsEntities(status.getHashtagEntities()));
+
+        if (status.isRetweet() && status.getRetweetedStatus() != null) {
+            tws.setOriginalPostId(status.getRetweetedStatus().getId());
+            tws.setOriginalPostDisplayName(status.getRetweetedStatus().getUser().getName());
+            tws.setOriginalPostScreenName(status.getRetweetedStatus().getUser().getScreenName());
+            tws.setOriginalPostProfileImageURL(status.getRetweetedStatus().getUser().getProfileImageURL());
+            tws.setOriginalPostText(status.getRetweetedStatus().getText());
+        }
+
+        return tws;
+    }
 
     public long getPostId() {
         return postId;
@@ -64,6 +76,38 @@ public class TwStatus implements Serializable {
 
     public void setPostId(long postId) {
         this.postId = postId;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Double getLatTrunc() {
+        return latTrunc;
+    }
+
+    public void setLatTrunc(Double latTrunc) {
+        this.latTrunc = latTrunc;
+    }
+
+    public Double getLongTrunc() {
+        return longTrunc;
+    }
+
+    public void setLongTrunc(Double longTrunc) {
+        this.longTrunc = longTrunc;
     }
 
     public Date getSentTime() {
@@ -122,52 +166,20 @@ public class TwStatus implements Serializable {
         this.lang = lang;
     }
 
-    public int getRetweetCount() {
-        return retweetCount;
+    public Set<String> getHts() {
+        return hts;
     }
 
-    public void setRetweetCount(int retweetCount) {
-        this.retweetCount = retweetCount;
+    public void setHts(Set<String> hts) {
+        this.hts = hts;
     }
 
-    public int getReplyCount() {
-        return replyCount;
+    public String getOriginalPostText() {
+        return originalPostText;
     }
 
-    public void setReplyCount(int replyCount) {
-        this.replyCount = replyCount;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
-
-    public double getLatTrunc() {
-        return latTrunc;
-    }
-
-    public void setLatTrunc(double latTrunc) {
-        this.latTrunc = latTrunc;
-    }
-
-    public double getLongTrunc() {
-        return longTrunc;
-    }
-
-    public void setLongTrunc(double longTrunc) {
-        this.longTrunc = longTrunc;
+    public void setOriginalPostText(String originalPostText) {
+        this.originalPostText = originalPostText;
     }
 
     public String getOriginalPostDisplayName() {
@@ -194,39 +206,28 @@ public class TwStatus implements Serializable {
         this.originalPostProfileImageURL = originalPostProfileImageURL;
     }
 
-    public static TwStatus twStatusFromStatus(Status status) {
-        TwStatus tws = new TwStatus();
-        tws.setLang(status.getLang());
-        tws.setPostId(status.getId());
-        tws.setReply(TwUtils.isReply(status));
-        tws.setRetweet(TwUtils.isRetweet(status));
-        tws.setRetweetCount(0);
-        tws.setReplyCount(0);
-        GeoLocation gl = status.getGeoLocation();
+    public long getOriginalPostId() {
+        return originalPostId;
+    }
 
-        if (gl != null) {
-            tws.setLatitude(gl.getLatitude());
-            tws.setLongitude(gl.getLongitude());
-            tws.setLatTrunc(Utils.truncateDouble(gl.getLatitude(), 3));
-            tws.setLongTrunc(Utils.truncateDouble(gl.getLongitude(), 3));
-        }
+    public void setOriginalPostId(long originalPostId) {
+        this.originalPostId = originalPostId;
+    }
 
-        tws.setSentTime(status.getCreatedAt());
-        tws.setSource(TwUtils.getSourceFromHTML(status.getSource()));
-        tws.setText(status.getText());
-        tws.setUserId(status.getUser().getId());
+    public int getRetweetCount() {
+        return retweetCount;
+    }
 
-        tws.setHts(TwUtils.getUniqueHtsFromHtsEntities(status.getHashtagEntities()));
+    public void setRetweetCount(int retweetCount) {
+        this.retweetCount = retweetCount;
+    }
 
-        if (status.isRetweet() && status.getRetweetedStatus() != null) {
-            tws.setOriginalPostId(status.getRetweetedStatus().getId());
-            tws.setOriginalPostDisplayName(status.getRetweetedStatus().getUser().getName());
-            tws.setOriginalPostScreenName(status.getRetweetedStatus().getUser().getScreenName());
-            tws.setOriginalPostProfileImageURL(status.getRetweetedStatus().getUser().getProfileImageURL());
-            tws.setOriginalPostText(status.getRetweetedStatus().getText());
-        }
+    public int getReplyCount() {
+        return replyCount;
+    }
 
-        return tws;
+    public void setReplyCount(int replyCount) {
+        this.replyCount = replyCount;
     }
 
 }

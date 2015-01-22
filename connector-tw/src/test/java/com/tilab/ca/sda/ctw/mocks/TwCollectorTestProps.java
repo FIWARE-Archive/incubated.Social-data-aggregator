@@ -5,9 +5,15 @@ import com.tilab.ca.sda.ctw.TwStreamConnectorProperties;
 public class TwCollectorTestProps implements TwStreamConnectorProperties{
 
     private String brokersList=null;
+    
+    private String langFilter=null;
 
     public void setBrokersList(String brokersList) {
         this.brokersList = brokersList;
+    }
+    
+    public void setLangFilter(String langFilter){
+        this.langFilter=langFilter;
     }
     
     @Override
@@ -29,7 +35,7 @@ public class TwCollectorTestProps implements TwStreamConnectorProperties{
     public String twTokenSecret() {return null;}
 
     @Override
-    public String langFilter() {return null;}
+    public String langFilter() {return langFilter;}
 
     @Override
     public String nodeName() { return "testNode";}

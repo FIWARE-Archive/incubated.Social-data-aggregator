@@ -12,7 +12,6 @@ public class HtsStatus implements Serializable{
 
 	private static final long serialVersionUID = -5495418359564180448L;
 
-	private int id;
 	private String hashTag=null;
 	private long postId;
 	private long userId;
@@ -31,14 +30,6 @@ public class HtsStatus implements Serializable{
 	}
 	
 	public HtsStatus(){}
-	
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public String getHashTag() {
 		return hashTag;
