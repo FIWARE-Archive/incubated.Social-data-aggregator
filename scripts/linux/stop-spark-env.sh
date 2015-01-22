@@ -4,7 +4,8 @@ source confs.cfg
 echo "Cleaning up application.."
 export SPARK_WORKER_INSTANCES=$SPARK_WORKER_INSTANCES;
 echo "Stopping master and workers..."
-$SPARK_HOME/sbin/stop-all.sh
+$SPARK_HOME/sbin/stop-all.sh 
+sleep 60
 echo "check if app is still running"
 ps aux | grep "spark" > $TEMP_FILE_PATH
 while read line

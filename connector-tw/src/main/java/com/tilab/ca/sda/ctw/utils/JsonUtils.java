@@ -14,10 +14,19 @@ import com.google.gson.GsonBuilder;
  */
 public class JsonUtils {
     
+    public static final String DATE_ISO_8601_FORMAT="yyyy-MM-dd'T'HH:mm:ssX";
+    
     public static String serialize(Object obj) {
         Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssX")
+                .setDateFormat(DATE_ISO_8601_FORMAT)
                 .create();
         return gson.toJson(obj);
+    }
+    
+    public static <T> T deserialize(String json,Class<T> cls){
+         Gson gson = new GsonBuilder()
+                .setDateFormat(DATE_ISO_8601_FORMAT)
+                .create();
+         return gson.fromJson(json, cls);
     }
 }

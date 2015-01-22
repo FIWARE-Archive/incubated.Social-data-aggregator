@@ -47,7 +47,6 @@ public class TwitterStreamConnector implements Serializable{
     private static final String TW_STATUS_LABEL = "status";
     private static final String RAW_LABEL = "raw";
     
-    //private int BATCH_CICLE_NUM = 0;
     
     public TwitterStreamConnector(TwStreamConnectorProperties twProps,TwStatsDao twStatDao){
         this.twProps = twProps;
@@ -56,7 +55,6 @@ public class TwitterStreamConnector implements Serializable{
             log.info(String.format("[%s] lang filter enabled on %s", Constants.SDA_TW_CONNECTOR_LOG_TAG, twProps.langFilter()));
             langFilter = new HashSet<>(Arrays.asList(twProps.langFilter().split(",")));
         }
-        //this.broadcastBusConnPool=broadcastBusConnPoolOpt;
     }
     
     
@@ -142,8 +140,7 @@ public class TwitterStreamConnector implements Serializable{
     }
     
     private JavaDStream<TwStatus> getTwStatusFromStatus(JavaDStream<Status> tweets){
-        return tweets.filter((status) -> TwUtils.isGeoLocStatus(status))
-                .map((status) -> TwStatus.twStatusFromStatus(status));
+        return tweets.map((status) -> TwStatus.twStatusFromStatus(status));
     }
     
     

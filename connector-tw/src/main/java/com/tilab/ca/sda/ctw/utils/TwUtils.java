@@ -32,8 +32,8 @@ public class TwUtils {
     public static String getSourceFromHTML(String html){ 	
     	String source=null;
     
-    	if(html.indexOf('>')==-1){
-    		return null;
+    	if(html==null || html.indexOf('>')==-1){
+    		return html;
     	}
     	else{
     		source=html.substring((html.indexOf('>')+1), html.lastIndexOf('<'));

@@ -2,46 +2,67 @@ package com.tilab.ca.sda.ctw.mocks;
 
 import com.tilab.ca.sda.ctw.bus.BusConnection;
 import com.tilab.ca.sda.ctw.bus.ProducerFactory;
-import java.util.LinkedList;
-import java.util.List;
+import com.tilab.ca.sda.ctw.utils.JsonUtils;
+import com.tilab.ca.sda.ctw.utils.TCPClient;
+import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class ProducerFactoryTestImpl<K,V> implements ProducerFactory<K, V>{
 
     private Properties props;
+    private TCPClient tcpClient;
+    //private ExpectedOutputHandlerMsgBusImpl<K,V> eoh;
     
     public ProducerFactoryTestImpl(Properties initProps){
         props=initProps;
     }
     
+    
     @Override
     public BusConnection<K, V> newInstance() {
-        return new TestProducer<>();
+            return new TestProducer<>(props);
     }
     
     
     public static class TestProducer<K,V> implements BusConnection<K, V>{
 
-        public List<SendContent> outputList;
+        //private ExpectedOutputHandlerMsgBusImpl<K,V> eoh=null;
+        private Properties props=null;
+        private TCPClient tcpClient;
+        public static final String SERVER_PORT_TEST_PROP="server.port";
+        public static final String SERVER_HOST_TEST_PROP="server.host";
         
-        public TestProducer(){
-            outputList=new LinkedList<>();
+        
+        public TestProducer(Properties props){
+            try {
+                this.props=props;
+                tcpClient=new TCPClient(props.getProperty(SERVER_HOST_TEST_PROP), Integer.parseInt(props.getProperty(SERVER_PORT_TEST_PROP)));
+            } catch (IOException ex) {
+                throw new RuntimeException("Failed to create tcpClient");
+            }
         }
+        
         
         @Override
         public void send(String providedTopic, V msg) {
-           outputList.add(new SendContent<>(providedTopic,msg));
+           SendContent sc=new SendContent<>(providedTopic,msg);
+           tcpClient.sendToServer(JsonUtils.serialize(sc));
         }
 
         @Override
         public void send(String providedTopic, V msg, K providedKey) {
-           outputList.add(new SendContent<>(providedTopic,msg,providedKey));
+            SendContent sc=new SendContent<>(providedTopic,msg,providedKey);
+            tcpClient.sendToServer(JsonUtils.serialize(sc));
+           //eoh.addOutputItem(new SendContent<>(providedTopic,msg,providedKey));
         }
 
         @Override
-        public void dispose() {}
-        
+        public void dispose() {
+            tcpClient.closeConnection();
+        }   
     }
     
     public static class SendContent<K,V>{
