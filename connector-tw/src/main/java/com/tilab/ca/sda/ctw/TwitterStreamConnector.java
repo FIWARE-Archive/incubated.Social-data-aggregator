@@ -71,8 +71,12 @@ public class TwitterStreamConnector implements Serializable{
     public void executeMainOperations(JavaStreamingContext jssc) throws Exception {
         log.info(String.format("[%s] starting acquisition twitter streaming..", Constants.SDA_TW_CONNECTOR_APP_NAME));
         JavaDStream<Status> tweetsDStream = TwitterStream.createStream(jssc, getTwitterReceiverBuilderFromConfigurations(twProps, twStatDao));
+        executeMainOperations(tweetsDStream);
+    }
+    
+    public void executeMainOperations(JavaDStream<Status> tweetsDStream){
         if (langFilter != null) {
-            tweetsDStream = tweetsDStream.filter((status) -> langFilter.contains(status.getUser().getLang()));
+            tweetsDStream = tweetsDStream.filter((status) -> langFilter.contains(status.getLang()));
             log.info(String.format("[%s] received tweets have been filtered", Constants.SDA_TW_CONNECTOR_LOG_TAG));
         }
         log.info(String.format("[%s] starting collecting tweets...", Constants.SDA_TW_CONNECTOR_APP_NAME));
@@ -191,6 +195,12 @@ public class TwitterStreamConnector implements Serializable{
                     onMonGeo.getLatitudeTo(),
                     onMonGeo.getLongitudeTo()));
         }
+        List<Long> onMonUsersList = twStatDao.getOnMonUsers(twProps.nodeName());
+        //TODO
+        if (!Utils.isNullOrEmpty(onMonUsersList)) {
+            twRecBuilder.users2Follow(onMonUsersList);
+        }
+        
         return twRecBuilder;
     }
 

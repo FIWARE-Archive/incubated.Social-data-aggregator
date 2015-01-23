@@ -2,9 +2,9 @@ package com.tilab.ca.sda.ctw.dao;
 
 import com.tilab.ca.hibutils.HibQueryExecutor;
 import com.tilab.ca.sda.ctw.data.GeoBox;
-import com.tilab.ca.sda.ctw.hibernate.TwStatsSession;
 import com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringGeo;
 import com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringKey;
+import com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringUser;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -57,6 +57,16 @@ public class TwStatsDaoDefaultImpl implements TwStatsDao {
                 .map((onMonGeoElem) -> new GeoBox(onMonGeoElem.getLatitudeFrom(),onMonGeoElem.getLatitudeTo(),
                                                   onMonGeoElem.getLongitudeFrom(),onMonGeoElem.getLongitudeTo()))
                 .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Long> getOnMonUsers(String nodeName) throws Exception {
+        return new HibQueryExecutor<Long>()
+                .select("uid")
+                .from(OnMonitoringUser.class)
+                .retClass(Long.class)
+                .where(Restrictions.eq("monitorFromNode", nodeName))
+                .listResult(TW_STATS_SESSION_FACTORY);
     }
 
     @Override

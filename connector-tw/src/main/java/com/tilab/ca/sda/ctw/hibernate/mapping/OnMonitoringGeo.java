@@ -32,15 +32,6 @@ public class OnMonitoringGeo implements Serializable{
 	@Column(name="longitude_to")
 	private double longitudeTo;
 	
-	@Column(name="tw_count")
-	private int twCount;
-	
-	@Column(name="tw_count_week")
-	private int twCountWeek;
-	
-	@Column(name="tw_count_month")
-	private int twCountMonth;
-	
 	@Column(name="on_monitoring_from")
 	private Date onMonitoringFrom=null;
 	
@@ -85,30 +76,6 @@ public class OnMonitoringGeo implements Serializable{
 
 	public void setLongitudeTo(double longitudeTo) {
 		this.longitudeTo = longitudeTo;
-	}
-
-	public int getTwCount() {
-		return twCount;
-	}
-
-	public void setTwCount(int twCount) {
-		this.twCount = twCount;
-	}
-
-	public int getTwCountWeek() {
-		return twCountWeek;
-	}
-
-	public void setTwCountWeek(int twCountWeek) {
-		this.twCountWeek = twCountWeek;
-	}
-
-	public int getTwCountMonth() {
-		return twCountMonth;
-	}
-
-	public void setTwCountMonth(int twCountMonth) {
-		this.twCountMonth = twCountMonth;
 	}
 
 	public Date getOnMonitoringFrom() {

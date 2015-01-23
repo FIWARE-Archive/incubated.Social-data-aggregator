@@ -11,6 +11,8 @@ public interface TwStatsDao extends Serializable{
 
 	public List<String> getOnMonKeys(String nodeName) throws Exception;
         
+        public List<Long> getOnMonUsers(String nodeName) throws Exception;
+        
         public void saveRddData(JavaRDD<?> rdd,String dataPath,String dataRootFolderName);
 
 }

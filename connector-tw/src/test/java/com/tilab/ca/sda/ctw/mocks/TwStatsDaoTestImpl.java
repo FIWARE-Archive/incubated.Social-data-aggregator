@@ -29,6 +29,14 @@ public class TwStatsDaoTestImpl implements TwStatsDao,ExpectedOutputHandler{
         return null;
     }
 
+    public List<Status> getMockTwStorage() {
+        return mockTwStorage;
+    }
+
+    public void setMockTwStorage(List<Status> mockTwStorage) {
+        this.mockTwStorage = mockTwStorage;
+    }
+
     @Override
     public void saveRddData(JavaRDD<?> rdd, String dataPath, String dataRootFolderName) {
         System.out.println("called save");
@@ -39,5 +47,9 @@ public class TwStatsDaoTestImpl implements TwStatsDao,ExpectedOutputHandler{
     public boolean isExpectedOutputFilled() {
         return mockTwStorage.size()==expectedOutputSize;
     }
-    
+
+    @Override
+    public List<Long> getOnMonUsers(String nodeName) throws Exception {
+        return null;
+    }
 }

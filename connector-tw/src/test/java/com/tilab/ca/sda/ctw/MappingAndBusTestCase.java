@@ -12,6 +12,7 @@ import com.tilab.ca.sda.ctw.data.TwStatus;
 import com.tilab.ca.sda.ctw.mocks.ExpectedOutputHandlerMsgBusImpl;
 import com.tilab.ca.sda.ctw.mocks.ProducerFactoryTestImpl;
 import com.tilab.ca.sda.ctw.mocks.ProducerFactoryTestImpl.SendContent;
+import com.tilab.ca.sda.ctw.mocks.TwStatsDaoTestImpl;
 import com.tilab.ca.sda.ctw.utils.JsonUtils;
 import com.tilab.ca.sda.ctw.utils.TCPServer;
 import static com.tilab.ca.sda.ctw.utils.TestUtils.assertMatches;
@@ -20,12 +21,15 @@ import com.tilab.ca.spark_test_lib.streaming.annotations.SparkTestConfig;
 import com.tilab.ca.spark_test_lib.streaming.interfaces.ExpectedOutputHandler;
 import com.tilab.ca.spark_test_lib.streaming.utils.TestStreamUtils;
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import static org.junit.Assert.assertEquals;
@@ -59,6 +63,7 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
                 workingDir).replace("#", File.separator);
     }
 
+    
     @Test
     public void testCreationCustomProducerFactoryImpl() {
         final String testTopic = "test";
@@ -102,7 +107,8 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
             fail();
         }
     }
-
+    
+    
     @Test
     public void simpleTestOneBatch() {
 
@@ -114,20 +120,21 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
 //        14 messages in total
         int expectedOutputSize = 14;
         ExpectedOutputHandlerMsgBusImpl<String, String> meoh = new ExpectedOutputHandlerMsgBusImpl<>(expectedOutputSize);
+        System.err.println("meoh inizialmente ha id "+meoh.toString());
 //        final ProducerFactory<String,String> mockProdFact=new ProducerFactoryTestImpl<>(meoh);
-        int serverPort = 9999;
+        int serverPort = 9997;
         Properties ps = new Properties();
         ps.setProperty(ProducerFactoryTestImpl.TestProducer.SERVER_HOST_TEST_PROP, "localhost");
         ps.setProperty(ProducerFactoryTestImpl.TestProducer.SERVER_PORT_TEST_PROP, String.valueOf(serverPort));
         final ProducerFactory<String, String> mockProdFact = new ProducerFactoryTestImpl<>(ps);
-        TCPServer tcpServer;
+        TCPServer tcpServer=null;
 
         try {
             tcpServer = new TCPServer(serverPort, meoh);
             tcpServer.start();
 
             final int numBatches = 1;
-            final int timeoutMillis = 30000; //10 seconds timeout
+            final int timeoutMillis = 30000; //30 seconds timeout
             final String filePath = BASE_PATH + File.separator + "sampleTws_1.txt";
             $newTest()
                     .expectedOutputHandler(meoh)
@@ -154,6 +161,7 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
                          .map((sc) -> JsonUtils.deserialize(sc.msg, GeoStatus.class))
                          .sorted((g1, g2) -> ((Long) g1.getPostId()).compareTo(g2.getPostId()))
                          .collect(Collectors.toList());
+                         
                          assertEquals(2, geoStatusList.size());
                          assertEquals(1, geoStatusList.get(0).getPostId());
                          assertEquals(40.827, geoStatusList.get(0).getLatTrunc(), 3);
@@ -162,6 +170,7 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
                          assertEquals(-73.886752, geoStatusList.get(0).getLongitude(), 6);
                          assertEquals(1, geoStatusList.get(0).getUserId());
                          assertDateIsCorrect("2014-09-26T17:00:28+02",geoStatusList.get(0).getSentTime());
+                         
                          assertEquals(2, geoStatusList.get(1).getPostId());
                          assertEquals(40.827, geoStatusList.get(1).getLatTrunc(), 3);
                          assertEquals(-73.886, geoStatusList.get(1).getLongTrunc(), 3);
@@ -305,14 +314,193 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
                           assertEquals(3, statusJStringList.size()); 
                          
                     }).executeTest(numBatches, timeoutMillis);
-            
-                    tcpServer.stop();
         } catch (Exception ex) {
             ex.printStackTrace();
             fail("An unexpected exception occurred during test");
+        }finally{
+            try {
+                if(tcpServer!=null && !tcpServer.isStopped())
+                    tcpServer.stop();
+            } catch (Exception ex) {
+                System.err.println("failed to stop the tcp server");
+                ex.printStackTrace();
+            }
         }
     }
+    
+    
+    @Test
+    public void simpleTestTwoBatches(){
 
+//        Expected sent message are:
+//        2 tweets raw (italian)
+//        1 GeoStatus
+//        2 TwStatus
+//        4 HtsStatus
+//        9 messages in total
+        int expectedOutputSize = 9;
+        ExpectedOutputHandlerMsgBusImpl<String, String> meoh = new ExpectedOutputHandlerMsgBusImpl<>(expectedOutputSize);
+//        final ProducerFactory<String,String> mockProdFact=new ProducerFactoryTestImpl<>(meoh);
+        int serverPort = 9996;
+        Properties ps = new Properties();
+        ps.setProperty(ProducerFactoryTestImpl.TestProducer.SERVER_HOST_TEST_PROP, "localhost");
+        ps.setProperty(ProducerFactoryTestImpl.TestProducer.SERVER_PORT_TEST_PROP, String.valueOf(serverPort));
+        final ProducerFactory<String, String> mockProdFact = new ProducerFactoryTestImpl<>(ps);
+        TCPServer tcpServer=null;
+        twsd=new TwStatsDaoTestImpl(1);
+        ((TwCollectorTestProps)props).setLangFilter("it");
+        try {
+            tcpServer = new TCPServer(serverPort, meoh);
+            tcpServer.start();
+
+            final int numBatches = 2;
+            final int timeoutMillis = 30000; //30 seconds timeout
+            $newTest()
+                    .expectedOutputHandler(meoh)
+                    .sparkStreamJob((jssc) -> {
+
+                        JavaDStream<Status> mockTwStream
+                        = TestStreamUtils.createMockDStream(BASE_PATH, jssc, 1, "sampleTws_1.txt", "sampleTws_2.txt")
+                        .map((rawJson) -> TwitterObjectFactory.createStatus(rawJson));
+
+                        new TwitterStreamConnector(props, twsd)
+                        .withProducerFactory(mockProdFact)
+                        .executeMainOperations(mockTwStream);
+
+                    })
+                    .test((ExpectedOutputHandler eoh) -> {
+                        
+                         assertEquals(9,meoh.outputList.size());
+                         
+                          List<GeoStatus> geoStatusList = meoh.outputList.stream()
+                         .filter((sc) -> sc.key.equals("geo"))
+                         .map((sc) -> JsonUtils.deserialize(sc.msg, GeoStatus.class))
+                         .collect(Collectors.toList());
+                          
+                         assertEquals(1,geoStatusList.size()); 
+                         assertEquals(6, geoStatusList.get(0).getPostId());
+                         assertEquals(40.827, geoStatusList.get(0).getLatTrunc(), 3);
+                         assertEquals(-73.886, geoStatusList.get(0).getLongTrunc(), 3);
+                         assertEquals(40.827484, geoStatusList.get(0).getLatitude(), 6);
+                         assertEquals(-73.886752, geoStatusList.get(0).getLongitude(), 6);
+                         assertEquals(6, geoStatusList.get(0).getUserId());
+                         assertDateIsCorrect("2014-09-26T17:09:28+02",geoStatusList.get(0).getSentTime()); 
+                         
+                         List<HtsStatus> htsStatusList = meoh.outputList.stream()
+                         .filter((sc) -> sc.key.equals("ht"))
+                         .map((sc) -> JsonUtils.deserialize(sc.msg, HtsStatus.class))
+                         .sorted((g1, g2) -> {
+                             int res=((Long) g1.getPostId()).compareTo(g2.getPostId());
+                             if(res==0){
+                                 return g1.getHashTag().compareTo(g2.getHashTag());
+                             }
+                             return res;
+                         })
+                         .collect(Collectors.toList());
+                         
+                         assertEquals(4, htsStatusList.size());
+                         assertEquals(3, htsStatusList.get(0).getPostId());
+                         assertEquals("ht4", htsStatusList.get(0).getHashTag());
+                         assertEquals(3, htsStatusList.get(0).getUserId());
+                         assertEquals(false, htsStatusList.get(0).isReply());
+                         assertEquals(false, htsStatusList.get(0).isRetweet());
+                         assertDateIsCorrect("2014-09-26T17:06:28+02",htsStatusList.get(0).getSentTime());
+                         
+                         assertEquals(3, htsStatusList.get(1).getPostId());
+                         assertEquals("test", htsStatusList.get(1).getHashTag());
+                         assertEquals(3, htsStatusList.get(1).getUserId());
+                         assertEquals(false, htsStatusList.get(1).isReply());
+                         assertEquals(false, htsStatusList.get(1).isRetweet());
+                         assertDateIsCorrect("2014-09-26T17:06:28+02",htsStatusList.get(1).getSentTime());
+                         
+                         assertEquals(6, htsStatusList.get(2).getPostId());
+                         assertEquals("ht7", htsStatusList.get(2).getHashTag());
+                         assertEquals(6, htsStatusList.get(2).getUserId());
+                         assertEquals(false, htsStatusList.get(2).isReply());
+                         assertEquals(true, htsStatusList.get(2).isRetweet());
+                         assertDateIsCorrect("2014-09-26T17:09:28+02",htsStatusList.get(2).getSentTime());
+                         
+                         assertEquals(6, htsStatusList.get(3).getPostId());
+                         assertEquals("test", htsStatusList.get(3).getHashTag());
+                         assertEquals(6, htsStatusList.get(3).getUserId());
+                         assertEquals(false, htsStatusList.get(3).isReply());
+                         assertEquals(true, htsStatusList.get(3).isRetweet());
+                         assertDateIsCorrect("2014-09-26T17:09:28+02",htsStatusList.get(3).getSentTime());
+                          
+                        List<TwStatus> twStatusList = meoh.outputList.stream()
+                         .filter((sc) -> sc.key.equals("status"))
+                         .map((sc) -> JsonUtils.deserialize(sc.msg, TwStatus.class))
+                         .sorted((g1, g2) -> ((Long) g1.getPostId()).compareTo(g2.getPostId()))
+                         .collect(Collectors.toList());
+
+                         assertEquals(2, twStatusList.size());
+                         assertEquals(3, twStatusList.get(0).getPostId());
+                         assertEquals("it", twStatusList.get(0).getLang());
+                         assertNull(twStatusList.get(0).getLatTrunc());
+                         assertNull(twStatusList.get(0).getLongTrunc());
+                         assertNull(twStatusList.get(0).getLatitude());
+                         assertNull(twStatusList.get(0).getLongitude());
+                         assertDateIsCorrect("2014-09-26T17:06:28+02",twStatusList.get(0).getSentTime());
+                         assertEquals("Twitter for Test", twStatusList.get(0).getSource());
+                         assertEquals("mockTw3", twStatusList.get(0).getText());
+                         assertEquals(3, twStatusList.get(0).getUserId());
+                         assertEquals(false, twStatusList.get(0).isReply());
+                         assertEquals(false, twStatusList.get(0).isRetweet());
+                         assertEquals(2, twStatusList.get(0).getHts().size());
+                         assertEquals(true, twStatusList.get(0).getHts().contains("test"));
+                         assertEquals(true, twStatusList.get(0).getHts().contains("ht4"));
+                         assertNull(twStatusList.get(0).getOriginalPostDisplayName());
+                         assertEquals(0,twStatusList.get(0).getOriginalPostId());
+                         assertNull(twStatusList.get(0).getOriginalPostProfileImageURL());
+                         assertNull(twStatusList.get(0).getOriginalPostScreenName());
+                         assertNull(twStatusList.get(0).getOriginalPostText());
+                         
+                         
+                         assertEquals(6, twStatusList.get(1).getPostId());
+                         assertEquals("it", twStatusList.get(1).getLang());
+                         assertEquals(40.827, twStatusList.get(1).getLatTrunc(), 3);
+                         assertEquals(-73.886, twStatusList.get(1).getLongTrunc(), 3);
+                         assertEquals(40.827485, twStatusList.get(1).getLatitude(), 6);
+                         assertEquals(-73.886752, twStatusList.get(1).getLongitude(), 6);
+                         assertDateIsCorrect("2014-09-26T17:09:28+02",twStatusList.get(1).getSentTime());
+                         assertNull(twStatusList.get(1).getSource());
+                         assertEquals("mockTw6", twStatusList.get(1).getText());
+                         assertEquals(6, twStatusList.get(1).getUserId());
+                         assertEquals(false, twStatusList.get(1).isReply());
+                         assertEquals(true, twStatusList.get(1).isRetweet());
+                         assertEquals(2, twStatusList.get(1).getHts().size());
+                         assertEquals(true, twStatusList.get(1).getHts().contains("test"));
+                         assertEquals(true, twStatusList.get(1).getHts().contains("ht7"));
+                         assertEquals("user125",twStatusList.get(1).getOriginalPostDisplayName());
+                         assertEquals(125,twStatusList.get(1).getOriginalPostId());
+                         assertNull(twStatusList.get(1).getOriginalPostProfileImageURL());
+                         assertEquals("mockTw125",twStatusList.get(1).getOriginalPostText());                        
+                         assertEquals("user125",twStatusList.get(1).getOriginalPostScreenName());
+                         
+                        
+                         List<String> statusJStringList = meoh.outputList.stream()
+                         .filter((sc) -> sc.key.equals("raw"))
+                         .map((sc) -> sc.msg)
+                         .collect(Collectors.toList());
+                         
+                          assertEquals(2, statusJStringList.size()); 
+                    })
+                    .executeTest(numBatches, timeoutMillis);;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            fail("An unexpected exception occurred during test");
+        }finally{
+            try {
+                if(tcpServer!=null && !tcpServer.isStopped())
+                    tcpServer.stop();
+            } catch (Exception ex) {
+                System.err.println("failed to stop the tcp server");
+                ex.printStackTrace();
+            }
+        }
+    }
+    
+    
     private void assertDateIsCorrect(String expectedDate, Date date2eval) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(JsonUtils.DATE_ISO_8601_FORMAT);
@@ -337,7 +525,4 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
             fail("not a valid json in input!");
         }
     }
-
-    
-    //test lang filter
 }

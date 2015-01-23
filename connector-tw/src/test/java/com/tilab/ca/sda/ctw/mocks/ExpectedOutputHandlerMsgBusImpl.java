@@ -18,16 +18,19 @@ public class ExpectedOutputHandlerMsgBusImpl<K, V> implements ExpectedOutputHand
         outputList = new LinkedList<>();
     }
 
-    public void addOutputItem(String output){
+    public synchronized void addOutputItem(String output){
+        System.err.print(this.toString()+" adding item!");
         SendContent sc=new Gson().fromJson(output, SendContent.class);
         addOutputItem(sc);
     }
+    
     public void addOutputItem(SendContent<K, V> sc) {
         outputList.add(sc);
     }
 
     @Override
     public boolean isExpectedOutputFilled() {
+        System.err.println(String.format("%s numExpectedOutput %d outputList.size %d", this.toString(),numExpectedOutput,outputList.size()));
         boolean filled=(numExpectedOutput == outputList.size());
         return filled;
     }
