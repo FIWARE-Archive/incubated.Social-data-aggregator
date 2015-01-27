@@ -53,6 +53,19 @@ public class TwStreamConnectorMain {
             props.load(new FileInputStream(new File(sdaHomePath+File.separator+Constants.PROPS_FILE_NAME)));
             TwStreamConnectorProperties twProps = ConfigFactory.create(TwStreamConnectorProperties.class, props);
             
+            if(StringUtils.isBlank(twProps.sparkCleanTTL()) || 
+               twProps.sparkBatchDurationMillis()==null ||
+               StringUtils.isBlank(twProps.checkpointDir())){
+                
+                String errMessage=String.format("[%s] The following properties cannot be left blank:"
+                        + "sparkCleanTTL\n"
+                        + "sparkBatchDurationMillis\n"
+                        + "checkpointDir.\n"
+                        + "Please provided the above configurations and restart the component",Constants.SDA_TW_CONNECTOR_LOG_TAG);
+                System.err.println(errMessage);
+                log.error(errMessage);
+                System.exit(1);
+            }
             
             log.debug(String.format("[%s] loading DAO..",Constants.SDA_TW_CONNECTOR_LOG_TAG));
             TwStatsDao twStatDao = getTwStatsDaoImpl(twProps.daoClass(),sdaHomePath);
@@ -102,6 +115,7 @@ public class TwStreamConnectorMain {
         } catch (Exception e) {
             log.error(String.format("[%s] Exception on %s ",
                     Constants.SDA_TW_CONNECTOR_LOG_TAG, Constants.SDA_TW_CONNECTOR_APP_NAME), e);
+            System.exit(1);
         }
     }
 

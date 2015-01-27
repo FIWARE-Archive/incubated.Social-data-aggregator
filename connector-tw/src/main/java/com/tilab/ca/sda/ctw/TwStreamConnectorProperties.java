@@ -55,7 +55,7 @@ public interface TwStreamConnectorProperties extends Config{
 
     String checkpointDir();
     
-    int sparkBatchDurationMillis();
+    Integer sparkBatchDurationMillis();
 
     int twitterInserterWindowDuration();
 
