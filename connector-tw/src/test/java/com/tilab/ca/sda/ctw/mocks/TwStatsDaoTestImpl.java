@@ -1,7 +1,7 @@
 package com.tilab.ca.sda.ctw.mocks;
 
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
-import com.tilab.ca.sda.ctw.data.GeoBox;
+import com.tilab.ca.sda.sda.model.GeoBox;
 import com.tilab.ca.spark_test_lib.streaming.interfaces.ExpectedOutputHandler;
 import java.util.LinkedList;
 import java.util.List;

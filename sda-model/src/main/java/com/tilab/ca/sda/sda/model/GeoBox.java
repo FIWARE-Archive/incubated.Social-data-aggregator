@@ -1,4 +1,4 @@
-package com.tilab.ca.sda.ctw.data;
+package com.tilab.ca.sda.sda.model;
 
 
 public class GeoBox {

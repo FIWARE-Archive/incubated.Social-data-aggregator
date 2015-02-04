@@ -59,7 +59,7 @@ public class TwCollectorTestProps implements TwStreamConnectorProperties{
     public String checkpointDir() {return "checkpoints";}
 
     @Override
-    public int sparkBatchDurationMillis() {return 1000;}
+    public Integer sparkBatchDurationMillis() {return 1000;}
 
     @Override
     public int twitterInserterWindowDuration() {return 60000;}

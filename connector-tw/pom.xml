@@ -13,7 +13,7 @@
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>social-data-aggregator</artifactId>
-        <version>4.2.1.0</version>
+        <version>4.2.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -23,7 +23,13 @@
         <dependency>
             <groupId>com.tilab.ca.sda</groupId>
             <artifactId>sda-utils</artifactId>
-            <version>4.2.1.0</version>
+            <version>4.2.2.0</version>
+        </dependency>
+        
+         <dependency>
+            <groupId>com.tilab.ca.sda</groupId>
+            <artifactId>sda-model</artifactId>
+            <version>4.2.2.0</version>
         </dependency>
         
         <dependency>

@@ -1,11 +1,7 @@
-package com.tilab.ca.sda.ctw.data;
+package com.tilab.ca.sda.sda.model;
 
-import com.tilab.ca.sda.ctw.utils.TwUtils;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import twitter4j.Status;
 
 
 public class HtsStatus implements Serializable{
@@ -80,18 +76,5 @@ public class HtsStatus implements Serializable{
 		this.reply = reply;
 	}
 	
-	public static List<HtsStatus> htsStatusesFromStatus(Status status){
-		if(!TwUtils.statusContainsHashTags(status))
-			return null;
-		List<HtsStatus> htsStatusList=new LinkedList<>();
-		
-		TwUtils.getUniqueHtsFromHtsEntities(status.getHashtagEntities()).forEach(
-				(ht) -> {
-					htsStatusList.add(new HtsStatus(status.getId(),status.getUser().getId(),
-								ht,status.getCreatedAt(),TwUtils.isRetweet(status),TwUtils.isReply(status)));
-				}
-		);
-		
-		return htsStatusList;
-	}
+	
 }

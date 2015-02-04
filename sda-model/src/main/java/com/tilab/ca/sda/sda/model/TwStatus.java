@@ -1,12 +1,8 @@
-package com.tilab.ca.sda.ctw.data;
+package com.tilab.ca.sda.sda.model;
 
-import com.tilab.ca.sda.ctw.utils.TwUtils;
-import com.tilab.ca.sda.ctw.utils.Utils;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-import twitter4j.GeoLocation;
-import twitter4j.Status;
 
 public class TwStatus implements Serializable {
 
@@ -35,40 +31,6 @@ public class TwStatus implements Serializable {
     private int retweetCount;
     private int replyCount;
     
-    public static TwStatus twStatusFromStatus(Status status) {
-        TwStatus tws = new TwStatus();
-        tws.setLang(status.getLang());
-        tws.setPostId(status.getId());
-        tws.setReply(TwUtils.isReply(status));
-        tws.setRetweet(TwUtils.isRetweet(status));
-        tws.setRetweetCount(0);
-        tws.setReplyCount(0);
-        GeoLocation gl = status.getGeoLocation();
-
-        if (gl != null) {
-            tws.setLatitude(gl.getLatitude());
-            tws.setLongitude(gl.getLongitude());
-            tws.setLatTrunc(Utils.truncateDouble(gl.getLatitude(), 3));
-            tws.setLongTrunc(Utils.truncateDouble(gl.getLongitude(), 3));
-        }
-
-        tws.setSentTime(status.getCreatedAt());
-        tws.setSource(TwUtils.getSourceFromHTML(status.getSource()));
-        tws.setText(status.getText());
-        tws.setUserId(status.getUser().getId());
-
-        tws.setHts(TwUtils.getUniqueHtsFromHtsEntities(status.getHashtagEntities()));
-
-        if (status.isRetweet() && status.getRetweetedStatus() != null) {
-            tws.setOriginalPostId(status.getRetweetedStatus().getId());
-            tws.setOriginalPostDisplayName(status.getRetweetedStatus().getUser().getName());
-            tws.setOriginalPostScreenName(status.getRetweetedStatus().getUser().getScreenName());
-            tws.setOriginalPostProfileImageURL(status.getRetweetedStatus().getUser().getProfileImageURL());
-            tws.setOriginalPostText(status.getRetweetedStatus().getText());
-        }
-
-        return tws;
-    }
 
     public long getPostId() {
         return postId;

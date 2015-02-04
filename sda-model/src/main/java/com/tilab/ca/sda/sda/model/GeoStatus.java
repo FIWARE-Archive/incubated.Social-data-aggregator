@@ -1,11 +1,7 @@
-package com.tilab.ca.sda.ctw.data;
+package com.tilab.ca.sda.sda.model;
 
-import com.tilab.ca.sda.ctw.utils.TwUtils;
-import com.tilab.ca.sda.ctw.utils.Utils;
 import java.io.Serializable;
 import java.util.Date;
-import twitter4j.GeoLocation;
-import twitter4j.Status;
 
 
 public class GeoStatus implements Serializable{
@@ -94,25 +90,6 @@ public class GeoStatus implements Serializable{
 	
 	public void setReply(boolean reply) {
 		this.reply = reply;
-	}
-	
-	public static GeoStatus geoStatusFromStatus(Status status){
-		if(!TwUtils.isGeoLocStatus(status))
-			return null;
-		
-		GeoLocation gl=status.getGeoLocation();
-		GeoStatus gs=new GeoStatus();
-		gs.setLatitude(gl.getLatitude());
-		gs.setLongitude(gl.getLongitude());
-		gs.setPostId(status.getId());
-		gs.setUserId(status.getUser().getId());
-		gs.setRetweet(TwUtils.isRetweet(status));
-		gs.setReply(TwUtils.isReply(status));
-		gs.setSentTime(status.getCreatedAt());
-		gs.setLatTrunc(Utils.truncateDouble(gl.getLatitude(), 3));
-		gs.setLongTrunc(Utils.truncateDouble(gl.getLongitude(), 3));
-		
-		return gs;
 	}
 	
 }

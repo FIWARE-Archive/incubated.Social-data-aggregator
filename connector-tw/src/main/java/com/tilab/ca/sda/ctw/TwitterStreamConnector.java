@@ -7,10 +7,10 @@ import com.tilab.ca.sda.ctw.bus.ProducerFactory;
 import com.tilab.ca.sda.ctw.connector.TwitterReceiverBuilder;
 import com.tilab.ca.sda.ctw.connector.TwitterStream;
 import com.tilab.ca.sda.ctw.dao.TwStatsDao;
-import com.tilab.ca.sda.ctw.data.GeoBox;
-import com.tilab.ca.sda.ctw.data.GeoStatus;
-import com.tilab.ca.sda.ctw.data.HtsStatus;
-import com.tilab.ca.sda.ctw.data.TwStatus;
+import com.tilab.ca.sda.sda.model.GeoBox;
+import com.tilab.ca.sda.sda.model.GeoStatus;
+import com.tilab.ca.sda.sda.model.HtsStatus;
+import com.tilab.ca.sda.sda.model.TwStatus;
 import com.tilab.ca.sda.ctw.utils.JsonUtils;
 import com.tilab.ca.sda.ctw.utils.TwUtils;
 import com.tilab.ca.sda.ctw.utils.Utils;
@@ -135,16 +135,16 @@ public class TwitterStreamConnector implements Serializable{
     
     private JavaDStream<GeoStatus> getTwGeoStatusFromStatus(JavaDStream<Status> tweets){
         return tweets.filter((status) -> TwUtils.isGeoLocStatus(status))
-                .map((status) -> GeoStatus.geoStatusFromStatus(status));
+                .map((status) -> TwUtils.geoStatusFromStatus(status));
     }
     
     private JavaDStream<HtsStatus> getTwHtsStatusFromStatus(JavaDStream<Status> tweets){
         return tweets.filter((status) -> TwUtils.statusContainsHashTags(status))
-                .flatMap((status) -> HtsStatus.htsStatusesFromStatus(status));
+                .flatMap((status) -> TwUtils.htsStatusesFromStatus(status));
     }
     
     private JavaDStream<TwStatus> getTwStatusFromStatus(JavaDStream<Status> tweets){
-        return tweets.map((status) -> TwStatus.twStatusFromStatus(status));
+        return tweets.map((status) -> TwUtils.twStatusFromStatus(status));
     }
     
     

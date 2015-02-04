@@ -1,6 +1,6 @@
 package com.tilab.ca.sda.ctw.dao;
 
-import com.tilab.ca.sda.ctw.data.GeoBox;
+import com.tilab.ca.sda.sda.model.GeoBox;
 import java.io.Serializable;
 import java.util.List;
 import org.apache.spark.api.java.JavaRDD;

@@ -1,7 +1,7 @@
 package com.tilab.ca.sda.ctw.dao;
 
 import com.tilab.ca.hibutils.HibQueryExecutor;
-import com.tilab.ca.sda.ctw.data.GeoBox;
+import com.tilab.ca.sda.sda.model.GeoBox;
 import com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringGeo;
 import com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringKey;
 import com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringUser;
