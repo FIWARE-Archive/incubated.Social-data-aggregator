@@ -59,6 +59,10 @@ public class Utils {
                 default: throw new IllegalArgumentException("provided mode is not supported");
             }
         }
+        
+        public static ZonedDateTime fromShortTimeZoneString2ZonedDateTime(String str){
+			return ZonedDateTime.parse(str,DTF_ISO_8601_SHORT_FORMAT);
+        }
 
     }
 }

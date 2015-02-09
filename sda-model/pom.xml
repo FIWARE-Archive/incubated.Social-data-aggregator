@@ -8,4 +8,5 @@
     </parent>
     <artifactId>sda-model</artifactId>
     <packaging>jar</packaging>
+    
 </project>

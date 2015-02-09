@@ -18,8 +18,7 @@ public class GeoStatus implements Serializable{
 	private boolean retweet;
 	private boolean reply;
 	
-	
-	
+
 	public long getPostId() {
 		return postId;
 	}
@@ -91,5 +90,5 @@ public class GeoStatus implements Serializable{
 	public void setReply(boolean reply) {
 		this.reply = reply;
 	}
-	
+        
 }
