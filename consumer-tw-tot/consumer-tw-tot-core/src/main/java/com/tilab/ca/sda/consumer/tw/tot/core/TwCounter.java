@@ -21,10 +21,13 @@ public class TwCounter {
      * @param roundType round type check RoundType class to see the allowed
      * round types
      * @param granMin the granularity expressed in minutes (needed only for RoundType.ROUND_TYPE_MIN)
+     * @param from
+     * @param to
      * @return a JavaPairRDD containing the tweet count by time and area
      */
-    public JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> countGeoStatuses(JavaRDD<GeoStatus> geoStatuses,int roundType,Integer granMin){
+    public static JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> countGeoStatuses(JavaRDD<GeoStatus> geoStatuses,int roundType,Integer granMin,ZonedDateTime from,ZonedDateTime to){
         return geoStatuses
+                .filter((geoStatus) -> Utils.Time.isBetween(from, to, Utils.Time.date2ZonedDateTime(geoStatus.getSentTime()), Utils.Time.EXTREME_INCLUDED))
                 .mapToPair((geoStatus)-> 
                         new Tuple2<GeoLocTruncTimeKey, StatsCounter>(
                             new GeoLocTruncTimeKey(RoundManager.roundDate(geoStatus.getSentTime(), roundType, granMin), 
@@ -40,7 +43,7 @@ public class TwCounter {
      * @param to
      * @return 
      */
-    public JavaPairRDD<GeoLocTruncKey, StatsCounter> countGeoStatusesFromTimeBounds(JavaRDD<GeoStatus> geoStatuses,ZonedDateTime from,ZonedDateTime to){
+    public static JavaPairRDD<GeoLocTruncKey, StatsCounter> countGeoStatusesFromTimeBounds(JavaRDD<GeoStatus> geoStatuses,ZonedDateTime from,ZonedDateTime to){
         return geoStatuses
                 .filter((geoStatus) -> Utils.Time.isBetween(from, to, Utils.Time.date2ZonedDateTime(geoStatus.getSentTime()), Utils.Time.EXTREME_INCLUDED))
                 .mapToPair((geoStatus)-> 
@@ -55,10 +58,13 @@ public class TwCounter {
      * @param htsStatuses
      * @param roundType
      * @param granMin
+     * @param from
+     * @param to
      * @return 
      */
-    public JavaPairRDD<DateHtKey, StatsCounter> countHtsStatuses(JavaRDD<HtsStatus> htsStatuses,int roundType,Integer granMin){
+    public static JavaPairRDD<DateHtKey, StatsCounter> countHtsStatuses(JavaRDD<HtsStatus> htsStatuses,int roundType,Integer granMin,ZonedDateTime from,ZonedDateTime to){
         return htsStatuses
+                .filter((geoStatus) -> Utils.Time.isBetween(from, to, Utils.Time.date2ZonedDateTime(geoStatus.getSentTime()), Utils.Time.EXTREME_INCLUDED))
                 .mapToPair((htStatus)-> 
                         new Tuple2<DateHtKey, StatsCounter>(new DateHtKey(RoundManager.roundDate(htStatus.getSentTime(), roundType, granMin), 
                                                             htStatus.getHashTag()),
@@ -73,7 +79,7 @@ public class TwCounter {
      * @param to
      * @return 
      */
-    public JavaPairRDD<String, StatsCounter> countHtsStatusesFromTimeBounds(JavaRDD<HtsStatus> htsStatuses,ZonedDateTime from,ZonedDateTime to){
+    public static JavaPairRDD<String, StatsCounter> countHtsStatusesFromTimeBounds(JavaRDD<HtsStatus> htsStatuses,ZonedDateTime from,ZonedDateTime to){
         return htsStatuses
                 .filter((htStatus) -> Utils.Time.isBetween(from, to, Utils.Time.date2ZonedDateTime(htStatus.getSentTime()), Utils.Time.EXTREME_INCLUDED))
                 .mapToPair((htStatus)-> new Tuple2<String, StatsCounter>(htStatus.getHashTag(),new StatsCounter(htStatus)))

@@ -8,7 +8,7 @@ public class Arguments {
     private ZonedDateTime from=null;
     private ZonedDateTime to=null;
     private String inputDataPath=null;
-    private int roundMode;
+    private Integer roundMode;
     private Integer granMin;
 
     public ZonedDateTime getFrom() {
@@ -35,11 +35,11 @@ public class Arguments {
         this.inputDataPath = inputDataPath;
     }
 
-    public int getRoundMode() {
+    public Integer getRoundMode() {
         return roundMode;
     }
 
-    public void setRoundMode(int roundMode) {
+    public void setRoundMode(Integer roundMode) {
         this.roundMode = roundMode;
     }
 

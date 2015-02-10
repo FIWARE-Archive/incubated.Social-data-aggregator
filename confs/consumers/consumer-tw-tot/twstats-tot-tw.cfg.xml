@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+
+        <property name="connection.url">${twtotConsumerDbConnectionUrl}</property>
+        <property name="connection.username">${twtotConsumerDbConnectionUsername}</property>
+        <property name="connection.password">${twtotConsumerDbConnectionPassword}</property>
+
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="current_session_context_class">thread</property>
+        <property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
+
+	
+            <!-- 
+          <property name="hibernate.show_sql">true</property>
+          <property name="format_sql">true</property>
+            -->
+     
+        <mapping class="com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping.StatsPreGeo"/>
+		<mapping class="com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping.StatsPreGeoBound"/>
+		<mapping class="com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping.StatsPreHts"/>
+		<mapping class="com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping.StatsPreHtsBound"/>
+    
+    </session-factory>
+
+
+</hibernate-configuration>

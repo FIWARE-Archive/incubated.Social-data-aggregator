@@ -5,7 +5,7 @@ import org.aeonbits.owner.Config.Sources;
 
 
 @Sources({
-	"file:${SDA_CONF}/${TOT_TW}/TwGenderConsumerProps.properties"
+	"file:${SDA_CONF}/${TOT_TW}/TwTotConsumerProps.properties"
 })
 public interface TwTotConsumerProperties extends Config{
     

@@ -56,6 +56,9 @@ public class CommandLineArgs {
            arguments.setGranMin(Integer.parseInt(cmd.getOptionValue(GRAN_MIN)));
         }
       
+        if(arguments.getFrom()==null || arguments.getTo()==null){
+            throw new IllegalArgumentException("params from and to are mandatory!");
+        }
         if(arguments.getGranMin()!=null && arguments.getRoundMode()!=RoundType.ROUND_TYPE_MIN)
             throw new IllegalArgumentException("gran min param cannot be valorized without roundType min");
         
