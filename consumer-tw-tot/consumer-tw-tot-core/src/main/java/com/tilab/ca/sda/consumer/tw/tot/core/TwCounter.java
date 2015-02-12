@@ -26,8 +26,13 @@ public class TwCounter {
      * @return a JavaPairRDD containing the tweet count by time and area
      */
     public static JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> countGeoStatuses(JavaRDD<GeoStatus> geoStatuses,int roundType,Integer granMin,ZonedDateTime from,ZonedDateTime to){
+        return countGeoStatuses(geoStatuses.filter((geoStatus) -> Utils.Time.isBetween(from, to, Utils.Time.date2ZonedDateTime(geoStatus.getSentTime()), Utils.Time.EXTREME_INCLUDED)),
+                roundType,granMin);       
+    }
+    
+    
+    public static JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> countGeoStatuses(JavaRDD<GeoStatus> geoStatuses,int roundType,Integer granMin){
         return geoStatuses
-                .filter((geoStatus) -> Utils.Time.isBetween(from, to, Utils.Time.date2ZonedDateTime(geoStatus.getSentTime()), Utils.Time.EXTREME_INCLUDED))
                 .mapToPair((geoStatus)-> 
                         new Tuple2<GeoLocTruncTimeKey, StatsCounter>(
                             new GeoLocTruncTimeKey(RoundManager.roundDate(geoStatus.getSentTime(), roundType, granMin), 
@@ -63,8 +68,13 @@ public class TwCounter {
      * @return 
      */
     public static JavaPairRDD<DateHtKey, StatsCounter> countHtsStatuses(JavaRDD<HtsStatus> htsStatuses,int roundType,Integer granMin,ZonedDateTime from,ZonedDateTime to){
+        return countHtsStatuses(htsStatuses
+                .filter((geoStatus) -> Utils.Time.isBetween(from, to, Utils.Time.date2ZonedDateTime(geoStatus.getSentTime()), Utils.Time.EXTREME_INCLUDED)),
+                 roundType,granMin);        
+    }
+    
+    public static JavaPairRDD<DateHtKey, StatsCounter> countHtsStatuses(JavaRDD<HtsStatus> htsStatuses,int roundType,Integer granMin){
         return htsStatuses
-                .filter((geoStatus) -> Utils.Time.isBetween(from, to, Utils.Time.date2ZonedDateTime(geoStatus.getSentTime()), Utils.Time.EXTREME_INCLUDED))
                 .mapToPair((htStatus)-> 
                         new Tuple2<DateHtKey, StatsCounter>(new DateHtKey(RoundManager.roundDate(htStatus.getSentTime(), roundType, granMin), 
                                                             htStatus.getHashTag()),

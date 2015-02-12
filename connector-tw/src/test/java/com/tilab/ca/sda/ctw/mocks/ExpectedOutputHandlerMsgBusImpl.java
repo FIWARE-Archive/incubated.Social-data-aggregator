@@ -1,7 +1,7 @@
 package com.tilab.ca.sda.ctw.mocks;
 
-import com.google.gson.Gson;
 import com.tilab.ca.sda.ctw.mocks.ProducerFactoryTestImpl.SendContent;
+import com.tilab.ca.sda.ctw.utils.JsonUtils;
 import com.tilab.ca.spark_test_lib.streaming.interfaces.ExpectedOutputHandler;
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -20,7 +20,7 @@ public class ExpectedOutputHandlerMsgBusImpl<K, V> implements ExpectedOutputHand
 
     public synchronized void addOutputItem(String output){
         System.err.print(this.toString()+" adding item!");
-        SendContent sc=new Gson().fromJson(output, SendContent.class);
+        SendContent sc=JsonUtils.deserialize(output, SendContent.class);
         addOutputItem(sc);
     }
     

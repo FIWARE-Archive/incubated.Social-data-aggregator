@@ -13,7 +13,7 @@ public interface TwTotConsumerProperties extends Config{
     public String defaultRoundMode();
     public Integer granMin();
     public int roundPos();
-    public String appName();
+    
     
     @DefaultValue("1")
     public int minPartitions();

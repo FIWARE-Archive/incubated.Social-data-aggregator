@@ -38,6 +38,11 @@
             </dependency>
 			
             <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-streaming-kafka_2.10</artifactId>
+                <version>${spark.version}</version>
+            </dependency>            
+            <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
                 <version>1.2.16</version>
@@ -59,6 +64,12 @@
                 <groupId>com.tilab.ca</groupId>
                 <artifactId>hibutils</artifactId>
                 <version>1.0.1</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.2.4</version>
             </dependency>
 
             <dependency>

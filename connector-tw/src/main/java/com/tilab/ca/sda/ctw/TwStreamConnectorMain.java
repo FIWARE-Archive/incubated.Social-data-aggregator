@@ -115,7 +115,6 @@ public class TwStreamConnectorMain {
         } catch (Exception e) {
             log.error(String.format("[%s] Exception on %s ",
                     Constants.SDA_TW_CONNECTOR_LOG_TAG, Constants.SDA_TW_CONNECTOR_APP_NAME), e);
-            System.exit(1);
         }
     }
 

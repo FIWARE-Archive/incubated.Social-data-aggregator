@@ -1,7 +1,5 @@
 package com.tilab.ca.sda.ctw;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.tilab.ca.sda.ctw.bus.BusConnection;
 import com.tilab.ca.sda.ctw.bus.ProducerFactory;
 import com.tilab.ca.sda.ctw.mocks.TwCollectorTestProps;
@@ -21,15 +19,12 @@ import com.tilab.ca.spark_test_lib.streaming.annotations.SparkTestConfig;
 import com.tilab.ca.spark_test_lib.streaming.interfaces.ExpectedOutputHandler;
 import com.tilab.ca.spark_test_lib.streaming.utils.TestStreamUtils;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import static org.junit.Assert.assertEquals;

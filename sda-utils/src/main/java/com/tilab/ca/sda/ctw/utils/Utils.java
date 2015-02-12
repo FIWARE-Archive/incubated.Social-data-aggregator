@@ -1,11 +1,13 @@
 package com.tilab.ca.sda.ctw.utils;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
+import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
 
@@ -20,6 +22,19 @@ public class Utils {
     public static double truncateDouble(double d, int scale) {
         BigDecimal bd = new BigDecimal(d).setScale(scale, BigDecimal.ROUND_DOWN);
         return bd.doubleValue();
+    }
+
+    public static class Env {
+
+        public static String getConfsPathFromEnv(String envRootPathName,String envConfFolderName) {
+            String sdaPath = System.getenv(envRootPathName) != null ? System.getenv(envRootPathName) : System.getProperty(envRootPathName);
+            String totTwConsumerConfFolderName = System.getenv(envConfFolderName) != null ? System.getenv(envConfFolderName) : System.getProperty(envConfFolderName);
+            if (StringUtils.isBlank(sdaPath) || StringUtils.isBlank(totTwConsumerConfFolderName)) {
+                throw new IllegalStateException(String.format("Environment variable %s or %s not setted", envRootPathName, envConfFolderName));
+            }
+            return sdaPath + File.separator + totTwConsumerConfFolderName;
+        }
+
     }
 
     public static class Time {

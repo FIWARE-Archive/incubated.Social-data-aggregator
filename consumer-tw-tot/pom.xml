@@ -13,6 +13,7 @@
         <module>consumer-tw-tot-batch</module>
         <module>consumer-tw-tot-core</module>
         <module>consumer-tw-tot-dao</module>
+        <module>consumer-tw-tot-stream</module>
     </modules>
     
     <dependencyManagement>
