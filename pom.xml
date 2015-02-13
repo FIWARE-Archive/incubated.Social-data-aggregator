@@ -14,10 +14,10 @@
     </properties>
 
     <modules>
-        <module>connector-tw</module>
         <module>sda-utils</module>
-        <module>consumer-tw-tot</module>
         <module>sda-model</module>
+        <module>producers</module>
+        <module>consumers</module>
     </modules>
     
   
