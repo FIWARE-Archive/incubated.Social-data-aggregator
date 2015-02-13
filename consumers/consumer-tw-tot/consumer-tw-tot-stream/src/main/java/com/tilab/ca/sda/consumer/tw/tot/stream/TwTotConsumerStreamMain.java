@@ -3,10 +3,12 @@ package com.tilab.ca.sda.consumer.tw.tot.stream;
 import com.tilab.ca.sda.consumer.tw.tot.core.TotTwConstants;
 import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDao;
 import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDaoDefaultImpl;
+import com.tilab.ca.sda.consumer.utils.stream.BusConsumerConnection;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.ctw.utils.stream.SparkStreamingManager;
 import com.tilab.ca.sda.ctw.utils.stream.SparkStreamingSystemSettings;
 import java.io.File;
+import java.util.Properties;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -18,7 +20,8 @@ public class TwTotConsumerStreamMain {
     private static final Logger log = Logger.getLogger(TwTotConsumerStreamMain.class);
 
     private static final String APP_NAME = "twTotConsumerStream";
-
+    
+   
     public void main(String[] args) {
 
         String confsPath = Utils.Env.getConfsPathFromEnv(TotTwConstants.SDA_CONF_SYSTEM_PROPERTY, TotTwConstants.TOT_TW_SYSTEM_PROPERTY);
@@ -41,7 +44,7 @@ public class TwTotConsumerStreamMain {
         }
         try {
             log.debug(String.format("[%s] loading DAO..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
-            ConsumerTwTotDao twDao = loadConsumerTwTotDao(confsPath + File.separator + TotTwConstants.HIBERNATE_CONF_FILE_NAME);
+            ConsumerTwTotDao twDao = loadConsumerTwTotDao(confsPath,twProps.daoImplClass());
             String ttl = twProps.sparkCleanTTL();
 
             //setup spark configuration
@@ -54,8 +57,7 @@ public class TwTotConsumerStreamMain {
                 sparkConf = sparkConf.set(SparkStreamingSystemSettings.SPARK_CORES_MAX_PROPERTY, twProps.numMaxCore());
             }
             
-            //INSTANZIARE BUS CONSUMER CONNECTOR IMPLEMENTAZIONE KAFKA (DARE LA POSSIBILITA' DI METTERNE UNO CUSTOM)
-            
+            BusConsumerConnection busConsConn=loadBusConsumerConnectionImpl(twProps.busConnImplClass());
 
             log.debug(String.format("[%s] Setting up streaming manager..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
             SparkStreamingManager strManager = SparkStreamingManager.$newStreamingManager()
@@ -64,14 +66,20 @@ public class TwTotConsumerStreamMain {
                     .withCheckpointPath(twProps.checkpointDir())
                     .setUpSparkStreaming();
             strManager.startSparkStream((jssc) -> {
-                //TotTwStreamConsumer.executeAnalysis(jssc, twDao, twProps);
+                TotTwStreamConsumer.executeAnalysis(jssc, twDao, twProps,busConsConn);
             });
         } catch (Exception e) {
             log.error(e);
         }
     }
 
-    private ConsumerTwTotDao loadConsumerTwTotDao(String confFilePath) {
-        return new ConsumerTwTotDaoDefaultImpl(confFilePath);
+    private ConsumerTwTotDao loadConsumerTwTotDao(String confsPath,String implClassStr) throws Exception {
+        Properties props=Utils.Load.loadPropertiesFromPath(confsPath);
+        props.put(ConsumerTwTotDao.CONF_PATH_PROPS_KEY, confsPath);
+        return Utils.Load.getClassInstFromInterface(ConsumerTwTotDao.class, implClassStr, props);
+    }
+    
+    private BusConsumerConnection loadBusConsumerConnectionImpl(String implClassStr) throws Exception{
+        return Utils.Load.getClassInstFromInterfaceAndPropsPath(BusConsumerConnection.class, implClassStr, TotTwConstants.BUS_CONF_FILE_NAME);
     }
 }

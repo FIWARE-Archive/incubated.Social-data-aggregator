@@ -1,12 +1,16 @@
 package com.tilab.ca.sda.ctw.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
@@ -22,6 +26,34 @@ public class Utils {
     public static double truncateDouble(double d, int scale) {
         BigDecimal bd = new BigDecimal(d).setScale(scale, BigDecimal.ROUND_DOWN);
         return bd.doubleValue();
+    }
+    
+    public static class Load{
+        
+        public static Properties loadPropertiesFromPath(String propsPath) throws Exception{
+            Properties props=new Properties();
+            if(propsPath!=null){
+                File propsFile=new File(propsPath);
+                if(!propsFile.exists())
+                    throw new IllegalArgumentException("Provided file does not exists on path "+propsPath);
+                props.load(new FileInputStream(propsFile));
+            }
+            return props;
+        }
+        
+        public static <T> T getClassInstFromInterface(Class<T> interfaceClass,String implClassStr,Properties props) throws Exception{
+        
+            Class<?> implClass = Class.forName(implClassStr);
+            if(!interfaceClass.isAssignableFrom(implClass))
+                throw new IllegalArgumentException(String.format("cannot instantiate impl class %s. Impl class must implements %s interface",implClass,interfaceClass.getName()));
+ 
+            return (T)implClass.getConstructor(Properties.class).newInstance(props);
+        } 
+        
+        public static <T> T getClassInstFromInterfaceAndPropsPath(Class<T> interfaceClass,String implClassStr,String propsPath) throws Exception{
+            return getClassInstFromInterface(interfaceClass, implClassStr, loadPropertiesFromPath(propsPath));
+        }
+   
     }
 
     public static class Env {

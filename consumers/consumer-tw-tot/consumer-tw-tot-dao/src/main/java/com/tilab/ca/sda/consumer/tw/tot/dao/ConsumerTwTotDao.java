@@ -11,6 +11,8 @@ import org.apache.spark.api.java.JavaPairRDD;
 
 public interface ConsumerTwTotDao extends Serializable{
     
+    public static final String CONF_PATH_PROPS_KEY="confPath";
+    
     public void saveGeoByTimeGran(JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> geoTimeGranRDD);
     
     public void saveGeoByTimeInterval(Date from,Date to,JavaPairRDD<GeoLocTruncKey, StatsCounter> geoTimeBoundRDD);

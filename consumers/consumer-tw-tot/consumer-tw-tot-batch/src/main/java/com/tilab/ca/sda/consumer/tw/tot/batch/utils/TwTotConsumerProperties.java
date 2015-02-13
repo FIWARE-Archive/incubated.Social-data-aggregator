@@ -14,6 +14,7 @@ public interface TwTotConsumerProperties extends Config{
     public Integer granMin();
     public int roundPos();
     
+    public String daoImplClass();
     
     @DefaultValue("1")
     public int minPartitions();

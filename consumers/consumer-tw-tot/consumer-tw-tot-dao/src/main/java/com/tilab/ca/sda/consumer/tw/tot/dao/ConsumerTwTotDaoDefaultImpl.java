@@ -2,6 +2,7 @@ package com.tilab.ca.sda.consumer.tw.tot.dao;
 
 
 import com.tilab.ca.hibutils.Hibutils;
+import com.tilab.ca.sda.consumer.tw.tot.core.TotTwConstants;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.DateHtKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncTimeKey;
@@ -14,6 +15,7 @@ import com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping.StatsPreHtsBound;
 import java.io.File;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Properties;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.hibernate.cfg.Configuration;
 import org.jboss.logging.Logger;
@@ -24,6 +26,10 @@ public class ConsumerTwTotDaoDefaultImpl implements ConsumerTwTotDao{
     private static final Logger log=Logger.getLogger(ConsumerTwTotDaoDefaultImpl.class);
     
     private final Configuration cfg;
+    
+    public ConsumerTwTotDaoDefaultImpl(Properties props){
+       cfg = new Configuration().configure(new File(props.getProperty(CONF_PATH_PROPS_KEY)+File.separator+TotTwConstants.HIBERNATE_CONF_FILE_NAME));
+    }
     
     public ConsumerTwTotDaoDefaultImpl(String hibConfFilePath){
        cfg = new Configuration().configure(new File(hibConfFilePath));

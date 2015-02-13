@@ -32,4 +32,6 @@ public interface TwTotConsumerProperties extends Config{
     public String keyHt();
     
     public String busConnImplClass();
+    
+    public String daoImplClass();
 }

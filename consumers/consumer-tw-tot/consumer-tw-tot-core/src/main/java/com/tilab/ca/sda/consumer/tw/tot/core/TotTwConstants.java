@@ -5,6 +5,8 @@ public class TotTwConstants {
     
     public static final String LOG4jPROPS_FILE_NAME="log4j.properties";
     public static final String HIBERNATE_CONF_FILE_NAME="twstats-tot-tw.cfg";
+    public static final String BUS_CONF_FILE_NAME="bus_impl.conf";
+    
     
     
     public static final String SDA_CONF_SYSTEM_PROPERTY="SDA_CONF";

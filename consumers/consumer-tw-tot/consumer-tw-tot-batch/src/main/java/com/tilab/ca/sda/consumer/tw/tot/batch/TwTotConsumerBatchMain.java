@@ -16,6 +16,7 @@ import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import java.io.File;
+import java.util.Properties;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,7 +44,7 @@ public class TwTotConsumerBatchMain {
             Arguments arguments=CommandLineArgs.parseCommandLineArgs(args);
             TwTotConsumerProperties twProps=ConfigFactory.create(TwTotConsumerProperties.class);
             String confsPath=Utils.Env.getConfsPathFromEnv(TotTwConstants.SDA_CONF_SYSTEM_PROPERTY, TotTwConstants.TOT_TW_SYSTEM_PROPERTY);
-            ConsumerTwTotDao twDao=new ConsumerTwTotDaoDefaultImpl(confsPath+File.separator+TotTwConstants.HIBERNATE_CONF_FILE_NAME);
+            ConsumerTwTotDao twDao=loadConsumerTwTotDao(confsPath, twProps.daoImplClass());
             String log4jPropsFilePath=confsPath+File.separator+TotTwConstants.LOG4jPROPS_FILE_NAME;
             PropertyConfigurator.configure(log4jPropsFilePath);
             
@@ -87,5 +88,11 @@ public class TwTotConsumerBatchMain {
             JavaPairRDD<String, StatsCounter> pairTotHtsRDD=TwCounter.countHtsStatusesFromTimeBounds(htsStatus, arguments.getFrom(), arguments.getTo());
             twDao.saveHtsByTimeInterval(Utils.Time.zonedDateTime2Date(arguments.getFrom()), Utils.Time.zonedDateTime2Date(arguments.getTo()), pairTotHtsRDD);
         }
+    }
+    
+    private ConsumerTwTotDao loadConsumerTwTotDao(String confsPath,String implClassStr) throws Exception {
+        Properties props=Utils.Load.loadPropertiesFromPath(confsPath);
+        props.put(ConsumerTwTotDao.CONF_PATH_PROPS_KEY, confsPath);
+        return Utils.Load.getClassInstFromInterface(ConsumerTwTotDao.class, implClassStr, props);
     }
 }
