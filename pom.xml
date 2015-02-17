@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>com.tilab.ca</groupId>
                 <artifactId>spark_test_lib</artifactId>
-                <version>0.0.1</version>
+                <version>0.0.2</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

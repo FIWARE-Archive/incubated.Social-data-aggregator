@@ -46,6 +46,7 @@ public class JettyServerManager {
         context.setResourceBase(".");
         context.setClassLoader(Thread.currentThread().getContextClassLoader());
         context.setHandler(handler);
+        context.setAllowNullPathInfo(true);
         if (handlerList == null) {
             handlerList = new LinkedList<>();
         }

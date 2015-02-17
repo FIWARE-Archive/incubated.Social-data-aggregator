@@ -30,5 +30,10 @@
             <artifactId>junit</artifactId>
         </dependency>
         
+        <dependency>
+            <groupId>com.tilab.ca</groupId>
+            <artifactId>spark_test_lib</artifactId>
+        </dependency>
+        
     </dependencies>
 </project>

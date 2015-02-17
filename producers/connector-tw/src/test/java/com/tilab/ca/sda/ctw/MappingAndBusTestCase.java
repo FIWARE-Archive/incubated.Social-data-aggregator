@@ -133,7 +133,7 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
             final String filePath = BASE_PATH + File.separator + "sampleTws_1.txt";
             $newTest()
                     .expectedOutputHandler(meoh)
-                    .sparkStreamJob((jssc) -> {
+                    .sparkStreamJob((jssc,eoh) -> {
 
                         JavaDStream<Status> mockTwStream
                         = TestStreamUtils.createMockDStream(jssc, 1, filePath)
@@ -352,7 +352,7 @@ public class MappingAndBusTestCase extends SparkStreamingTest implements Seriali
             final int timeoutMillis = 30000; //30 seconds timeout
             $newTest()
                     .expectedOutputHandler(meoh)
-                    .sparkStreamJob((jssc) -> {
+                    .sparkStreamJob((jssc,eoh) -> {
 
                         JavaDStream<Status> mockTwStream
                         = TestStreamUtils.createMockDStream(BASE_PATH, jssc, 1, "sampleTws_1.txt", "sampleTws_2.txt")

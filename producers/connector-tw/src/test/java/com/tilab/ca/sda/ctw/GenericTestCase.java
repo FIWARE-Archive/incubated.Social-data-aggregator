@@ -40,7 +40,7 @@ public class GenericTestCase extends SparkStreamingTest implements Serializable 
         int windowNumBatches=4;
         $newTest()
                 .expectedOutputHandler((ExpectedOutputHandler)twsd)
-                .sparkStreamJob((jssc) -> {
+                .sparkStreamJob((jssc,eoh) -> {
 
                     JavaDStream<Status> mockTwStream = 
                             TestStreamUtils.createMockDStreamFromDir(jssc, 1, BASE_PATH)
@@ -91,7 +91,7 @@ public class GenericTestCase extends SparkStreamingTest implements Serializable 
         
         $newTest()
                 .expectedOutputHandler((ExpectedOutputHandler)twsd)
-                .sparkStreamJob((jssc) -> {
+                .sparkStreamJob((jssc,eoh) -> {
 
                     JavaDStream<Status> mockTwStream = 
                             TestStreamUtils.createMockDStreamFromDir(jssc, 1, BASE_PATH)
