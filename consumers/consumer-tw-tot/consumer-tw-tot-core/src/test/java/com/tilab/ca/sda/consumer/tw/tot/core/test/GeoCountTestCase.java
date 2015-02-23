@@ -118,7 +118,7 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
     
     @Test
     public void simpleTestCountRound() {
-        HtCountTestCase.ExpectedHtsRound edh=new HtCountTestCase.ExpectedHtsRound(4);
+        ExpectedGeoRound edh=new ExpectedGeoRound(4);
        
         $newBatchTest().expectedOutputHandler(edh)
                 .sparkJob((jsc,eoh)->{
@@ -141,192 +141,229 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
                     geoStatusList.add(getGeoStatusFromParams(12, 7, 1.1261, 2.2344,dateFromStr("2015-02-12T16:13:59+01:00"), true, false, truncatePos));
                     
                     
-                    geoStatusList.add(getGeoStatusFromParams(13, 7, 1.1271, 2.2374,dateFromStr("2015-02-12T17:02:54+01:00"), true, false, truncatePos));
-                    geoStatusList.add(getGeoStatusFromParams(14, 7, 1.1272, 2.2378,dateFromStr("2015-02-12T17:02:22+01:00"), true, false, truncatePos));
+                    geoStatusList.add(getGeoStatusFromParams(13, 7, 1.1271, 2.2374,dateFromStr("2015-02-12T17:02:54+01:00"), false, false, truncatePos));
+                    geoStatusList.add(getGeoStatusFromParams(14, 7, 1.1272, 2.2378,dateFromStr("2015-02-12T17:02:22+01:00"), false, true, truncatePos));
                     
                     
-                    /*
-                    JavaRDD<HtsStatus> htsStatuses=jsc.parallelize(htStatusList);
-                    HtCountTestCase.ExpectedHtsRound ehr=((HtCountTestCase.ExpectedHtsRound)eoh);
-                    JavaPairRDD<DateHtKey, StatsCounter> htsStatusesFromTimeBounds= TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_MIN,null);
-                    ehr.addHtsCountOutputList(htsStatusesFromTimeBounds.collect());
+                    JavaRDD<GeoStatus> geoStatusesRDD=jsc.parallelize(geoStatusList);
+                    ExpectedGeoRound egr=(ExpectedGeoRound)eoh;
+                    egr.addGeoCountOutputListRound(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_MIN, null).collect());
+                    egr.addGeoCountOutputListRound(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_MIN, 3).collect());
+                    egr.addGeoCountOutputListRound(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_HOUR, null).collect());
+                    egr.addGeoCountOutputListRound(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_DAY, null).collect());
                     
-                    ehr.addHtsCountOutputList(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_MIN,5).collect()); //group by 5 min
-
-                    ehr.addHtsCountOutputList(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_HOUR,null).collect()); //group by hour
-
-                    ehr.addHtsCountOutputList(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_DAY,null).collect()); //group by day 
                 })
                 .test((eoh) ->{
-                    HtCountTestCase.ExpectedHtsRound ehr=((HtCountTestCase.ExpectedHtsRound)eoh);
-                    
-                    Assert.assertEquals(4,ehr.getHtsCountOutputList().size());
+                    ExpectedGeoRound egr=(ExpectedGeoRound)eoh;
+                    Assert.assertEquals(4,egr.getGeoCountOutputListRound().size());
                     
                     //check round min
-                    List<Tuple2<DateHtKey,StatsCounter>> roundMinOutputList=ehr.getHtsCountOutputList().get(0);
-                    Assert.assertEquals(5,roundMinOutputList.size());
-                    roundMinOutputList.sort((t1,t2) ->{
-                       int comp=t1._1.getDate().compareTo(t2._1.getDate());
-                       if(comp==0)
-                           return t1._1.getHt().compareTo(t2._1.getHt());          
-                       return comp;
-                    });
-                    
-                    Assert.assertEquals("h1",roundMinOutputList.get(0)._1.getHt());
-                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:44:00+01:00").toInstant()),
+                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundMinOutputList=egr.getGeoCountOutputListRound().get(0);
+                    Assert.assertEquals(6,roundMinOutputList.size());
+                    sortGeoTimeList(roundMinOutputList);
+                    Assert.assertEquals(1.123F,roundMinOutputList.get(0)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.233F,roundMinOutputList.get(0)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:46:00+01:00").toInstant()),
                                         roundMinOutputList.get(0)._1.getDate());
-                    Assert.assertEquals(2,roundMinOutputList.get(0)._2.getNumTw());
+                    Assert.assertEquals(1,roundMinOutputList.get(0)._2.getNumTw());
                     Assert.assertEquals(1,roundMinOutputList.get(0)._2.getNumRtw());
-                    Assert.assertEquals(1,roundMinOutputList.get(0)._2.getNumReply());
-                    
-                    Assert.assertEquals("h1",roundMinOutputList.get(1)._1.getHt());
-                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:47:00+01:00").toInstant()),
+                    Assert.assertEquals(0,roundMinOutputList.get(0)._2.getNumReply());
+                   
+                    Assert.assertEquals(1.123F,roundMinOutputList.get(1)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundMinOutputList.get(1)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:46:00+01:00").toInstant()),
                                         roundMinOutputList.get(1)._1.getDate());
-                    Assert.assertEquals(1,roundMinOutputList.get(1)._2.getNumTw());
+                    Assert.assertEquals(2,roundMinOutputList.get(1)._2.getNumTw());
                     Assert.assertEquals(0,roundMinOutputList.get(1)._2.getNumRtw());
                     Assert.assertEquals(0,roundMinOutputList.get(1)._2.getNumReply());
                     
-                    Assert.assertEquals("h2",roundMinOutputList.get(2)._1.getHt());
-                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:47:00+01:00").toInstant()),
+                    Assert.assertEquals(1.123F,roundMinOutputList.get(2)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.233F,roundMinOutputList.get(2)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:59:00+01:00").toInstant()),
                                         roundMinOutputList.get(2)._1.getDate());
-                    Assert.assertEquals(0,roundMinOutputList.get(2)._2.getNumTw());
-                    Assert.assertEquals(3,roundMinOutputList.get(2)._2.getNumRtw());
-                    Assert.assertEquals(2,roundMinOutputList.get(2)._2.getNumReply());
+                    Assert.assertEquals(3,roundMinOutputList.get(2)._2.getNumTw());
+                    Assert.assertEquals(1,roundMinOutputList.get(2)._2.getNumRtw());
+                    Assert.assertEquals(1,roundMinOutputList.get(2)._2.getNumReply());
                     
-                    Assert.assertEquals("h1",roundMinOutputList.get(3)._1.getHt());
-                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:00:00+01:00").toInstant()),
+                    Assert.assertEquals(1.123F,roundMinOutputList.get(3)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundMinOutputList.get(3)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:13:00+01:00").toInstant()),
                                         roundMinOutputList.get(3)._1.getDate());
-                    Assert.assertEquals(0,roundMinOutputList.get(3)._2.getNumTw());
-                    Assert.assertEquals(1,roundMinOutputList.get(3)._2.getNumRtw());
+                    Assert.assertEquals(1,roundMinOutputList.get(3)._2.getNumTw());
+                    Assert.assertEquals(0,roundMinOutputList.get(3)._2.getNumRtw());
                     Assert.assertEquals(0,roundMinOutputList.get(3)._2.getNumReply());
                     
-                    Assert.assertEquals("h3",roundMinOutputList.get(4)._1.getHt());
-                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:00:00+01:00").toInstant()),
+                    Assert.assertEquals(1.126F,roundMinOutputList.get(4)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundMinOutputList.get(4)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:13:00+01:00").toInstant()),
                                         roundMinOutputList.get(4)._1.getDate());
-                    Assert.assertEquals(2,roundMinOutputList.get(4)._2.getNumTw());
+                    Assert.assertEquals(1,roundMinOutputList.get(4)._2.getNumTw());
                     Assert.assertEquals(1,roundMinOutputList.get(4)._2.getNumRtw());
-                    Assert.assertEquals(2,roundMinOutputList.get(4)._2.getNumReply());
+                    Assert.assertEquals(0,roundMinOutputList.get(4)._2.getNumReply());
+                    
+                    Assert.assertEquals(1.127F,roundMinOutputList.get(5)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.237F,roundMinOutputList.get(5)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T17:02:00+01:00").toInstant()),
+                                        roundMinOutputList.get(5)._1.getDate());
+                    Assert.assertEquals(1,roundMinOutputList.get(5)._2.getNumTw());
+                    Assert.assertEquals(0,roundMinOutputList.get(5)._2.getNumRtw());
+                    Assert.assertEquals(1,roundMinOutputList.get(5)._2.getNumReply());
                     
                     //TEST ON GRAN MIN
-                    List<Tuple2<DateHtKey,StatsCounter>> roundMinGranOutputList=ehr.getHtsCountOutputList().get(1);
-                    Assert.assertEquals(5,roundMinGranOutputList.size());
-                    roundMinGranOutputList.sort((t1,t2) ->{
-                       int comp=t1._1.getDate().compareTo(t2._1.getDate());
-                       if(comp==0)
-                           return t1._1.getHt().compareTo(t2._1.getHt());          
-                       return comp;
-                    });
                     
-                    Assert.assertEquals("h1",roundMinGranOutputList.get(0)._1.getHt());
-                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:40:00+01:00").toInstant()),
-                                        roundMinGranOutputList.get(0)._1.getDate());
-                    Assert.assertEquals(2,roundMinGranOutputList.get(0)._2.getNumTw());
-                    Assert.assertEquals(1,roundMinGranOutputList.get(0)._2.getNumRtw());
-                    Assert.assertEquals(1,roundMinGranOutputList.get(0)._2.getNumReply());
+                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundGranMinOutputList=egr.getGeoCountOutputListRound().get(1);
+                    Assert.assertEquals(6,roundGranMinOutputList.size());
+                    sortGeoTimeList(roundGranMinOutputList);
                     
-                    Assert.assertEquals("h1",roundMinGranOutputList.get(1)._1.getHt());
+                    Assert.assertEquals(1.123F,roundGranMinOutputList.get(0)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.233F,roundGranMinOutputList.get(0)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:45:00+01:00").toInstant()),
-                                        roundMinGranOutputList.get(1)._1.getDate());
-                    Assert.assertEquals(1,roundMinGranOutputList.get(1)._2.getNumTw());
-                    Assert.assertEquals(0,roundMinGranOutputList.get(1)._2.getNumRtw());
-                    Assert.assertEquals(0,roundMinGranOutputList.get(1)._2.getNumReply());
-                    
-                    Assert.assertEquals("h2",roundMinGranOutputList.get(2)._1.getHt());
+                                        roundGranMinOutputList.get(0)._1.getDate());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(0)._2.getNumTw());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(0)._2.getNumRtw());
+                    Assert.assertEquals(0,roundGranMinOutputList.get(0)._2.getNumReply());
+                   
+                    Assert.assertEquals(1.123F,roundGranMinOutputList.get(1)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundGranMinOutputList.get(1)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:45:00+01:00").toInstant()),
-                                        roundMinGranOutputList.get(2)._1.getDate());
-                    Assert.assertEquals(0,roundMinGranOutputList.get(2)._2.getNumTw());
-                    Assert.assertEquals(3,roundMinGranOutputList.get(2)._2.getNumRtw());
-                    Assert.assertEquals(2,roundMinGranOutputList.get(2)._2.getNumReply());
+                                        roundGranMinOutputList.get(1)._1.getDate());
+                    Assert.assertEquals(2,roundGranMinOutputList.get(1)._2.getNumTw());
+                    Assert.assertEquals(0,roundGranMinOutputList.get(1)._2.getNumRtw());
+                    Assert.assertEquals(0,roundGranMinOutputList.get(1)._2.getNumReply());
                     
-                    Assert.assertEquals("h1",roundMinGranOutputList.get(3)._1.getHt());
-                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:00:00+01:00").toInstant()),
-                                        roundMinGranOutputList.get(3)._1.getDate());
-                    Assert.assertEquals(0,roundMinGranOutputList.get(3)._2.getNumTw());
-                    Assert.assertEquals(1,roundMinGranOutputList.get(3)._2.getNumRtw());
-                    Assert.assertEquals(0,roundMinGranOutputList.get(3)._2.getNumReply());
+                    Assert.assertEquals(1.123F,roundGranMinOutputList.get(2)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.233F,roundGranMinOutputList.get(2)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:57:00+01:00").toInstant()),
+                                        roundGranMinOutputList.get(2)._1.getDate());
+                    Assert.assertEquals(3,roundGranMinOutputList.get(2)._2.getNumTw());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(2)._2.getNumRtw());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(2)._2.getNumReply());
                     
-                    Assert.assertEquals("h3",roundMinGranOutputList.get(4)._1.getHt());
-                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:00:00+01:00").toInstant()),
-                                        roundMinGranOutputList.get(4)._1.getDate());
-                    Assert.assertEquals(2,roundMinGranOutputList.get(4)._2.getNumTw());
-                    Assert.assertEquals(1,roundMinGranOutputList.get(4)._2.getNumRtw());
-                    Assert.assertEquals(2,roundMinGranOutputList.get(4)._2.getNumReply());
+                    Assert.assertEquals(1.123F,roundGranMinOutputList.get(3)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundGranMinOutputList.get(3)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:12:00+01:00").toInstant()),
+                                        roundGranMinOutputList.get(3)._1.getDate());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(3)._2.getNumTw());
+                    Assert.assertEquals(0,roundGranMinOutputList.get(3)._2.getNumRtw());
+                    Assert.assertEquals(0,roundGranMinOutputList.get(3)._2.getNumReply());
                     
-                    //TEST ON HOUR
-                    List<Tuple2<DateHtKey,StatsCounter>> roundHourOutputList=ehr.getHtsCountOutputList().get(2);
-                    Assert.assertEquals(4,roundHourOutputList.size());
-                    roundHourOutputList.sort((t1,t2) ->{
-                       int comp=t1._1.getDate().compareTo(t2._1.getDate());
-                       if(comp==0)
-                           return t1._1.getHt().compareTo(t2._1.getHt());          
-                       return comp;
-                    });
+                    Assert.assertEquals(1.126F,roundGranMinOutputList.get(4)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundGranMinOutputList.get(4)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:12:00+01:00").toInstant()),
+                                        roundGranMinOutputList.get(4)._1.getDate());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(4)._2.getNumTw());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(4)._2.getNumRtw());
+                    Assert.assertEquals(0,roundGranMinOutputList.get(4)._2.getNumReply());
                     
-                    Assert.assertEquals("h1",roundHourOutputList.get(0)._1.getHt());
+                    Assert.assertEquals(1.126F,roundGranMinOutputList.get(5)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundGranMinOutputList.get(5)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T17:00:00+01:00").toInstant()),
+                                        roundGranMinOutputList.get(5)._1.getDate());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(5)._2.getNumTw());
+                    Assert.assertEquals(0,roundGranMinOutputList.get(5)._2.getNumRtw());
+                    Assert.assertEquals(1,roundGranMinOutputList.get(5)._2.getNumReply());
+                    
+                   
+                    
+                    //TEST ON ROUND HOUR
+                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundHourOutputList=egr.getGeoCountOutputListRound().get(2);
+                    Assert.assertEquals(5,roundHourOutputList.size());
+                    sortGeoTimeList(roundHourOutputList);
+                    
+                    Assert.assertEquals(1.123F,roundHourOutputList.get(0)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.233F,roundHourOutputList.get(0)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:00:00+01:00").toInstant()),
                                         roundHourOutputList.get(0)._1.getDate());
-                    Assert.assertEquals(3,roundHourOutputList.get(0)._2.getNumTw());
-                    Assert.assertEquals(1,roundHourOutputList.get(0)._2.getNumRtw());
+                    Assert.assertEquals(4,roundHourOutputList.get(0)._2.getNumTw());
+                    Assert.assertEquals(2,roundHourOutputList.get(0)._2.getNumRtw());
                     Assert.assertEquals(1,roundHourOutputList.get(0)._2.getNumReply());
                     
-                    Assert.assertEquals("h2",roundHourOutputList.get(1)._1.getHt());
+                    
+                    Assert.assertEquals(1.123F,roundHourOutputList.get(1)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundHourOutputList.get(1)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T15:00:00+01:00").toInstant()),
                                         roundHourOutputList.get(1)._1.getDate());
-                    Assert.assertEquals(0,roundHourOutputList.get(1)._2.getNumTw());
-                    Assert.assertEquals(3,roundHourOutputList.get(1)._2.getNumRtw());
-                    Assert.assertEquals(2,roundHourOutputList.get(1)._2.getNumReply());
+                    Assert.assertEquals(2,roundHourOutputList.get(1)._2.getNumTw());
+                    Assert.assertEquals(0,roundHourOutputList.get(1)._2.getNumRtw());
+                    Assert.assertEquals(0,roundHourOutputList.get(1)._2.getNumReply());
                     
-                    Assert.assertEquals("h1",roundMinGranOutputList.get(3)._1.getHt());
+                    Assert.assertEquals(1.123F,roundHourOutputList.get(2)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundHourOutputList.get(2)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:00:00+01:00").toInstant()),
                                         roundHourOutputList.get(2)._1.getDate());
-                    Assert.assertEquals(0,roundHourOutputList.get(2)._2.getNumTw());
-                    Assert.assertEquals(1,roundHourOutputList.get(2)._2.getNumRtw());
+                    Assert.assertEquals(1,roundHourOutputList.get(2)._2.getNumTw());
+                    Assert.assertEquals(0,roundHourOutputList.get(2)._2.getNumRtw());
                     Assert.assertEquals(0,roundHourOutputList.get(2)._2.getNumReply());
                     
-                    Assert.assertEquals("h3",roundHourOutputList.get(3)._1.getHt());
+                    Assert.assertEquals(1.126F,roundHourOutputList.get(3)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundHourOutputList.get(3)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T16:00:00+01:00").toInstant()),
                                         roundHourOutputList.get(3)._1.getDate());
-                    Assert.assertEquals(2,roundHourOutputList.get(3)._2.getNumTw());
+                    Assert.assertEquals(1,roundHourOutputList.get(3)._2.getNumTw());
                     Assert.assertEquals(1,roundHourOutputList.get(3)._2.getNumRtw());
-                    Assert.assertEquals(2,roundHourOutputList.get(3)._2.getNumReply());
+                    Assert.assertEquals(0,roundHourOutputList.get(3)._2.getNumReply());
+                    
+                    Assert.assertEquals(1.126F,roundHourOutputList.get(4)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundHourOutputList.get(4)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T17:00:00+01:00").toInstant()),
+                                        roundHourOutputList.get(4)._1.getDate());
+                    Assert.assertEquals(1,roundHourOutputList.get(4)._2.getNumTw());
+                    Assert.assertEquals(0,roundHourOutputList.get(4)._2.getNumRtw());
+                    Assert.assertEquals(1,roundHourOutputList.get(4)._2.getNumReply());
                     
                     
-                    //TEST ON DAY
-                    List<Tuple2<DateHtKey,StatsCounter>> roundDayOutputList=ehr.getHtsCountOutputList().get(3);
-                    Assert.assertEquals(3,roundDayOutputList.size());
-                    roundDayOutputList.sort((t1,t2) ->{
-                       int comp=t1._1.getDate().compareTo(t2._1.getDate());
-                       if(comp==0)
-                           return t1._1.getHt().compareTo(t2._1.getHt());          
-                       return comp;
-                    });
+                    //TEST ON ROUND DAY
+                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundDayOutputList=egr.getGeoCountOutputListRound().get(3);
+                    Assert.assertEquals(4,roundDayOutputList.size());
+                    sortGeoTimeList(roundDayOutputList);
                     
-                    Assert.assertEquals("h1",roundDayOutputList.get(0)._1.getHt());
+                    Assert.assertEquals(1.123F,roundDayOutputList.get(0)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.233F,roundDayOutputList.get(0)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T00:00:00+01:00").toInstant()),
                                         roundDayOutputList.get(0)._1.getDate());
-                    Assert.assertEquals(3,roundDayOutputList.get(0)._2.getNumTw());
+                    Assert.assertEquals(4,roundDayOutputList.get(0)._2.getNumTw());
                     Assert.assertEquals(2,roundDayOutputList.get(0)._2.getNumRtw());
                     Assert.assertEquals(1,roundDayOutputList.get(0)._2.getNumReply());
                     
-                    Assert.assertEquals("h2",roundDayOutputList.get(1)._1.getHt());
+                    Assert.assertEquals(1.123F,roundDayOutputList.get(1)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundDayOutputList.get(1)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T00:00:00+01:00").toInstant()),
                                         roundDayOutputList.get(1)._1.getDate());
-                    Assert.assertEquals(0,roundDayOutputList.get(1)._2.getNumTw());
-                    Assert.assertEquals(3,roundDayOutputList.get(1)._2.getNumRtw());
-                    Assert.assertEquals(2,roundDayOutputList.get(1)._2.getNumReply());
+                    Assert.assertEquals(3,roundDayOutputList.get(1)._2.getNumTw());
+                    Assert.assertEquals(0,roundDayOutputList.get(1)._2.getNumRtw());
+                    Assert.assertEquals(0,roundDayOutputList.get(1)._2.getNumReply());
                     
-                    Assert.assertEquals("h3",roundDayOutputList.get(2)._1.getHt());
+                    Assert.assertEquals(1.126F,roundDayOutputList.get(2)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundDayOutputList.get(2)._1.getGeoLocTruncKey().getLongTrunc(),3);
                     Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T00:00:00+01:00").toInstant()),
                                         roundDayOutputList.get(2)._1.getDate());
-                    Assert.assertEquals(2,roundDayOutputList.get(2)._2.getNumTw());
+                    Assert.assertEquals(1,roundDayOutputList.get(2)._2.getNumTw());
                     Assert.assertEquals(1,roundDayOutputList.get(2)._2.getNumRtw());
-                    Assert.assertEquals(2,roundDayOutputList.get(2)._2.getNumReply());
-                    */
+                    Assert.assertEquals(0,roundDayOutputList.get(2)._2.getNumReply());
+                    
+                    Assert.assertEquals(1.126F,roundDayOutputList.get(3)._1.getGeoLocTruncKey().getLatTrunc(),3);
+                    Assert.assertEquals(2.234F,roundDayOutputList.get(3)._1.getGeoLocTruncKey().getLongTrunc(),3);
+                    Assert.assertEquals(Date.from(ZonedDateTime.parse("2015-02-12T00:00:00+01:00").toInstant()),
+                                        roundDayOutputList.get(3)._1.getDate());
+                    Assert.assertEquals(1,roundDayOutputList.get(3)._2.getNumTw());
+                    Assert.assertEquals(0,roundDayOutputList.get(3)._2.getNumRtw());
+                    Assert.assertEquals(1,roundDayOutputList.get(3)._2.getNumReply());
+                    
                 })
                 .executeTest(30000);
                 
     }
     
+    private void sortGeoTimeList(List<Tuple2<GeoLocTruncTimeKey, StatsCounter>> roundOutputList) {
+        roundOutputList.sort((t1, t2) -> {
+            int comp = t1._1.getDate().compareTo(t2._1.getDate());
+            if (comp == 0) {
+                int comp2 = ((Double) t1._1.getGeoLocTruncKey().getLatTrunc()).compareTo(t2._1.getGeoLocTruncKey().getLatTrunc());
+                return comp2 != 0 ? comp2 : ((Double) t1._1.getGeoLocTruncKey().getLongTrunc()).compareTo(t2._1.getGeoLocTruncKey().getLongTrunc());
+            }
+            return comp;
+        });
+    }
     
     private GeoStatus getGeoStatusFromParams(long postId,long userId,double latitude,double longitude,Date sentTime,boolean retweet,boolean reply,int truncPos){ 
         GeoStatus geoStatus=new GeoStatus();
@@ -377,17 +414,17 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
             this.expectedOutputSize=expectedOutputSize;
         }
 
-        public List<List<Tuple2<GeoLocTruncTimeKey, StatsCounter>>> getHtsCountOutputList() {
+        public List<List<Tuple2<GeoLocTruncTimeKey, StatsCounter>>> getGeoCountOutputListRound() {
             return geoCountOutputListRound;
         }
 
-        public void setHtsCountOutputList(List<List<Tuple2<GeoLocTruncTimeKey, StatsCounter>>> geoCountOutputListRound) {
+        public void setGeoCountOutputListRound(List<List<Tuple2<GeoLocTruncTimeKey, StatsCounter>>> geoCountOutputListRound) {
             this.geoCountOutputListRound = geoCountOutputListRound;
         }
         
-         public void addHtsCountOutputList(List<Tuple2<GeoLocTruncTimeKey, StatsCounter>> geoCountOutputListRound) {
-            if(geoCountOutputListRound==null)
-                geoCountOutputListRound=new LinkedList<>();
+         public void addGeoCountOutputListRound(List<Tuple2<GeoLocTruncTimeKey, StatsCounter>> geoCountOutputListRound) {
+            if(this.geoCountOutputListRound==null)
+                this.geoCountOutputListRound=new LinkedList<>();
             this.geoCountOutputListRound.add(geoCountOutputListRound);
         }
         

@@ -12,8 +12,7 @@ public class GeoLocTruncTimeKey implements Serializable{
     
     public GeoLocTruncTimeKey(Date date,double latTrunc, double longTrunc) {
         this.date=date;
-        geoLocTruncKey.setLatTrunc(latTrunc);
-        geoLocTruncKey.setLongTrunc(longTrunc);
+        geoLocTruncKey=new GeoLocTruncKey(latTrunc, longTrunc);
     }
 
     public Date getDate() {
