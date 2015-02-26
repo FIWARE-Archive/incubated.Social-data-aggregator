@@ -1,0 +1,11 @@
+{"postId":1,"userId":10,"latitude":1.123,"longitude":4.567,"latTrunc":1.123,"longTrunc":4.567,"sentTime":"2015-02-12T17:00:02+01","retweet":false,"reply":false}
+{"postId":2,"userId":9,"latitude":1.123,"longitude":4.567,"latTrunc":1.123,"longTrunc":4.567,"sentTime":"2015-02-12T17:00:05+01","retweet":false,"reply":false}
+{"postId":3,"userId":8,"latitude":1.123,"longitude":4.567,"latTrunc":1.123,"longTrunc":4.567,"sentTime":"2015-02-12T17:00:07+01","retweet":false,"reply":false}
+{"postId":4,"userId":7,"latitude":1.123,"longitude":4.567,"latTrunc":1.123,"longTrunc":4.567,"sentTime":"2015-02-12T17:00:08+01","retweet":false,"reply":false}
+{"postId":5,"userId":6,"latitude":1.123,"longitude":4.567,"latTrunc":1.123,"longTrunc":4.567,"sentTime":"2015-02-12T17:00:10+01","retweet":true,"reply":false}
+{"postId":6,"userId":5,"latitude":1.123,"longitude":4.567,"latTrunc":1.123,"longTrunc":4.567,"sentTime":"2015-02-12T17:00:17+01","retweet":true,"reply":false}
+{"postId":7,"userId":6,"latitude":1.123,"longitude":4.567,"latTrunc":1.123,"longTrunc":4.567,"sentTime":"2015-02-12T17:00:20+01","retweet":false,"reply":true}
+{"postId":8,"userId":9,"latitude":1.123,"longitude":4.567,"latTrunc":1.123,"longTrunc":4.567,"sentTime":"2015-02-12T17:00:22+01","retweet":false,"reply":true}
+{"postId":9,"userId":10,"latitude":1.125,"longitude":4.666,"latTrunc":1.125,"longTrunc":4.666,"sentTime":"2015-02-12T17:00:02+01","retweet":false,"reply":true}
+{"postId":10,"userId":9,"latitude":1.125,"longitude":4.666,"latTrunc":1.125,"longTrunc":4.666,"sentTime":"2015-02-12T17:00:05+01","retweet":false,"reply":true}
+{"postId":11,"userId":9,"latitude":1.135,"longitude":4.894,"latTrunc":1.135,"longTrunc":4.894,"sentTime":"2015-02-12T17:00:05+01","retweet":false,"reply":false}

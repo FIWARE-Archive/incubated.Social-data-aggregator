@@ -22,16 +22,23 @@ public class TotTwStreamConsumer {
     
     private static final Logger log=Logger.getLogger(TotTwStreamConsumer.class);
    
+    /**
+     * 
+     * @param jssc
+     * @param twDao
+     * @param twProps
+     * @param busConnection 
+     */
     public static void executeAnalysis(JavaStreamingContext jssc,ConsumerTwTotDao twDao,TwTotConsumerProperties twProps,BusConsumerConnection busConnection){
         busConnection.init(jssc);
         int roundMode=RoundType.fromString(twProps.defaultRoundMode());
-        JavaPairDStream<GeoLocTruncTimeKey, StatsCounter> geoStatusPairDstream=collectGeoStatus(jssc, twProps, busConnection, roundMode);
+        JavaPairDStream<GeoLocTruncTimeKey, StatsCounter> geoStatusPairDstream=collectGeoStatus(twProps, busConnection, roundMode);
         log.info(String.format("[%s]saving geo statuses on storage..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
         geoStatusPairDstream.foreachRDD((geoStatusRDD) -> {
             twDao.saveGeoByTimeGran(geoStatusRDD);
             return null;
         });
-        JavaPairDStream<DateHtKey, StatsCounter> htStatusPairDstream=collectHtsStatus(jssc, twProps, busConnection, roundMode);
+        JavaPairDStream<DateHtKey, StatsCounter> htStatusPairDstream=collectHtsStatus(twProps, busConnection, roundMode);
         log.info(String.format("[%s]saving hts statuses on storage..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
         htStatusPairDstream.foreachRDD((htsStatusRDD) -> {
             twDao.saveHtsByTimeGran(htsStatusRDD);
@@ -39,7 +46,14 @@ public class TotTwStreamConsumer {
         });
     }
     
-    public static JavaPairDStream<GeoLocTruncTimeKey, StatsCounter> collectGeoStatus(JavaStreamingContext jssc,TwTotConsumerProperties twProps,BusConsumerConnection busConnection,final int roundMode){
+    /**
+     * Count geo statuses using geoLocation and time as keys 
+     * @param twProps
+     * @param busConnection
+     * @param roundMode
+     * @return 
+     */
+    public static JavaPairDStream<GeoLocTruncTimeKey, StatsCounter> collectGeoStatus(TwTotConsumerProperties twProps,BusConsumerConnection busConnection,final int roundMode){
          String geoKey = twProps.keyGeo();
          log.info(String.format("[%s]get all the geo..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
          JavaDStream<GeoStatus> geoStatuses =busConnection.getDStreamByKey(geoKey).map((geoStatusJsonStr) -> JsonUtils.deserialize(geoStatusJsonStr, GeoStatus.class));
@@ -47,7 +61,14 @@ public class TotTwStreamConsumer {
          return geoStatusWindow.transformToPair((geoRDD) -> TwCounter.countGeoStatuses(geoRDD,roundMode, twProps.granMin()));     
     }
     
-     public static JavaPairDStream<DateHtKey, StatsCounter> collectHtsStatus(JavaStreamingContext jssc,TwTotConsumerProperties twProps,BusConsumerConnection busConnection,final int roundMode){
+    /**
+     * 
+     * @param twProps
+     * @param busConnection
+     * @param roundMode
+     * @return 
+     */
+    public static JavaPairDStream<DateHtKey, StatsCounter> collectHtsStatus(TwTotConsumerProperties twProps,BusConsumerConnection busConnection,final int roundMode){
          String htKey = twProps.keyHt();
          log.info(String.format("[%s]get all the hts..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
          JavaDStream<HtsStatus> htsStatuses =busConnection.getDStreamByKey(htKey).map((htStatusJsonStr) -> JsonUtils.deserialize(htStatusJsonStr, HtsStatus.class));

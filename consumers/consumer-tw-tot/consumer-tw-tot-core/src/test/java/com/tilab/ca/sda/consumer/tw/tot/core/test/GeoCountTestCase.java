@@ -1,14 +1,12 @@
 package com.tilab.ca.sda.consumer.tw.tot.core.test;
 
 import com.tilab.ca.sda.consumer.tw.tot.core.TwCounter;
-import com.tilab.ca.sda.consumer.tw.tot.core.data.DateHtKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncTimeKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import com.tilab.ca.sda.ctw.utils.RoundType;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
-import com.tilab.ca.sda.sda.model.HtsStatus;
 import com.tilab.ca.spark_test_lib.batch.SparkBatchTest;
 import com.tilab.ca.spark_test_lib.streaming.annotations.SparkTestConfig;
 import com.tilab.ca.spark_test_lib.streaming.interfaces.ExpectedOutputHandler;

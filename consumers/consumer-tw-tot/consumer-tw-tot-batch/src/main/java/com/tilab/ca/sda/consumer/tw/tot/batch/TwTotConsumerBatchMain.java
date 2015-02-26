@@ -11,7 +11,6 @@ import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncTimeKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDao;
-import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDaoDefaultImpl;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;

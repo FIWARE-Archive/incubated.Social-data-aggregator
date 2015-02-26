@@ -1,0 +1,7 @@
+{"hashTag":"ht1","postId":10,"userId":1,"sentTime":"2015-02-12T17:00:02+01","retweet":false,"reply":false}
+{"hashTag":"ht1","postId":11,"userId":2,"sentTime":"2015-02-12T17:00:04+01","retweet":true,"reply":false}
+{"hashTag":"ht1","postId":12,"userId":2,"sentTime":"2015-02-12T17:00:40+01","retweet":false,"reply":true}
+{"hashTag":"ht2","postId":13,"userId":4,"sentTime":"2015-02-12T17:01:18+01","retweet":false,"reply":false}
+{"hashTag":"ht2","postId":14,"userId":5,"sentTime":"2015-02-12T17:01:22+01","retweet":false,"reply":false}
+{"hashTag":"ht3","postId":15,"userId":5,"sentTime":"2015-02-12T17:04:18+01","retweet":false,"reply":false}
+{"hashTag":"ht3","postId":16,"userId":6,"sentTime":"2015-02-12T17:04:19+01","retweet":true,"reply":false}

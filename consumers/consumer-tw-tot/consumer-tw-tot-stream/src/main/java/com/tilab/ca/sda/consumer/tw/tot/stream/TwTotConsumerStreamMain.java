@@ -73,12 +73,25 @@ public class TwTotConsumerStreamMain {
         }
     }
 
+    /**
+     * 
+     * @param confsPath
+     * @param implClassStr
+     * @return
+     * @throws Exception 
+     */
     private ConsumerTwTotDao loadConsumerTwTotDao(String confsPath,String implClassStr) throws Exception {
         Properties props=Utils.Load.loadPropertiesFromPath(confsPath);
         props.put(ConsumerTwTotDao.CONF_PATH_PROPS_KEY, confsPath);
         return Utils.Load.getClassInstFromInterface(ConsumerTwTotDao.class, implClassStr, props);
     }
     
+    /**
+     * 
+     * @param implClassStr
+     * @return
+     * @throws Exception 
+     */
     private BusConsumerConnection loadBusConsumerConnectionImpl(String implClassStr) throws Exception{
         return Utils.Load.getClassInstFromInterfaceAndPropsPath(BusConsumerConnection.class, implClassStr, TotTwConstants.BUS_CONF_FILE_NAME);
     }
