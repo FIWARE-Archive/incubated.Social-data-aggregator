@@ -44,7 +44,7 @@ public class CommandLineArgs {
             arguments.setFrom(Utils.Time.fromShortTimeZoneString2ZonedDateTime(cmd.getOptionValue(FROM)));
         }    
         if(cmd.hasOption(TO)){
-            arguments.setFrom(Utils.Time.fromShortTimeZoneString2ZonedDateTime(cmd.getOptionValue(TO)));
+            arguments.setTo(Utils.Time.fromShortTimeZoneString2ZonedDateTime(cmd.getOptionValue(TO)));
         }
         if(cmd.hasOption(INPUT_DATA_PATH)){
             arguments.setInputDataPath(cmd.getOptionValue(INPUT_DATA_PATH));

@@ -79,11 +79,11 @@ public class BatchUtils {
     }
     
     public static boolean isGeoLocStatus(JsonObject statusJsonObject) {
-        return !statusJsonObject.get(GEOLOCATION_ELEM).isJsonNull();
+        return statusJsonObject.get(GEOLOCATION_ELEM)!=null && !statusJsonObject.get(GEOLOCATION_ELEM).isJsonNull();
     }
     
     public static boolean isRetweet(JsonObject statusJsonObject) {
-        return !statusJsonObject.get(RETWEET_STATUS_ELEM).isJsonNull();
+        return statusJsonObject.get(RETWEET_STATUS_ELEM)!=null && !statusJsonObject.get(RETWEET_STATUS_ELEM).isJsonNull();
     }
     
     public static boolean isReply(JsonObject statusJsonObject) {

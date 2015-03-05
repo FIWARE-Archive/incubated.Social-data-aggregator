@@ -42,7 +42,7 @@ call:exit_with_usage
 goto:eof )
 
 set  SDA_CONF=%SDA_HOME%\confs\connector-tw
-set PATH_TO_JAR_FILE=%SDA_HOME%\bin\connectors\connector-tw\%JAR_FILE_NAME%
+set PATH_TO_JAR_FILE=%SDA_HOME%\bin\connectors\%JAR_FILE_NAME%
 echo. Submitting tw-connector application...
 echo. Spark Home is %SPARK_HOME%
 echo. SDA_CONF is %SDA_CONF%

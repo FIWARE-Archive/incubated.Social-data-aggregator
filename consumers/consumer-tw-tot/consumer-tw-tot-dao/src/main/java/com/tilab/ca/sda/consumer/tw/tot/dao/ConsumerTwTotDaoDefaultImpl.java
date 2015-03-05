@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Properties;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.hibernate.cfg.Configuration;
 import org.jboss.logging.Logger;
 
@@ -28,7 +29,8 @@ public class ConsumerTwTotDaoDefaultImpl implements ConsumerTwTotDao{
     private final Configuration cfg;
     
     public ConsumerTwTotDaoDefaultImpl(Properties props){
-       cfg = new Configuration().configure(new File(props.getProperty(CONF_PATH_PROPS_KEY)+File.separator+TotTwConstants.HIBERNATE_CONF_FILE_NAME));
+       String hibConfFilePath=props.getProperty(CONF_PATH_PROPS_KEY)+File.separator+TotTwConstants.HIBERNATE_CONF_FILE_NAME;
+       cfg = new Configuration().configure(new File(hibConfFilePath));
     }
     
     public ConsumerTwTotDaoDefaultImpl(String hibConfFilePath){
@@ -38,47 +40,45 @@ public class ConsumerTwTotDaoDefaultImpl implements ConsumerTwTotDao{
     @Override
     public void saveGeoByTimeGran(JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> geoTimeGranRDD){
         log.info("CALLED saveGeoByTimeGran");
-        geoTimeGranRDD.map((t) -> new StatsPreGeo(t._1,t._2))
-                .foreachPartition((spgIterator) ->{
-                    saveOnDb(spgIterator);
-                });
+        JavaRDD<StatsPreGeo> preGeoRDD=geoTimeGranRDD.map((t) -> new StatsPreGeo(t._1,t._2));
+        preGeoRDD.foreachPartition((spgIterator) ->{
+            saveOnDb(spgIterator);
+        }); 
     }
     
     @Override
     public void saveGeoByTimeInterval(Date from,Date to,JavaPairRDD<GeoLocTruncKey, StatsCounter> geoTimeBoundRDD){
-        log.info("CALLED saveGeoByTimeInterval");
-        geoTimeBoundRDD.map((t) -> new StatsPreGeoBound(from,to,t._1,t._2))
-                .foreachPartition((spgBoundIterator) ->{
-                   saveOnDb(spgBoundIterator);
-                });
+        log.info("CALLED saveGeoByTimeInterval");       
+        JavaRDD<StatsPreGeoBound> preGeoBoundRDD=geoTimeBoundRDD.map((t) -> new StatsPreGeoBound(from,to,t._1,t._2));
+		preGeoBoundRDD.foreachPartition((spgBoundIterator) ->{
+            saveOnDb(spgBoundIterator);
+        });         
     }
     
     @Override
     public void saveHtsByTimeGran(JavaPairRDD<DateHtKey, StatsCounter> htTimeGranRDD){
         log.info("CALLED saveGeoByTimeGran");
-        htTimeGranRDD.map((t) -> new StatsPreHts(t._1,t._2))
-                .foreachPartition((sphIterator) ->{
-                    saveOnDb(sphIterator);
-                });
+        JavaRDD<StatsPreHts> preHtsRDD=htTimeGranRDD.map((t) -> new StatsPreHts(t._1,t._2));
+        preHtsRDD.foreachPartition((sphIterator) ->{
+            saveOnDb(sphIterator);
+        });
     }
     
     @Override
     public void saveHtsByTimeInterval(Date from,Date to,JavaPairRDD<String, StatsCounter> htTimeBoundRDD){
         log.info("CALLED saveGeoByTimeGran");
-        htTimeBoundRDD.map((t) -> new StatsPreHtsBound(from,to,t._1,t._2))
-                .foreachPartition((sphIterator) ->{
-                    saveOnDb(sphIterator);
-                });
+        JavaRDD<StatsPreHtsBound> preHtsRDD=htTimeBoundRDD.map((t) -> new StatsPreHtsBound(from,to,t._1,t._2));
+        preHtsRDD.foreachPartition((sphIterator) ->{
+            saveOnDb(sphIterator);
+        });
     }
     
   
     private void saveOnDb(Iterator<?> objIterator) throws Exception{
-        //final Configuration hibConf=cfg;
-        Hibutils.executeVoidOperation(TwStatsSession.getSessionFactory(cfg), 
+        final Configuration hibConf=cfg;
+        Hibutils.executeVoidOperation(TwStatsSession.getSessionFactory(hibConf), 
             (session) ->{
-                session.beginTransaction();
                 objIterator.forEachRemaining((obj) -> session.save(obj));
-                session.getTransaction().commit();
-            });
+        });
     }
 }

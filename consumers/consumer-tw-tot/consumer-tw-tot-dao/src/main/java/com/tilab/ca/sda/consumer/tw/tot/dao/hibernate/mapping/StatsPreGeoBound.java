@@ -28,8 +28,10 @@ public class StatsPreGeoBound implements Serializable {
     @Column(name = "long_trunc")
     private double longTrunc;
 
+	@Column(name = "from_time")
     private Date from = null;
 
+	@Column(name = "to_time")
     private Date to = null;
 
     @Column(name = "num_tw")

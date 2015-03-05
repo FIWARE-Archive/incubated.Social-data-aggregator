@@ -15,6 +15,8 @@ import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.Properties;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -32,21 +34,25 @@ public class TwTotConsumerBatchMain {
     private static final Logger log=Logger.getLogger(TwTotConsumerBatchMain.class);
     
     private static final String APP_NAME="totTwConsumerBatch";
+    private static final String DAO_IMPL_CONF_FILE_NAME="dao_impl.conf";
     
     
-    
-    public void main(String[] args){
+    public static void main(String[] args){
         
-        log.info("Start Tw tot Consumer Batch");
-        log.info("Parsing commandline arguments...");
         try {
-            Arguments arguments=CommandLineArgs.parseCommandLineArgs(args);
-            TwTotConsumerProperties twProps=ConfigFactory.create(TwTotConsumerProperties.class);
             String confsPath=Utils.Env.getConfsPathFromEnv(TotTwConstants.SDA_CONF_SYSTEM_PROPERTY, TotTwConstants.TOT_TW_SYSTEM_PROPERTY);
-            ConsumerTwTotDao twDao=loadConsumerTwTotDao(confsPath, twProps.daoImplClass());
             String log4jPropsFilePath=confsPath+File.separator+TotTwConstants.LOG4jPROPS_FILE_NAME;
             PropertyConfigurator.configure(log4jPropsFilePath);
             
+            log.info("Start Tw tot Consumer Batch");
+            log.info("Parsing commandline arguments...");
+            
+            Arguments arguments=CommandLineArgs.parseCommandLineArgs(args);
+            TwTotConsumerProperties twProps=loadProps(confsPath);
+            
+            log.info("Loading tw tot DAO..");
+            ConsumerTwTotDao twDao=loadConsumerTwTotDao(confsPath, twProps.daoImplClass());
+         
             SparkConf conf=new SparkConf().setAppName(APP_NAME);
 	    JavaSparkContext sc=new JavaSparkContext(conf);
             String inputDataPath= StringUtils.isBlank(arguments.getInputDataPath())?twProps.defaultInputDataPath():arguments.getInputDataPath();
@@ -55,13 +61,12 @@ public class TwTotConsumerBatchMain {
             
             log.debug("Input data path is "+inputDataPath);
             executeTotTwAnalysis(sc, inputDataPath, twProps, arguments, twDao);
-               
         } catch (Exception ex) {
             log.error(ex);
         }
     }
 
-    private void executeTotTwAnalysis(JavaSparkContext sc, String inputDataPath, TwTotConsumerProperties twProps, Arguments arguments, ConsumerTwTotDao twDao) {
+    private static void executeTotTwAnalysis(JavaSparkContext sc, String inputDataPath, TwTotConsumerProperties twProps, Arguments arguments, ConsumerTwTotDao twDao) {
         JavaRDD<String> tweetsRdd=sc.textFile(inputDataPath, twProps.minPartitions());
         
         JavaRDD<GeoStatus> geoStatus=tweetsRdd.map((tweetStr) -> BatchUtils.fromJstring2GeoStatus(tweetStr, twProps.roundPos()))
@@ -89,9 +94,18 @@ public class TwTotConsumerBatchMain {
         }
     }
     
-    private ConsumerTwTotDao loadConsumerTwTotDao(String confsPath,String implClassStr) throws Exception {
-        Properties props=Utils.Load.loadPropertiesFromPath(confsPath);
+    private static ConsumerTwTotDao loadConsumerTwTotDao(String confsPath,String implClassStr) throws Exception {
+        Properties props=Utils.Load.loadPropertiesFromPath(confsPath+File.separator+DAO_IMPL_CONF_FILE_NAME);
         props.put(ConsumerTwTotDao.CONF_PATH_PROPS_KEY, confsPath);
         return Utils.Load.getClassInstFromInterface(ConsumerTwTotDao.class, implClassStr, props);
+    }
+    
+    private static TwTotConsumerProperties loadProps(String confsPath) throws Exception{
+        TwTotConsumerProperties twProps=ConfigFactory.create(TwTotConsumerProperties.class);
+        if(twProps==null){
+            Properties props = Utils.Load.loadPropertiesFromPath(confsPath);
+            twProps = ConfigFactory.create(TwTotConsumerProperties.class, props);
+        }
+        return twProps;
     }
 }

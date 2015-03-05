@@ -24,9 +24,11 @@ public class StatsPreHtsBound implements Serializable {
 
     @Column(name = "hash_tag")
     private String hashTag = null;
-
+	
+	@Column(name = "from_time")
     private Date from = null;
 
+	@Column(name = "to_time")
     private Date to = null;
 
     @Column(name = "num_tw")
