@@ -15,11 +15,20 @@ then
 	fi
 fi
 export SDA_HOME
+
+SCRIPT_DIRNAME=$(dirname "$0")
+cd $SCRIPT_DIRNAME
 #####
 echo "loading env.."
-./start-spark-env.sh
+#source start-spark-env.sh
+export MASTER=spark://$SPARK_MASTER_IP:$SPARK_MASTER_PORT
 
-echo "starting tw-connector.."
-./connector-tw/start-tw-connector.sh --with-master spark://$SPARK_MASTER_IP:$SPARK_MASTER_PORT --sda-home $SDA_HOME --spark-home $SPARK_HOME
+while read row 
+do
+	MODULE_NAME=$(echo $row | cut -d " " -f1)
+	MODULE_SCRIPT=$(echo $row | cut -d " " -f2)
+	echo "starting $MODULE_NAME"
+	source $MODULE_SCRIPT
+done < modules
 
 echo "End"
