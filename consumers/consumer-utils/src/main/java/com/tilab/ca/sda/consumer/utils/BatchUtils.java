@@ -8,13 +8,17 @@ import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.log4j.Logger;
 
 
 public class BatchUtils {
+    
+    private static final Logger log=Logger.getLogger(BatchUtils.class);
 
     private static final String GEOLOCATION_ELEM="geoLocation";
     private static final String HTS_ELEM="hashtagEntities";
@@ -26,60 +30,83 @@ public class BatchUtils {
     private static final String ID_FIELD="id";
     private static final String LATITUDE_FIELD="latitude";
     private static final String LONGITUDE_FIELD="longitude";
+    
+    private static final String JHTS_FORMAT=String.format("\"%s\":[",HTS_ELEM);
+    private static final String JHTS_FORMAT_EMPTY=String.format("\"%s\":[]",HTS_ELEM);
+    private static final String JGEO_FORMAT=String.format("\"%s\":{",GEOLOCATION_ELEM);
+    private static final String JGEO_FORMAT_EMPTY=String.format("\"%s\":{}",GEOLOCATION_ELEM);
    
-    public static Optional<List<HtsStatus>> fromJstring2HtsStatus(String statusString) {
-        Optional<List<HtsStatus>> htsStatusOptional=Optional.empty();
-        JsonObject statusJsonObject = new JsonParser().parse(statusString).getAsJsonObject();
-        if(statusContainsHashTags(statusJsonObject)){
-            Date sentTime=Utils.Time.zonedDateTime2Date(Utils.Time.fromShortTimeZoneString2ZonedDateTime(
-                    statusJsonObject.get(CREATED_AT_FIELD).getAsString()));
-            long userId=statusJsonObject.getAsJsonObject(USER_OBJ).get(ID_FIELD).getAsLong();
-            boolean isRetweet=isRetweet(statusJsonObject);
-            boolean isReply=isReply(statusJsonObject);
-            long postId=statusJsonObject.get(ID_FIELD).getAsLong();
-            JsonArray htsArray=statusJsonObject.getAsJsonArray(HTS_ELEM);
-            htsStatusOptional=Optional.of(getUniqueHtsFromHtsEntities(htsArray).stream()
-                     .map((htStr) -> new HtsStatus(postId, userId, htStr, sentTime, isRetweet, isReply))
-                     .collect(Collectors.toList()));
+    public static List<HtsStatus> fromJstring2HtsStatus(String statusString) {
+        log.debug("parsing status string "+statusString);
+        List<HtsStatus> htsStatusList=new LinkedList<>();
+        try{
+            JsonObject statusJsonObject = new JsonParser().parse(statusString).getAsJsonObject();
+            if(statusContainsHashTags(statusJsonObject)){
+                Date sentTime=Utils.Time.zonedDateTime2Date(Utils.Time.fromShortTimeZoneString2ZonedDateTime(
+                        statusJsonObject.get(CREATED_AT_FIELD).getAsString()));
+                long userId=statusJsonObject.getAsJsonObject(USER_OBJ).get(ID_FIELD).getAsLong();
+                boolean isRetweet=isRetweet(statusJsonObject);
+                boolean isReply=isReply(statusJsonObject);
+                long postId=statusJsonObject.get(ID_FIELD).getAsLong();
+                JsonArray htsArray=statusJsonObject.getAsJsonArray(HTS_ELEM);
+                htsStatusList=getUniqueHtsFromHtsEntities(htsArray).stream()
+                         .map((htStr) -> new HtsStatus(postId, userId, htStr, sentTime, isRetweet, isReply))
+                         .collect(Collectors.toList());
+            }
+        }catch(Exception e){
+          log.error("failed to parse or error while processing jstring "+statusString,e);
         }
-        return htsStatusOptional;
+        return htsStatusList;
     }
     
     
-    public static Optional<GeoStatus> fromJstring2GeoStatus(String statusString,int geoDecTruncation) {
-        
-        Optional<GeoStatus> geoStatusOptional = Optional.empty();
-        JsonObject statusJsonObject = new JsonParser().parse(statusString).getAsJsonObject();
-        if (isGeoLocStatus(statusJsonObject)) {
-            GeoStatus geoStatus = new GeoStatus();
-            geoStatus.setSentTime(Utils.Time.zonedDateTime2Date(Utils.Time.fromShortTimeZoneString2ZonedDateTime(
-                    statusJsonObject.get(CREATED_AT_FIELD).getAsString())));
-            geoStatus.setUserId(statusJsonObject.getAsJsonObject(USER_OBJ).get(ID_FIELD).getAsLong());
-            geoStatus.setRetweet(isRetweet(statusJsonObject));
-            geoStatus.setReply(isReply(statusJsonObject));
-            geoStatus.setPostId(statusJsonObject.get(ID_FIELD).getAsLong());
-            JsonObject geoLocation=statusJsonObject.getAsJsonObject(GEOLOCATION_ELEM);
-            geoStatus.setLatitude(geoLocation.get(LATITUDE_FIELD).getAsDouble());
-            geoStatus.setLongitude(geoLocation.get(LONGITUDE_FIELD).getAsDouble());   
-            geoStatus.setLatTrunc(Utils.truncateDouble(geoStatus.getLatitude(), geoDecTruncation));
-            geoStatus.setLongTrunc(Utils.truncateDouble(geoStatus.getLongitude(), geoDecTruncation));
-            geoStatusOptional=Optional.of(geoStatus);
+    public static GeoStatus fromJstring2GeoStatus(String statusString,int geoDecTruncation) {
+        log.debug("geoStatus: parsing status string "+statusString);
+        GeoStatus  geoStatus = new GeoStatus();
+        try{
+            JsonObject statusJsonObject = new JsonParser().parse(statusString).getAsJsonObject();
+            if (isGeoLocStatus(statusJsonObject)) {
+                geoStatus.setSentTime(Utils.Time.zonedDateTime2Date(Utils.Time.fromShortTimeZoneString2ZonedDateTime(
+                        statusJsonObject.get(CREATED_AT_FIELD).getAsString())));
+                geoStatus.setUserId(statusJsonObject.getAsJsonObject(USER_OBJ).get(ID_FIELD).getAsLong());
+                geoStatus.setRetweet(isRetweet(statusJsonObject));
+                geoStatus.setReply(isReply(statusJsonObject));
+                geoStatus.setPostId(statusJsonObject.get(ID_FIELD).getAsLong());
+                JsonObject geoLocation=statusJsonObject.getAsJsonObject(GEOLOCATION_ELEM);
+                geoStatus.setLatitude(geoLocation.get(LATITUDE_FIELD).getAsDouble());
+                geoStatus.setLongitude(geoLocation.get(LONGITUDE_FIELD).getAsDouble());   
+                geoStatus.setLatTrunc(Utils.truncateDouble(geoStatus.getLatitude(), geoDecTruncation));
+                geoStatus.setLongTrunc(Utils.truncateDouble(geoStatus.getLongitude(), geoDecTruncation));
+            }
+        }catch(Exception e){
+          log.error("failed to parse or error while processing jstring "+statusString,e);
         }
-        return geoStatusOptional;
+        return geoStatus;
     }
     
     public static boolean statusContainsHashTags(JsonObject statusJsonObject) {
-        return !statusJsonObject.getAsJsonArray(HTS_ELEM).isJsonNull() && statusJsonObject.getAsJsonArray(HTS_ELEM).size() >0;
+        log.info("calling statusContainsHashTags");
+        return statusJsonObject.getAsJsonArray(HTS_ELEM)!=null && !statusJsonObject.getAsJsonArray(HTS_ELEM).isJsonNull() && statusJsonObject.getAsJsonArray(HTS_ELEM).size() >0;
+    }
+    
+    public static boolean isHtsStatus(String jStatus){
+        return jStatus.contains(JHTS_FORMAT) && !jStatus.contains(JHTS_FORMAT_EMPTY);
     }
     
     public static Set<String> getUniqueHtsFromHtsEntities(JsonArray htEntities) {
+        log.debug("calling getUniqueHtsFromHtsEntities");
         Set<String> htsSet=new HashSet<>();
         htEntities.forEach((jsonHt) -> htsSet.add(jsonHt.getAsJsonObject().get(HT_TEXT_FIELD).getAsString().toLowerCase()));
         return htsSet;
     }
     
     public static boolean isGeoLocStatus(JsonObject statusJsonObject) {
+        log.debug("calling isGeoLocStatus");
         return statusJsonObject.get(GEOLOCATION_ELEM)!=null && !statusJsonObject.get(GEOLOCATION_ELEM).isJsonNull();
+    }
+    
+    public static boolean isGeoLocStatus(String jStatus) {
+        return jStatus.contains(JGEO_FORMAT) && !jStatus.contains(JGEO_FORMAT_EMPTY);
     }
     
     public static boolean isRetweet(JsonObject statusJsonObject) {

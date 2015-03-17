@@ -12,6 +12,8 @@ public interface TwTotConsumerProperties extends Config{
     public String defaultInputDataPath();
     public String defaultRoundMode();
     public Integer granMin();
+    
+    @DefaultValue("3")
     public int roundPos();
     
     public String daoImplClass();

@@ -60,9 +60,9 @@ CONF_FILE=$SDA_HOME/scripts/connector-tw/tw-connector-confs.cfg
 
 source $CONF_FILE
 
-PATH_TO_JAR_FILE=$SDA_HOME/bin/connectors/connector-tw/$JAR_FILE_NAME
+PATH_TO_JAR_FILE=$SDA_HOME/bin/connectors/$JAR_FILE_NAME
 
 SDA_CONF=$SDA_HOME/confs/connector-tw
 
 echo "Submitting tw-connector application..."
-nohup $SPARK_HOME/bin/spark-submit --class $TW_CONN_MAIN_CLASS --master $MASTER --deploy-mode client $PATH_TO_JAR_FILE $SDA_CONF &
+nohup $SPARK_HOME/bin/spark-submit --class $TW_CONN_MAIN_CLASS --master $MASTER --supervise --deploy-mode client $PATH_TO_JAR_FILE $SDA_CONF &

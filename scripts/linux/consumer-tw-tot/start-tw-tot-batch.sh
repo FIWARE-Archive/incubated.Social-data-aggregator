@@ -44,5 +44,9 @@ PATH_TO_JAR_FILE=$SDA_HOME/bin/consumers/batch/$JAR_FILE_NAME_BATCH
 export SDA_CONF=$SDA_HOME/confs
 export TOT_TW=consumers/consumer-tw-tot
 
+if [ "x$INPUT_DATA_PATH" != "x" ]
+then
+INPUT_DATA_ARG="-I $INPUT_DATA_PATH"
+fi
 echo "Submitting consumer-tw-tot batch application..."
-$SPARK_HOME/bin/spark-submit --class $TOT_TW_BATCH_MAIN_CLASS --master $MASTER --deploy-mode client $PATH_TO_JAR_FILE -I $INPUT_DATA_PATH $JAR_FILE_ARGS
+nohup $SPARK_HOME/bin/spark-submit --class $TOT_TW_BATCH_MAIN_CLASS --master $MASTER --supervise --deploy-mode client $PATH_TO_JAR_FILE $INPUT_DATA_ARG $JAR_FILE_ARGS &

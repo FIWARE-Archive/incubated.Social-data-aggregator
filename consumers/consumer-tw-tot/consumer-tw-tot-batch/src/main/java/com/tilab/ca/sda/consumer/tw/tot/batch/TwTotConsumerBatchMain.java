@@ -15,8 +15,6 @@ import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import java.io.File;
-import java.io.FileInputStream;
-import java.util.Arrays;
 import java.util.Properties;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +36,7 @@ public class TwTotConsumerBatchMain {
     
     
     public static void main(String[] args){
-        
+      
         try {
             String confsPath=Utils.Env.getConfsPathFromEnv(TotTwConstants.SDA_CONF_SYSTEM_PROPERTY, TotTwConstants.TOT_TW_SYSTEM_PROPERTY);
             String log4jPropsFilePath=confsPath+File.separator+TotTwConstants.LOG4jPROPS_FILE_NAME;
@@ -69,10 +67,12 @@ public class TwTotConsumerBatchMain {
     private static void executeTotTwAnalysis(JavaSparkContext sc, String inputDataPath, TwTotConsumerProperties twProps, Arguments arguments, ConsumerTwTotDao twDao) {
         JavaRDD<String> tweetsRdd=sc.textFile(inputDataPath, twProps.minPartitions());
         
-        JavaRDD<GeoStatus> geoStatus=tweetsRdd.map((tweetStr) -> BatchUtils.fromJstring2GeoStatus(tweetStr, twProps.roundPos()))
-                .filter((geoStatusOpt) -> geoStatusOpt.isPresent())
-                .map((geoOpt) -> geoOpt.get());
-        
+        final int roundPos=twProps.roundPos();
+        JavaRDD<GeoStatus> geoStatus=tweetsRdd
+                .filter(BatchUtils::isGeoLocStatus)
+                .map((tweetStr) -> BatchUtils.fromJstring2GeoStatus(tweetStr, roundPos))
+                .filter((geo) -> geo.getPostId()>0); //filter void statuses
+                
         if(arguments.getRoundMode()!=null){
             JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> pairTotRDDGeoRound=TwCounter.countGeoStatuses(geoStatus, arguments.getRoundMode(), arguments.getGranMin(), arguments.getFrom(), arguments.getTo());
             twDao.saveGeoByTimeGran(pairTotRDDGeoRound);
@@ -81,10 +81,10 @@ public class TwTotConsumerBatchMain {
             twDao.saveGeoByTimeInterval(Utils.Time.zonedDateTime2Date(arguments.getFrom()), Utils.Time.zonedDateTime2Date(arguments.getTo()), pairTotGeoRDD);
         }
         
-        JavaRDD<HtsStatus> htsStatus=tweetsRdd.map((tweetStr) -> BatchUtils.fromJstring2HtsStatus(tweetStr))
-                .filter((htsList) -> htsList.isPresent())
-                .flatMap((htsStatusOpt) -> htsStatusOpt.get());
-        
+        JavaRDD<HtsStatus> htsStatus=tweetsRdd
+                .filter(BatchUtils::isHtsStatus)
+                .flatMap(BatchUtils::fromJstring2HtsStatus);
+                    
         if(arguments.getRoundMode()!=null){
             JavaPairRDD<DateHtKey, StatsCounter> pairTotRDDHtsRound=TwCounter.countHtsStatuses(htsStatus, arguments.getRoundMode(), arguments.getGranMin(), arguments.getFrom(), arguments.getTo());
             twDao.saveHtsByTimeGran(pairTotRDDHtsRound);

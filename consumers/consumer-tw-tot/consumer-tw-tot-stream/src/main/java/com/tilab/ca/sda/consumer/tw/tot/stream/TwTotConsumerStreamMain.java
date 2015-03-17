@@ -22,7 +22,7 @@ public class TwTotConsumerStreamMain {
     private static final String APP_NAME = "twTotConsumerStream";
     
    
-    public void main(String[] args) {
+    public static void main(String[] args) {
 
         String confsPath = Utils.Env.getConfsPathFromEnv(TotTwConstants.SDA_CONF_SYSTEM_PROPERTY, TotTwConstants.TOT_TW_SYSTEM_PROPERTY);
         String log4jPropsFilePath = confsPath + File.separator + TotTwConstants.LOG4jPROPS_FILE_NAME;
@@ -57,7 +57,7 @@ public class TwTotConsumerStreamMain {
                 sparkConf = sparkConf.set(SparkStreamingSystemSettings.SPARK_CORES_MAX_PROPERTY, twProps.numMaxCore());
             }
             
-            BusConsumerConnection busConsConn=loadBusConsumerConnectionImpl(twProps.busConnImplClass());
+            BusConsumerConnection busConsConn=loadBusConsumerConnectionImpl(confsPath,twProps.busConnImplClass());
 
             log.debug(String.format("[%s] Setting up streaming manager..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
             SparkStreamingManager strManager = SparkStreamingManager.$newStreamingManager()
@@ -80,8 +80,8 @@ public class TwTotConsumerStreamMain {
      * @return
      * @throws Exception 
      */
-    private ConsumerTwTotDao loadConsumerTwTotDao(String confsPath,String implClassStr) throws Exception {
-        Properties props=Utils.Load.loadPropertiesFromPath(confsPath);
+    private static ConsumerTwTotDao loadConsumerTwTotDao(String confsPath,String implClassStr) throws Exception {
+        Properties props=Utils.Load.loadPropertiesFromPath(confsPath+File.separator+TotTwConstants.DAO_CONF_FILE_NAME);
         props.put(ConsumerTwTotDao.CONF_PATH_PROPS_KEY, confsPath);
         return Utils.Load.getClassInstFromInterface(ConsumerTwTotDao.class, implClassStr, props);
     }
@@ -92,7 +92,7 @@ public class TwTotConsumerStreamMain {
      * @return
      * @throws Exception 
      */
-    private BusConsumerConnection loadBusConsumerConnectionImpl(String implClassStr) throws Exception{
-        return Utils.Load.getClassInstFromInterfaceAndPropsPath(BusConsumerConnection.class, implClassStr, TotTwConstants.BUS_CONF_FILE_NAME);
+    private static BusConsumerConnection loadBusConsumerConnectionImpl(String confsPath,String implClassStr) throws Exception{
+        return Utils.Load.getClassInstFromInterfaceAndPropsPath(BusConsumerConnection.class, implClassStr, confsPath+File.separator+TotTwConstants.BUS_CONF_FILE_NAME);
     }
 }

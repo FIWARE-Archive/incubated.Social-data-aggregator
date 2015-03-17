@@ -7,7 +7,7 @@ function display_usage_and_exit {
   echo ""
   echo "--sda-home -> The path of social-data-aggregator folder. Optional. Provide from command line if SDA_HOME is not setted in your environment"
   echo "--with-master -> master name (eg local,spark://xxx.xxx). Optional. Provide from command line if MASTER is not setted in your environment"
-  echo "--spark-home -> The path of spark folder. Optional. Provide from command line if SPARK_HOME is not setted in your environment"
+  echo "--spark-home -> The path to spark folder. Optional. Provide from command line if SPARK_HOME is not setted in your environment"
   echo ""
   exit 1
 }
@@ -63,4 +63,4 @@ export SDA_CONF=$SDA_HOME/confs
 export TOT_TW=consumers/consumer-tw-tot
 
 echo "Submitting consumer-tw-tot stream application..."
-$SPARK_HOME/bin/spark-submit --class $TOT_TW_STREAM_MAIN_CLASS --master $MASTER --deploy-mode client $PATH_TO_JAR_FILE
+nohup $SPARK_HOME/bin/spark-submit --class $TOT_TW_STREAM_MAIN_CLASS --master $MASTER --supervise --deploy-mode client $PATH_TO_JAR_FILE &
