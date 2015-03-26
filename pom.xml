@@ -18,6 +18,7 @@
         <module>sda-model</module>
         <module>producers</module>
         <module>consumers</module>
+        <module>sda-tools</module>
     </modules>
     
   
