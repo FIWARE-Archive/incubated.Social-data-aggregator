@@ -1,42 +1,38 @@
-package com.tilab.ca.sda.tw_user_profile_extractor;
+package com.tilab.ca.sda.tw_user_profile_extractor.hibernate.mapping;
 
 import java.io.Serializable;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
-@Entity
-@Table(name="tw_profiles_raw")
+@MappedSuperclass
 public class TwProfile implements Serializable{
     
-    public static final String TRAINING_TYPE="TRAINING";
-    public static final String TEST_TYPE="TEST";
+    @Id
+    @Column(name="user_id",updatable=false)
+    protected long userId;
     
-    @Column(name="user_id")
-    private long userId;
-    
-    private String name;
+    protected String name;
     
     @Column(name="screen_name")
-    private String screenName;
+    protected String screenName;
     
-    private String description;
+    protected String description;
     
     @Column(name="profile_background_color")
-    private String profileBackgroundColor;
+    protected String profileBackgroundColor;
     
     @Column(name="profile_text_color")
-    private String profileTextColor;
+    protected String profileTextColor;
     
-    private char gender;
+    @Column(name="location")
+    protected String location;
     
-    @Column(name="is_person")
-    private boolean isPerson;
+    @Column(name="gender",updatable=false)
+    protected char gender;
     
-    @Column(name="data_type")
-    private String dataType;
+    protected transient long postId;
 
-    
     public long getUserId() {
         return userId;
     }
@@ -93,26 +89,26 @@ public class TwProfile implements Serializable{
         this.gender = gender;
     }
 
-    public boolean isIsPerson() {
-        return isPerson;
+    public String getLocation() {
+        return location;
     }
 
-    public void setIsPerson(boolean isPerson) {
-        this.isPerson = isPerson;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public String getDataType() {
-        return dataType;
+    public long getPostId() {
+        return postId;
     }
 
-    public void setDataType(String dataType) {
-        this.dataType = dataType;
+    public void setPostId(long postId) {
+        this.postId = postId;
     }
     
     @Override
     public String toString(){
-        return String.format("%d\001%s\001%s\001%s\001%s\001%s\001%c\001%b\001%s",userId,name,screenName,description,profileBackgroundColor,
-                                                                                  profileTextColor,gender,isPerson,dataType);
+        return String.format("%d\001%s\001%s\001%s\001%s\001%s\001%c",userId,name,screenName,description,profileBackgroundColor,
+                                                                                  profileTextColor,gender);
     }
     
 }

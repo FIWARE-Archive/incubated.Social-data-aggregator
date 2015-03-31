@@ -67,7 +67,7 @@ public class CommandLineArgs {
     
     private static void printHelp() {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("TwitterUsersTimelineCrowler", options);
+        formatter.printHelp("Consumer Tw tot batch", options);
         System.exit(0);
     }
 }
