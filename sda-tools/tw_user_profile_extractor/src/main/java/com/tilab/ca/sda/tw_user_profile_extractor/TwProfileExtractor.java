@@ -34,12 +34,19 @@ public class TwProfileExtractor {
         
         JsonObject userObj=statusJsonObject.getAsJsonObject(USER_OBJ);
         twProfile.setUserId(userObj.get("id").getAsLong());
-        twProfile.setDescription(userObj.get("description").getAsString());
+        
+        if(userObj.get("description")!=null && !userObj.get("description").isJsonNull())
+            twProfile.setDescription(userObj.get("description").getAsString());
+        
         twProfile.setName(userObj.get("name").getAsString());
         twProfile.setScreenName(userObj.get("screenName").getAsString());
         twProfile.setProfileBackgroundColor(userObj.get("profileBackgroundColor").getAsString());
         twProfile.setProfileTextColor(userObj.get("profileTextColor").getAsString());
-        twProfile.setLocation(userObj.get("location").getAsString());
+        
+        if(userObj.get("location")!=null && !userObj.get("location").isJsonNull())
+            twProfile.setLocation(userObj.get("location").getAsString());
+        
+        
         twProfile.setGender(GENDER_UNKNOWN);
         
         if(testSetProfiles)

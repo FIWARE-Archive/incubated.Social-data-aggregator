@@ -3,6 +3,7 @@ package com.tilab.ca.sda.tw_user_profile_extractor.utils;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
@@ -19,16 +20,17 @@ public class CommandLineArgs {
 
     static {
         options = new Options();
+        options.addOption(new Option(HELP_OPT, "print this message"));
         options.addOption(INPUT_DATA_PATH, true, "input data path: the folder under which are stored data");
         options.addOption(OUTPUT_PATH, true, "output data path: the folder under which save data");
-        options.addOption(TRAINING_DATA, false, "if the data are training data or not");
-        
+        options.addOption(TRAINING_DATA, false, "if the data are training data or not");     
     }
 
     public static Arguments parseCommandLineArgs(String[] args) throws Exception{
         CommandLineParser parser = new PosixParser();
         Arguments arguments=new Arguments();
 	CommandLine cmd = parser.parse(options, args);
+        
         if(cmd.hasOption(HELP_OPT)){
             printHelp();
         }
