@@ -48,8 +48,8 @@ public class TwTotConsumerStreamMain {
 
             //setup spark configuration
             SparkConf sparkConf = new SparkConf().setAppName(APP_NAME)
-                    .set(SparkStreamingSystemSettings.SPARK_CLEANER_TTL_PROPERTY, ttl); // Enable meta-data cleaning in Spark (so this can run forever)
-
+                    .set(SparkStreamingSystemSettings.SPARK_CLEANER_TTL_PROPERTY, ttl) // Enable meta-data cleaning in Spark (so this can run forever)
+                    .set(SparkStreamingSystemSettings.SPARK_WRITE_AHEAD_LOG_ENABLED,"true"); //All the input data received through receivers will be saved to write ahead logs that will allow it to be recovered after driver failures. 
             //if there are other streaming applications running on the same cluster set this property to avoid them wait forever
             if (StringUtils.isNotBlank(twProps.numMaxCore())) {
                 log.debug(String.format("[%s] setting numMaxCore for this streaming application to %s..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG, twProps.numMaxCore()));

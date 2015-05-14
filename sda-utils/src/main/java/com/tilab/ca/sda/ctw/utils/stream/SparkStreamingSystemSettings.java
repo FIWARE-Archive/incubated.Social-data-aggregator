@@ -15,4 +15,6 @@ public class SparkStreamingSystemSettings {
      public static final String SPARK_DRIVER_HOST_PROPERTY="spark.driver.host";
      public static final String SPARK_CLEANER_TTL_PROPERTY="spark.cleaner.ttl";
      public static final String SPARK_CORES_MAX_PROPERTY="spark.cores.max";
+     public static final String SPARK_WRITE_AHEAD_LOG_ENABLED="spark.streaming.receiver.writeAheadLog.enable";
+     
 }
