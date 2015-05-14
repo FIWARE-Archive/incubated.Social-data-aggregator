@@ -42,6 +42,12 @@ public class TwProfileExtractor {
         twProfile.setScreenName(userObj.get("screenName").getAsString());
         twProfile.setProfileBackgroundColor(userObj.get("profileBackgroundColor").getAsString());
         twProfile.setProfileTextColor(userObj.get("profileTextColor").getAsString());
+        twProfile.setProfileLinkColor(userObj.get("profileLinkColor").getAsString());
+        twProfile.setProfileSidebarFillColor(userObj.get("profileSidebarFillColor").getAsString());
+        twProfile.setProfileSidebarBorderColor(userObj.get("profileSidebarBorderColor").getAsString());
+        
+        if(userObj.get("url")!=null && !userObj.get("url").isJsonNull())
+            twProfile.setUrl(userObj.get("url").getAsString());
         
         if(userObj.get("location")!=null && !userObj.get("location").isJsonNull())
             twProfile.setLocation(userObj.get("location").getAsString());

@@ -28,7 +28,11 @@ public class TwProfileExtractorJsonMapTest {
         
         
         //test complete json with all fields
-        String completeRawJson = "{\"id\":1,\"user\":{\"id\":1,\"name\":\"TestUsr1\",\"screenName\":\"test_user_1\",\"profileBackgroundColor\":\"000000\",\"profileTextColor\":\"FFFFFF\",\"description\":\"descr1\",\"location\":\"TestLoc\"}}";
+        String completeRawJson = "{\"id\":1,\"user\":{\"id\":1,\"name\":\"TestUsr1\",\"screenName\":\"test_user_1\","
+                                + "\"profileBackgroundColor\":\"000000\",\"profileTextColor\":\"FFFFFF\","
+                                + "\"profileLinkColor\":\"FFFFFF\",\"profileSidebarFillColor\":\"FFFFFF\","
+                                + "\"profileSidebarBorderColor\":\"FFFFFF\",\"url\":\"http://test_url\","
+                                + "\"description\":\"descr1\",\"location\":\"TestLoc\"}}";
         
         //test with testSetProfile false
         boolean testSetProfiles = false;
@@ -64,7 +68,11 @@ public class TwProfileExtractorJsonMapTest {
         assertTwProfilesEquals(expResultRaw, result);
         
         //test json with missing description
-        String partialRawJsonNoDesc = "{\"id\":1,\"user\":{\"id\":1,\"name\":\"TestUsr1\",\"screenName\":\"test_user_1\",\"profileBackgroundColor\":\"000000\",\"profileTextColor\":\"FFFFFF\",\"location\":\"TestLoc\"}}";
+        String partialRawJsonNoDesc = "{\"id\":1,\"user\":{\"id\":1,\"name\":\"TestUsr1\",\"screenName\":\"test_user_1\","
+                                + "\"profileBackgroundColor\":\"000000\",\"profileTextColor\":\"FFFFFF\","
+                                + "\"profileLinkColor\":\"FFFFFF\",\"profileSidebarFillColor\":\"FFFFFF\","
+                                + "\"profileSidebarBorderColor\":\"FFFFFF\",\"url\":\"http://test_url\","
+                                + "\"location\":\"TestLoc\"}}";
         testSetProfiles = false;
         expResultEvaluated.setDescription(null);
         result = TwProfileExtractor.mapRawJson2TwProfile(partialRawJsonNoDesc, testSetProfiles);
@@ -77,7 +85,11 @@ public class TwProfileExtractorJsonMapTest {
         assertTwProfilesEquals(expResultRaw, result);
         
         //test json with missing location
-        String partialRawJsonNoLoc = "{\"id\":1,\"user\":{\"id\":1,\"name\":\"TestUsr1\",\"screenName\":\"test_user_1\",\"profileBackgroundColor\":\"000000\",\"profileTextColor\":\"FFFFFF\",\"description\":\"descr1\"}}";
+        String partialRawJsonNoLoc = "{\"id\":1,\"user\":{\"id\":1,\"name\":\"TestUsr1\",\"screenName\":\"test_user_1\","
+                                + "\"profileBackgroundColor\":\"000000\",\"profileTextColor\":\"FFFFFF\","
+                                + "\"profileLinkColor\":\"FFFFFF\",\"profileSidebarFillColor\":\"FFFFFF\","
+                                + "\"profileSidebarBorderColor\":\"FFFFFF\",\"url\":\"http://test_url\","
+                                + "\"description\":\"descr1\"}}";
         testSetProfiles = false;
         expResultEvaluated.setDescription("descr1");
         expResultEvaluated.setLocation(null);

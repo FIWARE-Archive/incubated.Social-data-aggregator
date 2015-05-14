@@ -1,12 +1,16 @@
 package com.tilab.ca.sda.tw_user_profile_extractor.hibernate.mapping;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import org.apache.log4j.Logger;
 
 @MappedSuperclass
 public class TwProfile implements Serializable{
+    
+    private static final Logger log=Logger.getLogger(TwProfile.class);
     
     @Id
     @Column(name="user_id",updatable=false)
@@ -30,6 +34,18 @@ public class TwProfile implements Serializable{
     
     @Column(name="gender",updatable=false)
     protected char gender;
+    
+    protected String url;
+    
+    @Column(name="profile_link_color")
+    protected String profileLinkColor;
+    
+    @Column(name="profiles_sidebar_fill_color")
+    protected String profileSidebarFillColor;
+    
+    @Column(name="profiles_sidebar_border_color")
+    protected String profileSidebarBorderColor;        
+    
     
     protected transient long postId;
 
@@ -104,11 +120,55 @@ public class TwProfile implements Serializable{
     public void setPostId(long postId) {
         this.postId = postId;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getProfileLinkColor() {
+        return profileLinkColor;
+    }
+
+    public void setProfileLinkColor(String profileLinkColor) {
+        this.profileLinkColor = profileLinkColor;
+    }
+
+    public String getProfileSidebarFillColor() {
+        return profileSidebarFillColor;
+    }
+
+    public void setProfileSidebarFillColor(String profileSidebarFillColor) {
+        this.profileSidebarFillColor = profileSidebarFillColor;
+    }
+
+    public String getProfileSidebarBorderColor() {
+        return profileSidebarBorderColor;
+    }
+
+    public void setProfileSidebarBorderColor(String profileSidebarBorderColor) {
+        this.profileSidebarBorderColor = profileSidebarBorderColor;
+    }
+    
+    
     
     @Override
     public String toString(){
-        return String.format("%d\001%s\001%s\001%s\001%s\001%s\001%c",userId,name,screenName,description,profileBackgroundColor,
-                                                                                  profileTextColor,gender);
+        Field[] fields=this.getClass().getFields();
+        StringBuilder sb=new StringBuilder();
+        for(int i=0;i<fields.length;i++){
+            try {
+                sb.append(fields[i].get(this).toString());
+                sb.append('\001');
+            } catch (Exception ex) {
+                log.error(ex);
+            } 
+        }
+        sb.deleteCharAt(sb.length()-1);
+        return sb.toString();
     }
-    
+
 }
