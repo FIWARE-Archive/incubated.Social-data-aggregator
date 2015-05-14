@@ -36,9 +36,9 @@ public class TwStreamConnectorMain {
          System.out.println();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
         log.debug(String.format("[%s] STARTING %s application",Constants.SDA_TW_CONNECTOR_LOG_TAG,Constants.SDA_TW_CONNECTOR_APP_NAME));
-        try {
+        //try {
             if(args.length<1 || args[0].equals("--help")){
                 printUsage();
                 System.exit(1);
@@ -86,9 +86,8 @@ public class TwStreamConnectorMain {
             SparkStreamingManager strManager = SparkStreamingManager.$newStreamingManager()
                     .withBatchDurationMillis(twProps.sparkBatchDurationMillis())
                     .withSparkConf(sparkConf)
-                    .withCheckpointPath(twProps.checkpointDir())
-                    .setUpSparkStreaming();
-
+                    .withCheckpointPath(twProps.checkpointDir());
+                    
             log.info(String.format("[%s] Starting jetty serve to restart connector from api",
                                                                             Constants.SDA_TW_CONNECTOR_LOG_TAG));
             JettyServerManager.newInstance()
@@ -112,10 +111,10 @@ public class TwStreamConnectorMain {
                 tsc.executeMainOperations(jssc);
             });
 
-        } catch (Exception e) {
-            log.error(String.format("[%s] Exception on %s ",
-                    Constants.SDA_TW_CONNECTOR_LOG_TAG, Constants.SDA_TW_CONNECTOR_APP_NAME), e);
-        }
+        //} catch (Exception e) {
+            //log.error(String.format("[%s] Exception on %s ",
+                    //Constants.SDA_TW_CONNECTOR_LOG_TAG, Constants.SDA_TW_CONNECTOR_APP_NAME), e);
+        //}
     }
 
 

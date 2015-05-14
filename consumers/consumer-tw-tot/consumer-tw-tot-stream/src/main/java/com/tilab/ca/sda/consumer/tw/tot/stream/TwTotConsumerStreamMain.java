@@ -2,7 +2,6 @@ package com.tilab.ca.sda.consumer.tw.tot.stream;
 
 import com.tilab.ca.sda.consumer.tw.tot.core.TotTwConstants;
 import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDao;
-import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDaoDefaultImpl;
 import com.tilab.ca.sda.consumer.utils.stream.BusConsumerConnection;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.ctw.utils.stream.SparkStreamingManager;
@@ -22,7 +21,7 @@ public class TwTotConsumerStreamMain {
     private static final String APP_NAME = "twTotConsumerStream";
     
    
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
 
         String confsPath = Utils.Env.getConfsPathFromEnv(TotTwConstants.SDA_CONF_SYSTEM_PROPERTY, TotTwConstants.TOT_TW_SYSTEM_PROPERTY);
         String log4jPropsFilePath = confsPath + File.separator + TotTwConstants.LOG4jPROPS_FILE_NAME;
@@ -42,7 +41,7 @@ public class TwTotConsumerStreamMain {
             log.error(errMessage);
             System.exit(1);
         }
-        try {
+        //try {
             log.debug(String.format("[%s] loading DAO..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
             ConsumerTwTotDao twDao = loadConsumerTwTotDao(confsPath,twProps.daoImplClass());
             String ttl = twProps.sparkCleanTTL();
@@ -63,14 +62,14 @@ public class TwTotConsumerStreamMain {
             SparkStreamingManager strManager = SparkStreamingManager.$newStreamingManager()
                     .withBatchDurationMillis(twProps.sparkBatchDurationMillis())
                     .withSparkConf(sparkConf)
-                    .withCheckpointPath(twProps.checkpointDir())
-                    .setUpSparkStreaming();
+                    .withCheckpointPath(twProps.checkpointDir());
+                    
             strManager.startSparkStream((jssc) -> {
                 TotTwStreamConsumer.executeAnalysis(jssc, twDao, twProps,busConsConn);
             });
-        } catch (Exception e) {
-            log.error(e);
-        }
+        //} catch (Exception e) {
+            //log.error(e);
+        //}
     }
 
     /**
