@@ -38,7 +38,7 @@ public class TwStreamConnectorMain {
 
     public static void main(String[] args) throws Exception{
         log.debug(String.format("[%s] STARTING %s application",Constants.SDA_TW_CONNECTOR_LOG_TAG,Constants.SDA_TW_CONNECTOR_APP_NAME));
-        //try {
+        try {
             if(args.length<1 || args[0].equals("--help")){
                 printUsage();
                 System.exit(1);
@@ -74,8 +74,9 @@ public class TwStreamConnectorMain {
             
             //setup spark configuration
             SparkConf sparkConf = new SparkConf().setAppName(Constants.SDA_TW_CONNECTOR_APP_NAME)
-                    .set(SparkStreamingSystemSettings.SPARK_CLEANER_TTL_PROPERTY, ttl); // Enable meta-data cleaning in Spark (so this can run forever)
-            
+                    .set(SparkStreamingSystemSettings.SPARK_WORKER_CLEANUP_ENABLED,"true") //Enable periodic cleanup of worker / application directories.
+                    .set(SparkStreamingSystemSettings.SPARK_CLEANER_TTL_PROPERTY, ttl) // Enable meta-data cleaning in Spark (so this can run forever)
+                    .set(SparkStreamingSystemSettings.SPARK_WRITE_AHEAD_LOG_ENABLED,"true"); //All the input data received through receivers will be saved to write ahead logs that will allow it to be recovered after driver failures. 
             //if there are other streaming applications running on the same cluster set this property to avoid them wait forever
             if(StringUtils.isNotBlank(twProps.numMaxCore())){
                 log.debug(String.format("[%s] setting numMaxCore for this streaming application to %s..",Constants.SDA_TW_CONNECTOR_LOG_TAG,twProps.numMaxCore()));
@@ -111,10 +112,10 @@ public class TwStreamConnectorMain {
                 tsc.executeMainOperations(jssc);
             });
 
-        //} catch (Exception e) {
-            //log.error(String.format("[%s] Exception on %s ",
-                    //Constants.SDA_TW_CONNECTOR_LOG_TAG, Constants.SDA_TW_CONNECTOR_APP_NAME), e);
-        //}
+        } catch (Exception e) {
+            log.error(String.format("[%s] Exception on %s ",
+                    Constants.SDA_TW_CONNECTOR_LOG_TAG, Constants.SDA_TW_CONNECTOR_APP_NAME), e);
+        }
     }
 
 

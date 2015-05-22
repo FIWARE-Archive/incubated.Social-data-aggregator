@@ -41,7 +41,7 @@ public class TwTotConsumerStreamMain {
             log.error(errMessage);
             System.exit(1);
         }
-        //try {
+        try {
             log.debug(String.format("[%s] loading DAO..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG));
             ConsumerTwTotDao twDao = loadConsumerTwTotDao(confsPath,twProps.daoImplClass());
             String ttl = twProps.sparkCleanTTL();
@@ -49,7 +49,9 @@ public class TwTotConsumerStreamMain {
             //setup spark configuration
             SparkConf sparkConf = new SparkConf().setAppName(APP_NAME)
                     .set(SparkStreamingSystemSettings.SPARK_CLEANER_TTL_PROPERTY, ttl) // Enable meta-data cleaning in Spark (so this can run forever)
-                    .set(SparkStreamingSystemSettings.SPARK_WRITE_AHEAD_LOG_ENABLED,"true"); //All the input data received through receivers will be saved to write ahead logs that will allow it to be recovered after driver failures. 
+                    .set(SparkStreamingSystemSettings.SPARK_WORKER_CLEANUP_ENABLED,"true"); //Enable periodic cleanup of worker / application directories.
+                   
+                    
             //if there are other streaming applications running on the same cluster set this property to avoid them wait forever
             if (StringUtils.isNotBlank(twProps.numMaxCore())) {
                 log.debug(String.format("[%s] setting numMaxCore for this streaming application to %s..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG, twProps.numMaxCore()));
@@ -67,9 +69,9 @@ public class TwTotConsumerStreamMain {
             strManager.startSparkStream((jssc) -> {
                 TotTwStreamConsumer.executeAnalysis(jssc, twDao, twProps,busConsConn);
             });
-        //} catch (Exception e) {
-            //log.error(e);
-        //}
+        } catch (Exception e) {
+            log.error(e);
+        }
     }
 
     /**

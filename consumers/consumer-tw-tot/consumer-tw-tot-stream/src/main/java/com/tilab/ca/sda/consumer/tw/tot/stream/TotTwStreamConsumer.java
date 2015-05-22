@@ -33,14 +33,14 @@ public class TotTwStreamConsumer {
         busConnection.init(jssc);
         int roundMode=RoundType.fromString(twProps.defaultRoundMode());
         JavaPairDStream<GeoLocTruncTimeKey, StatsCounter> geoStatusPairDstream=collectGeoStatus(twProps, busConnection, roundMode);
-        log.info(String.format("[%s]saving %d geo statuses on storage..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG,geoStatusPairDstream.count()));
         geoStatusPairDstream.foreachRDD((geoStatusRDD) -> {
+            log.info(String.format("[%s]saving %d geo statuses on storage..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG,geoStatusRDD.collect()));
             twDao.saveGeoByTimeGran(geoStatusRDD);
             return null;
         });
         JavaPairDStream<DateHtKey, StatsCounter> htStatusPairDstream=collectHtsStatus(twProps, busConnection, roundMode);
-        log.info(String.format("[%s]saving %d hts statuses on storage..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG,htStatusPairDstream.count()));
         htStatusPairDstream.foreachRDD((htsStatusRDD) -> {
+            log.info(String.format("[%s]saving %d hts statuses on storage..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG,htsStatusRDD.count()));
             twDao.saveHtsByTimeGran(htsStatusRDD);
             return null;
         });

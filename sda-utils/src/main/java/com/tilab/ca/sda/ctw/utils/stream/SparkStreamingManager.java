@@ -6,6 +6,7 @@
 package com.tilab.ca.sda.ctw.utils.stream;
 
 
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.Duration;
@@ -48,31 +49,8 @@ public class SparkStreamingManager {
         return this;
     }
 	
-    /*
-    public SparkStreamingManager setUpSparkStreaming(){
-            log.info(String.format("[%s] Initializing spark streaming context with batchDurationMillis %d ...",STREAMING_MANAGER_LOG_TAG,
-                    batchDurationMillis));	
- 
-            JavaStreamingContextFactory cntxFactory=() -> {
-                return getNewJavaStreamingContext();
-            };
-            
-            // Get JavaStreamingContext from checkpoint data or create a new one
-            try{
-                jssc = JavaStreamingContext.getOrCreate(checkpointPath, cntxFactory);
-            }catch(Exception se){
-                if(se instanceof SparkException){
-                    log.error(String.format("[%s] Failed to read checkpoints dir ",STREAMING_MANAGER_LOG_TAG),se);
-                    jssc=getNewJavaStreamingContext();
-                }else{
-                    throw se;
-                }
-            }
-            log.info(String.format("[%s] Spark streaming context initialized",STREAMING_MANAGER_LOG_TAG));	
-            return this;
-    }*/
-    
-    private JavaStreamingContext setUpSparkStreaming(SparkOperation operation) throws Exception{
+   
+    private JavaStreamingContext createContext(SparkOperation operation) throws Exception{
         log.info(String.format("[%s] Initializing spark streaming context with batchDurationMillis %d ...",STREAMING_MANAGER_LOG_TAG,
                     batchDurationMillis));
         log.info(String.format("[%s] Creating new JavaStreamingContext...",STREAMING_MANAGER_LOG_TAG));	
@@ -83,7 +61,7 @@ public class SparkStreamingManager {
         
         //execute the operation
         this.sparkOperation=operation;
-        operation.execute(jssc);
+        operation.execute(jsscT);
         
         return jsscT;
     }
@@ -93,11 +71,29 @@ public class SparkStreamingManager {
      * @param operation SparkOperation containing the code the streaming application has to execute 
      */
     public void startSparkStream(SparkOperation operation){
+            try{
+                $startSparkStream(operation);
+            }catch(Exception e){
+                 logErrorAndRestartDriver(e);
+            }
+    }
+    
+    private void logErrorAndRestartDriver(Exception e){
+        log.error(String.format("[%s] Exception on driver: ",STREAMING_MANAGER_LOG_TAG), e);
+        log.info(String.format("[%s] Trying to restart driver..",STREAMING_MANAGER_LOG_TAG));
+        try {
+            restartSparkStreaming();
+        } catch (Exception ex) {
+            log.error(String.format("[%s] Failed to restart driver.",STREAMING_MANAGER_LOG_TAG), e);
+        }
+    }
+    
+    private void $startSparkStream(SparkOperation operation){
             log.info(String.format("[%s] Starting streaming app...",STREAMING_MANAGER_LOG_TAG));
             
             JavaStreamingContextFactory cntxFactory=() -> {
                 try {
-                    return setUpSparkStreaming(operation);
+                    return createContext(operation);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -106,6 +102,7 @@ public class SparkStreamingManager {
             jssc.start();
             jssc.awaitTermination();
     }
+    
 	
     public void tearDownSparkStreaming(){
             log.info(String.format("[%s] Stopping spark streaming context...",STREAMING_MANAGER_LOG_TAG));
@@ -120,7 +117,7 @@ public class SparkStreamingManager {
     public void restartSparkStreaming() throws Exception{
         log.info(String.format("[%s] Tearing down spark streaming..",STREAMING_MANAGER_LOG_TAG));
         tearDownSparkStreaming();
-        log.info(String.format("[%s] Setting up new StreamingContext...",STREAMING_MANAGER_LOG_TAG));
+        //log.info(String.format("[%s] Setting up new StreamingContext...",STREAMING_MANAGER_LOG_TAG));
         //setUpSparkStreaming();
         log.info(String.format("[%s] Restarting spark streaming...",STREAMING_MANAGER_LOG_TAG));
         startSparkStream(sparkOperation);
