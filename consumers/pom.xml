@@ -11,6 +11,7 @@
     <modules>
         <module>consumer-tw-tot</module>
         <module>consumer-utils</module>
+        <module>consumer_gra</module>
     </modules>
     
     <dependencyManagement>

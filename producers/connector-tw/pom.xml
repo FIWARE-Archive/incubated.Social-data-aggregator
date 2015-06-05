@@ -26,7 +26,7 @@
             <version>4.2.2.0</version>
         </dependency>
         
-         <dependency>
+        <dependency>
             <groupId>com.tilab.ca.sda</groupId>
             <artifactId>sda-model</artifactId>
             <version>4.2.2.0</version>
@@ -78,10 +78,10 @@
             <artifactId>spark_test_lib</artifactId>
         </dependency>
         
-         <dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-         </dependency>
+        </dependency>
        
         <dependency>
             <groupId>com.tilab.ca</groupId>
