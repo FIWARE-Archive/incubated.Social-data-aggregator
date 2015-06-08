@@ -14,7 +14,11 @@
         <dependency>
             <groupId>com.tilab.ca.sda</groupId>
             <artifactId>sda-model</artifactId>
-            <version>4.2.2.0</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.tilab.ca.sda</groupId>
+            <artifactId>sda-utils</artifactId>
         </dependency>
         
         <dependency>

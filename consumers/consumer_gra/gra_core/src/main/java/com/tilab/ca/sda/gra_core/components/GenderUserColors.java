@@ -1,6 +1,7 @@
 package com.tilab.ca.sda.gra_core.components;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
+import com.tilab.ca.sda.gra_core.GenderUid;
 import com.tilab.ca.sda.gra_core.ml.MlModel;
 import com.tilab.ca.sda.gra_core.utils.ColourUtils;
 import com.tilab.ca.sda.gra_core.utils.GraConstants;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
@@ -36,6 +38,12 @@ public class GenderUserColors implements Serializable{
         this.numColors=numColors;
         coloursIndexMap=ColourUtils.generatePaletteRGB(numBits);
     }
+    
+    
+    public JavaRDD<GenderUid> getGendersFromTwProfiles(JavaRDD<TwUserProfile> profilesRDD){
+        return profilesRDD.map(twProfile -> new GenderUid(twProfile.getUid(), getGenderFromProfileColours(twProfile)));
+    }
+    
     
     public GenderTypes getGenderFromProfileColours(TwUserProfile twUserProfile){
         //a list containing the index of each scaled color in coloursIndexMap

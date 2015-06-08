@@ -20,6 +20,13 @@ public class GenderNameSN {
         this.namesGenderMap=namesGenderMap;
     }
     
+    public GenderTypes getGenderFromNameScreenName(String name,String screenName){
+        GenderTypes gender=getGenderFromName(name);
+        if(gender==GenderTypes.UNKNOWN)
+            gender=getGenderFromScreenName(screenName);
+        return gender;
+    }
+    
     public GenderTypes getGenderFromName(String name){
         log.debug("received name "+name);
         String cleanName=cleanName(name);

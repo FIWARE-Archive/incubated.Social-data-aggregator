@@ -2,6 +2,7 @@ package com.tilab.ca.sda.gra_core.ml;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
 import java.util.List;
+import java.util.Properties;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.feature.IDF;
@@ -14,6 +15,10 @@ public class FeaturesExtractionTFIDF extends FeatureExtractionTF implements Feat
     
     private IDFModel idfModel;
 
+    public FeaturesExtractionTFIDF(Properties props) {
+        this(Integer.parseInt(props.getProperty(NUM_FEATURES_PROPS))); //NUM_FEATURES_PROPS is a variable from superclass
+    }
+    
     public FeaturesExtractionTFIDF(int numFeatures) {
         super(numFeatures);
     }
