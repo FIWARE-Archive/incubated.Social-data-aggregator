@@ -2,6 +2,7 @@ package com.tilab.ca.sda.gra_core.components;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.GenderUid;
+import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.ml.MlModel;
 import com.tilab.ca.sda.gra_core.utils.ColourUtils;
 import com.tilab.ca.sda.gra_core.utils.GraConstants;
@@ -40,8 +41,9 @@ public class GenderUserColors implements Serializable{
     }
     
     
-    public JavaRDD<GenderUid> getGendersFromTwProfiles(JavaRDD<TwUserProfile> profilesRDD){
-        return profilesRDD.map(twProfile -> new GenderUid(twProfile.getUid(), getGenderFromProfileColours(twProfile)));
+    public JavaRDD<ProfileGender> getGendersFromTwProfiles(JavaRDD<ProfileGender> profilesRDD){
+        return profilesRDD.map(twProfileGender -> new ProfileGender(twProfileGender.getTwProfile(), 
+                                                                    getGenderFromProfileColours(twProfileGender.getTwProfile())));
     }
     
     

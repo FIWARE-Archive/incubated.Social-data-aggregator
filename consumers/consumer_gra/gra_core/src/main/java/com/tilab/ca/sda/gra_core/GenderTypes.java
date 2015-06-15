@@ -5,7 +5,8 @@ public enum GenderTypes {
     FEMALE('f',1.0),
     PAGE('x',2.0),
     DEPENDANT('y',3.0), //can be used for females or as a second name for males
-    UNKNOWN('u',4.0);
+    AMBIGUOUS('a',4.0), 
+    UNKNOWN('u',5.0);
     
     private char genderChar;
     private double label;
@@ -30,6 +31,7 @@ public enum GenderTypes {
             case 'f': return FEMALE;
             case 'x': return PAGE;
             case 'y': return DEPENDANT;
+            case 'a': return AMBIGUOUS; 
             default: return UNKNOWN;
         }
     }
@@ -40,6 +42,8 @@ public enum GenderTypes {
             case 0: return MALE;
             case 1: return FEMALE;
             case 2: return PAGE;
+            case 3: return DEPENDANT;
+            case 4: return AMBIGUOUS;
             default: return UNKNOWN;
         }
     }

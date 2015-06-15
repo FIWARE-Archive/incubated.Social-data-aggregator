@@ -2,7 +2,8 @@ package com.tilab.ca.sda.gra_core.components;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.GenderUid;
-import com.tilab.ca.sda.gra_core.UidDescrLst;
+import com.tilab.ca.sda.gra_core.ProfileGender;
+import com.tilab.ca.sda.gra_core.ProfileDescrLst;
 import com.tilab.ca.sda.gra_core.ml.FeaturesExtraction;
 import com.tilab.ca.sda.gra_core.ml.MlModel;
 import com.tilab.ca.sda.gra_core.utils.GraConstants;
@@ -108,26 +109,27 @@ public class GenderUserDescr implements Serializable{
         return descrWords;    
     }
     
-    public JavaRDD<GenderUid> getGendersFromTwProfiles(JavaRDD<TwUserProfile> profilesRDD){
+    public JavaRDD<ProfileGender> getGendersFromTwProfiles(JavaRDD<ProfileGender> profilesRDD){
         
         //profiles that does not provide enough information
-        JavaRDD<GenderUid> undefinedProfiles=profilesRDD.filter((twProfile) -> processDescription(twProfile.getDescription()).isEmpty())
-                                                        .map(twProfile -> new GenderUid(twProfile.getUid(),GenderTypes.UNKNOWN));
+        JavaRDD<ProfileGender> undefinedProfiles=profilesRDD.filter((twProfileGender) -> processDescription(twProfileGender.getTwProfile().getDescription()).isEmpty())
+                                                        .map(twProfileGender -> new ProfileGender(twProfileGender.getTwProfile(),GenderTypes.UNKNOWN));
         
         //get only profiles with a good description and map to an intermediate state (uid,list cleaned word in description)
-        JavaRDD<UidDescrLst> definedProfiles=profilesRDD
-                .map(twProfile -> new UidDescrLst(twProfile.getUid(),processDescription(twProfile.getDescription())))
+        JavaRDD<ProfileDescrLst> definedProfiles=profilesRDD
+                .map(twProfileGender -> new ProfileDescrLst(twProfileGender.getTwProfile(),
+                                                            processDescription(twProfileGender.getTwProfile().getDescription())))
                 .filter((uidDescr) -> !uidDescr.getDescrStrLst().isEmpty());
         
         //cache rdd
         definedProfiles.cache();
         
         //use the model to classify genders
-        JavaRDD<GenderTypes> gtsRDD=fe.generateFeatureExtractorLabeledPoints(definedProfiles.map(uidDescr -> uidDescr.getDescrStrLst()))
+        JavaRDD<GenderTypes> gtsRDD=fe.generateFeatureExtractorLabeledPoints(definedProfiles.map(profileDescr -> profileDescr.getDescrStrLst()))
                                       .map(lp -> GenderTypes.fromLabel(model.predict(lp.features())));
         
         //return the union of classified profiles with the ones unknown (not enough information in the description field)
-        return gtsRDD.zip(definedProfiles).map(zippedRdd -> new GenderUid(zippedRdd._2.getUid(), zippedRdd._1))
+        return gtsRDD.zip(definedProfiles).map(zippedRdd -> new ProfileGender(zippedRdd._2.getProfile(), zippedRdd._1))
                                           .union(undefinedProfiles);
     }
     
