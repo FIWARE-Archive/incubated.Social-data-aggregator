@@ -1,17 +1,17 @@
 package com.tilab.ca.sda.gra_core.components;
 
+import com.tilab.ca.sda.gra_core.DescrResults;
 import com.tilab.ca.sda.gra_core.GenderTypes;
-import com.tilab.ca.sda.gra_core.GenderUid;
 import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.ProfileDescrLst;
 import com.tilab.ca.sda.gra_core.ml.FeaturesExtraction;
 import com.tilab.ca.sda.gra_core.ml.MlModel;
 import com.tilab.ca.sda.gra_core.utils.GraConstants;
-import com.tilab.ca.sda.sda.model.TwUserProfile;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -109,7 +109,7 @@ public class GenderUserDescr implements Serializable{
         return descrWords;    
     }
     
-    public JavaRDD<ProfileGender> getGendersFromTwProfiles(JavaRDD<ProfileGender> profilesRDD){
+    public DescrResults getGendersFromTwProfiles(JavaRDD<ProfileGender> profilesRDD){
         
         //profiles that does not provide enough information
         JavaRDD<ProfileGender> undefinedProfiles=profilesRDD.filter((twProfileGender) -> processDescription(twProfileGender.getTwProfile().getDescription()).isEmpty())
@@ -129,8 +129,8 @@ public class GenderUserDescr implements Serializable{
                                       .map(lp -> GenderTypes.fromLabel(model.predict(lp.features())));
         
         //return the union of classified profiles with the ones unknown (not enough information in the description field)
-        return gtsRDD.zip(definedProfiles).map(zippedRdd -> new ProfileGender(zippedRdd._2.getProfile(), zippedRdd._1))
-                                          .union(undefinedProfiles);
+        return  new DescrResults(gtsRDD.zip(definedProfiles).map(zippedRdd -> new ProfileGender(zippedRdd._2.getProfile(), zippedRdd._1)),
+                                 undefinedProfiles);
     }
     
 }

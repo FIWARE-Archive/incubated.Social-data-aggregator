@@ -8,8 +8,8 @@ public enum GenderTypes {
     AMBIGUOUS('a',4.0), 
     UNKNOWN('u',5.0);
     
-    private char genderChar;
-    private double label;
+    private final char genderChar;
+    private final double label;
     
     private GenderTypes(char c,double lb){
         genderChar=c;

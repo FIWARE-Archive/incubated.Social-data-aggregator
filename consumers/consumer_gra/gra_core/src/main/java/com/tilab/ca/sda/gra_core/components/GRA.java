@@ -1,6 +1,7 @@
 package com.tilab.ca.sda.gra_core.components;
 
 import com.tilab.ca.sda.ctw.utils.Utils;
+import com.tilab.ca.sda.gra_core.DescrResults;
 import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.GenderUid;
 import com.tilab.ca.sda.gra_core.ProfileGender;
@@ -43,15 +44,15 @@ public class GRA implements Serializable{
         log.info("getting gender from description..");
         JavaRDD<ProfileGender> notReconFromGender=namesGenderRDD.filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN ||
                                                                                          profileGender.getGender()==GenderTypes.AMBIGUOUS);
-        JavaRDD<ProfileGender> descrGenderRdd=genderUserDescr.getGendersFromTwProfiles(notReconFromGender);
-        
-        JavaRDD<ProfileGender> notReconFromDescr=descrGenderRdd.filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN);
+        DescrResults descrResults=genderUserDescr.getGendersFromTwProfiles(notReconFromGender);
+        JavaRDD<ProfileGender> descrGenderRdd=descrResults.getProfilesRecognized();
+               
+        JavaRDD<ProfileGender> notReconFromDescr=descrResults.getProfilesUnrecognized().filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN);
         
         log.info("getting gender from colors..");
         JavaRDD<ProfileGender> colorGenderRdd=genderUserColor.getGendersFromTwProfiles(notReconFromDescr);
         namesGenderRDD=namesGenderRDD.filter(profileGender -> profileGender.getGender()!=GenderTypes.UNKNOWN &&
                                                               profileGender.getGender()!=GenderTypes.AMBIGUOUS);
-        descrGenderRdd=descrGenderRdd.filter(profileGender -> profileGender.getGender()!=GenderTypes.UNKNOWN);
         
         return jsc.union(namesGenderRDD,descrGenderRdd,colorGenderRdd);
     }
