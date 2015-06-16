@@ -1,4 +1,4 @@
-package com.tilab.ca.sda.consumer.tw.tot.batch.utils;
+package com.tilab.ca.sda.gra_consumer_batch.utils;
 
 import java.time.ZonedDateTime;
 

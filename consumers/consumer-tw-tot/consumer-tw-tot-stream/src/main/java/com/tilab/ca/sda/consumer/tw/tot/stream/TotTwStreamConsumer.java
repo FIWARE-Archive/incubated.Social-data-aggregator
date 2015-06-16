@@ -2,8 +2,8 @@ package com.tilab.ca.sda.consumer.tw.tot.stream;
 
 import com.tilab.ca.sda.consumer.tw.tot.core.TotTwConstants;
 import com.tilab.ca.sda.consumer.tw.tot.core.TwCounter;
-import com.tilab.ca.sda.consumer.tw.tot.core.data.DateHtKey;
-import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncTimeKey;
+import com.tilab.ca.sda.sda.model.keys.DateHtKey;
+import com.tilab.ca.sda.sda.model.keys.GeoLocTruncTimeKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDao;
 import com.tilab.ca.sda.consumer.utils.stream.BusConsumerConnection;

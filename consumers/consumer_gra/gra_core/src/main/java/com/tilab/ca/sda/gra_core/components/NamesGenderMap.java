@@ -5,6 +5,8 @@ import com.tilab.ca.sda.gra_core.GenderTypes;
 
 
 public interface NamesGenderMap {
+    
+    public static final String CONFS_PATH="CONFS_PATH";
     /**
      * @param name the name of the person
      * @return the corresponding gender for that name or GenderTypes.UNKNOWN if the

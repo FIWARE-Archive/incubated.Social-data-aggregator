@@ -14,9 +14,9 @@ public class ColourUtils {
     public static Color hex2Rgb(String colorHexStr){
         colorHexStr=colorHexStr.replace("#","");
         return new Color(
-            Integer.valueOf(colorHexStr.substring( 1, 3 ), 16 ),
-            Integer.valueOf(colorHexStr.substring( 3, 5 ), 16 ),
-            Integer.valueOf(colorHexStr.substring( 5, 7 ), 16 )
+            Integer.valueOf(colorHexStr.substring( 0, 2 ), 16 ),
+            Integer.valueOf(colorHexStr.substring( 2, 4 ), 16 ),
+            Integer.valueOf(colorHexStr.substring( 4, 6 ), 16 )
         );
     }
     

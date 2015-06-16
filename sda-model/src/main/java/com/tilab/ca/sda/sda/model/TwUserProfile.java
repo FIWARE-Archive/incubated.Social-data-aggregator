@@ -1,6 +1,7 @@
 package com.tilab.ca.sda.sda.model;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 
 
 public class TwUserProfile implements Serializable{
@@ -9,9 +10,22 @@ public class TwUserProfile implements Serializable{
     private String name;
     private String screenName;
     private String description;
+    private ZonedDateTime lastUpdate;
     
     private String[] profileColors;
 
+    public TwUserProfile() {
+    }
+
+    public TwUserProfile(long uid) {
+        this.uid = uid;
+    }
+    
+    public TwUserProfile(long uid,String description) {
+        this.uid = uid;
+        this.description=description;
+    }
+    
     public long getUid() {
         return uid;
     }
@@ -51,4 +65,13 @@ public class TwUserProfile implements Serializable{
     public void setProfileColors(String[] profileColors) {
         this.profileColors = profileColors;
     }
+
+    public ZonedDateTime getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(ZonedDateTime lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+    
 }

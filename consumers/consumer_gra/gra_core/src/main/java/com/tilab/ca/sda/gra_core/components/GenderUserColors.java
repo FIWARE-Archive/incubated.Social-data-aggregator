@@ -1,7 +1,6 @@
 package com.tilab.ca.sda.gra_core.components;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
-import com.tilab.ca.sda.gra_core.GenderUid;
 import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.ml.MlModel;
 import com.tilab.ca.sda.gra_core.utils.ColourUtils;

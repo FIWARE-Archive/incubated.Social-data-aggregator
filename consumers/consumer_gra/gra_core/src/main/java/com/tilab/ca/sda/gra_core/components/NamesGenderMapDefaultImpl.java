@@ -1,17 +1,26 @@
 package com.tilab.ca.sda.gra_core.components;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 
 public class NamesGenderMapDefaultImpl implements NamesGenderMap{
 
     private Map<String,GenderTypes> namesGenderMap=null;
+    private static final String DEFAULT_FILE_SEPARATOR=",";
+    private static final String DEFAULT_FILE_NAME="namesGenders.txt";
+    
+    public NamesGenderMapDefaultImpl(Properties props){
+        namesGenderMap=loadGenderMapFromFile(props.getProperty(NamesGenderMap.CONFS_PATH+File.separator+DEFAULT_FILE_NAME),
+                DEFAULT_FILE_SEPARATOR);
+    }
     
     public NamesGenderMapDefaultImpl(Map<String,GenderTypes> namesGenderMap){
         this.namesGenderMap=namesGenderMap;
@@ -20,6 +29,8 @@ public class NamesGenderMapDefaultImpl implements NamesGenderMap{
     public NamesGenderMapDefaultImpl(String nameGenderFilePath,String fileSeparator){
         namesGenderMap=loadGenderMapFromFile(nameGenderFilePath,fileSeparator);
     }
+    
+    
     
     @Override
     public GenderTypes getGender(String name) {

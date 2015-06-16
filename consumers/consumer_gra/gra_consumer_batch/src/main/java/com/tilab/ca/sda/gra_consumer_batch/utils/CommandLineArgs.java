@@ -1,4 +1,4 @@
-package com.tilab.ca.sda.consumer.tw.tot.batch.utils;
+package com.tilab.ca.sda.gra_consumer_batch.utils;
 
 import com.tilab.ca.sda.ctw.utils.RoundType;
 import com.tilab.ca.sda.ctw.utils.Utils;
@@ -67,7 +67,7 @@ public class CommandLineArgs {
     
     private static void printHelp() {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("Consumer Tw tot batch", options);
+        formatter.printHelp("Consumer Gra batch", options);
         System.exit(0);
     }
 }

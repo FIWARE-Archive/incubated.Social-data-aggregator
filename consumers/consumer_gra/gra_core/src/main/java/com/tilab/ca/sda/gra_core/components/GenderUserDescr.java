@@ -7,11 +7,11 @@ import com.tilab.ca.sda.gra_core.ProfileDescrLst;
 import com.tilab.ca.sda.gra_core.ml.FeaturesExtraction;
 import com.tilab.ca.sda.gra_core.ml.MlModel;
 import com.tilab.ca.sda.gra_core.utils.GraConstants;
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
@@ -22,17 +22,17 @@ public class GenderUserDescr implements Serializable{
     private final FeaturesExtraction fe;
     private final List<String> smiles;
     private final List<String> stopWords;
-    private static final int MIN_WORD_LENGTH=3;
+    private static final int MIN_WORD_LENGTH=2;
     
     
     public GenderUserDescr(MlModel cmodel,FeaturesExtraction fe,JavaSparkContext sc,String trainingPath){
         this.model=cmodel;
         this.fe=fe;
-        model.init(fe.generateTrainingSet(sc, trainingPath+GraConstants.DESCR_TAG+GraConstants.TRAINING_FILE_NAME));
+        model.init(fe.generateTrainingSet(sc, trainingPath+File.separator+GraConstants.DESCR_TAG+GraConstants.TRAINING_FILE_NAME));
         //loading allowed smiles
-        smiles=sc.textFile(trainingPath+GraConstants.DESCR_SMILES).collect();
+        smiles=sc.textFile(trainingPath+File.separator+GraConstants.DESCR_SMILES).collect();
         //loading stop words
-        stopWords=sc.textFile(trainingPath+GraConstants.DESCR_STOP_WORDS).collect();
+        stopWords=sc.textFile(trainingPath+File.separator+GraConstants.DESCR_STOP_WORDS).collect();
     }
     
     /**
@@ -68,9 +68,7 @@ public class GenderUserDescr implements Serializable{
      * @return 
      */
     public String cleanWord(String word){
-        if(!isASmile(word))
-                return word.replaceAll("[\\W_]", "");
-        return word;
+        return word.replaceAll("[\\W_]", "");
     }
     
     /**
@@ -115,6 +113,7 @@ public class GenderUserDescr implements Serializable{
         JavaRDD<ProfileGender> undefinedProfiles=profilesRDD.filter((twProfileGender) -> processDescription(twProfileGender.getTwProfile().getDescription()).isEmpty())
                                                         .map(twProfileGender -> new ProfileGender(twProfileGender.getTwProfile(),GenderTypes.UNKNOWN));
         
+       
         //get only profiles with a good description and map to an intermediate state (uid,list cleaned word in description)
         JavaRDD<ProfileDescrLst> definedProfiles=profilesRDD
                 .map(twProfileGender -> new ProfileDescrLst(twProfileGender.getTwProfile(),

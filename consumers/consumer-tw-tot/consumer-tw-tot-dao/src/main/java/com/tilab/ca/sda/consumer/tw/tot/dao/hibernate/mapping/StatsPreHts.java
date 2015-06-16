@@ -1,7 +1,7 @@
 package com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping;
 
 
-import com.tilab.ca.sda.consumer.tw.tot.core.data.DateHtKey;
+import com.tilab.ca.sda.sda.model.keys.DateHtKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import java.io.Serializable;
 import java.util.Date;

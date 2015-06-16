@@ -10,5 +10,23 @@
     <packaging>pom</packaging>
     <modules>
         <module>gra_core</module>
+        <module>gra_consumer_batch</module>
+        <module>gra_consumer_dao</module>
     </modules>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.tilab.ca.sda</groupId>
+                <artifactId>gra_core</artifactId>
+                <version>4.2.2.0</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>com.tilab.ca.sda</groupId>
+                <artifactId>gra_consumer_dao</artifactId>
+                <version>4.2.2.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

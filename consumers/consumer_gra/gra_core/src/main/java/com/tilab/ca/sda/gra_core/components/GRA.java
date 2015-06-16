@@ -77,7 +77,7 @@ public class GRA implements Serializable{
             return this;
         }
         
-        public GRAConfig fearureExtractorImpl(String featureExtractorClassImpl) throws Exception{
+        public GRAConfig featureExtractorImpl(String featureExtractorClassImpl) throws Exception{
             this.fe=Utils.Load.getClassInstFromInterface(FeaturesExtraction.class,featureExtractorClassImpl,null);
             return this;
         }
@@ -87,8 +87,8 @@ public class GRA implements Serializable{
             return this;
         }
         
-        public GRAConfig namesGenderMap(NamesGenderMap namesGenderMap) throws Exception{
-            this.namesGenderMap=namesGenderMap;
+        public GRAConfig namesGenderMapClassImpl(String namesGenderMapClassImpl) throws Exception{
+            this.namesGenderMap=Utils.Load.getClassInstFromInterface(NamesGenderMap.class,namesGenderMapClassImpl,null);
             return this;
         }
         
@@ -102,7 +102,7 @@ public class GRA implements Serializable{
             return this;
         }
 
-        public boolean areMandatoryFieldsFilled(){
+        private boolean areMandatoryFieldsFilled(){
             return StringUtils.isNotBlank(trainingPathStr) && coloursModel!=null 
                     && descrModel!=null && fe!=null && namesGenderMap!=null
                     && numBits>0 && numColors>0;
