@@ -57,8 +57,12 @@ public class CommandLineArgs {
         }
       
         if(arguments.getFrom()==null || arguments.getTo()==null){
-            throw new IllegalArgumentException("params from and to are mandatory!");
+            throw new IllegalArgumentException("params from and to are mandatory.");
         }
+        if(arguments.getFrom().isAfter(arguments.getTo())){
+            throw new IllegalArgumentException("from date cannot be after to");
+        }
+        
         if(arguments.getGranMin()!=null && arguments.getRoundMode()!=RoundType.ROUND_TYPE_MIN)
             throw new IllegalArgumentException("gran min param cannot be valorized without roundType min");
         

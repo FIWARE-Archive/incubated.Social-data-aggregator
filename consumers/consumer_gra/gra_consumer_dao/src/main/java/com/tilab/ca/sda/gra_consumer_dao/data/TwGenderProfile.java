@@ -1,9 +1,24 @@
 package com.tilab.ca.sda.gra_consumer_dao.data;
 
+import java.io.Serializable;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-public class TwGenderProfile {
+@Entity
+@Table(name="tw_user_gender")
+public class TwGenderProfile implements Serializable{
+    
+    private static final String FIELDS_SEPARATOR=",";
+    
+    @Id
+    @Column(name="uid")
     private long uid;
     
+    @Column(name="screen_name")
     private String screenName;
     
     private char gender;
@@ -38,6 +53,11 @@ public class TwGenderProfile {
 
     public void setGender(char gender) {
         this.gender = gender;
+    }
+    
+    @Override
+    public String toString(){
+        return uid+FIELDS_SEPARATOR+screenName+FIELDS_SEPARATOR+gender;
     }
 
 }

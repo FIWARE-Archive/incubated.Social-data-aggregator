@@ -84,6 +84,33 @@ public class RoundManager {
         }
         return roundedZdt;
     }
+    
+    public static final int ONE_MIN=1;
+    public static final int MINS_IN_HOUR=60;
+    public static final int MINS_IN_DAY=24*MINS_IN_HOUR;
+    
+    /**
+     * Evaluate the granularity from roundType and granMin passed as parameters
+     * @param roundType round type check RoundType class to see the allowed
+     * round types
+     * @param granMin the granularity expressed in minutes
+     * @return the correspondent round type in granularity (gran hour -> 60 ,gran day -> 60*24 min)
+     */
+    public static int getGranMinFromRoundType(int roundType, Integer granMin){
+        switch (roundType) {
+            case RoundType.ROUND_TYPE_MIN:
+                if (granMin != null && granMin != 0) {
+                    return granMin;
+                } 
+                return ONE_MIN;
+            case RoundType.ROUND_TYPE_HOUR:
+                return MINS_IN_HOUR;
+            case RoundType.ROUND_TYPE_DAY:
+                return MINS_IN_DAY;
+            default:
+                throw new IllegalArgumentException("RoundType " + roundType + " not recognized");
+        }
+    }
 
     /**
      * Round the ZonedDateTime to the gran related to the minute (e.g granMin=5

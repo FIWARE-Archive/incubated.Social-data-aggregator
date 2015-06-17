@@ -39,13 +39,21 @@ public class GenderUserColors implements Serializable{
         coloursIndexMap=ColourUtils.generatePaletteRGB(numBits);
     }
     
-    
+    /**
+     * classify gender info for an RDD containing many user profiles
+     * @param profilesRDD rdd containing twitter user profiles
+     * @return rdd containing objects of type ProfileGender (info on user profile and related gender)
+     */
     public JavaRDD<ProfileGender> getGendersFromTwProfiles(JavaRDD<ProfileGender> profilesRDD){
         return profilesRDD.map(twProfileGender -> new ProfileGender(twProfileGender.getTwProfile(), 
                                                                     getGenderFromProfileColours(twProfileGender.getTwProfile())));
     }
     
-    
+    /**
+     * Classify user gender evaluating colours info from twitter user profile 
+     * @param twUserProfile user profile containing profile colours
+     * @return the gender for the current profile
+     */
     public GenderTypes getGenderFromProfileColours(TwUserProfile twUserProfile){
         //a list containing the index of each scaled color in coloursIndexMap
         List<Integer> indexLst=Arrays.asList(twUserProfile.getProfileColors())

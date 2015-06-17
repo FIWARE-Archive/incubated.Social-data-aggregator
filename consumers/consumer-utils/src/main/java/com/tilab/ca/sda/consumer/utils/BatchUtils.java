@@ -7,12 +7,14 @@ import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import com.tilab.ca.sda.sda.model.TwUserProfile;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
@@ -46,6 +48,8 @@ public class BatchUtils {
     private static final String JHTS_FORMAT_EMPTY=String.format("\"%s\":[]",HTS_ELEM);
     private static final String JGEO_FORMAT=String.format("\"%s\":{",GEOLOCATION_ELEM);
     private static final String JGEO_FORMAT_EMPTY=String.format("\"%s\":{}",GEOLOCATION_ELEM);
+    
+    private static final Pattern CREATED_AT_DATA_PATTERN = Pattern.compile("\"createdAt\":\"(.*)\"");
    
     public static List<HtsStatus> fromJstring2HtsStatus(String statusString) {
         log.debug("parsing status string "+statusString);
@@ -150,5 +154,15 @@ public class BatchUtils {
     
     public static boolean isReply(JsonObject statusJsonObject) {
         return (statusJsonObject.get(REPLY_FIELD).getAsInt() != -1);
+    }
+    
+    public static boolean isCreatedAtInRange(String rawStatusJson,ZonedDateTime from,ZonedDateTime to){
+        Matcher m=CREATED_AT_DATA_PATTERN.matcher(rawStatusJson);
+        if (m.find()) {
+            ZonedDateTime createdAt=Utils.Time.fromShortTimeZoneString2ZonedDateTime(m.group(1));
+            return Utils.Time.isBetween(from, to, createdAt, Utils.Time.EXTREME_INCLUDED);
+        }else{
+            throw new IllegalStateException("pattern on createdAt not found as expected");
+        }
     }
 }
