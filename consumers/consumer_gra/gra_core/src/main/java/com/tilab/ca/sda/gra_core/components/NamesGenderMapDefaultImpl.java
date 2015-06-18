@@ -18,7 +18,7 @@ public class NamesGenderMapDefaultImpl implements NamesGenderMap{
     private static final String DEFAULT_FILE_NAME="namesGenders.txt";
     
     public NamesGenderMapDefaultImpl(Properties props){
-        namesGenderMap=loadGenderMapFromFile(props.getProperty(NamesGenderMap.CONFS_PATH+File.separator+DEFAULT_FILE_NAME),
+        namesGenderMap=loadGenderMapFromFile(props.getProperty(NamesGenderMap.CONFS_PATH)+File.separator+DEFAULT_FILE_NAME,
                 DEFAULT_FILE_SEPARATOR);
     }
     

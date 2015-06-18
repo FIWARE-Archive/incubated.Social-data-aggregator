@@ -5,8 +5,8 @@ import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.gra_consumer_batch.utils.Arguments;
 import com.tilab.ca.sda.gra_consumer_batch.utils.CommandLineArgs;
 import com.tilab.ca.sda.gra_consumer_batch.utils.GraConsumerProperties;
+import com.tilab.ca.sda.gra_consumer_batch.utils.LoadUtils;
 import com.tilab.ca.sda.gra_consumer_dao.GraConsumerDao;
-import com.tilab.ca.sda.gra_consumer_dao.data.TwGenderProfile;
 import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.StatsGenderCount;
@@ -14,12 +14,10 @@ import com.tilab.ca.sda.gra_core.components.GRA;
 import com.tilab.ca.sda.gra_core.utils.GraConstants;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
-import com.tilab.ca.sda.sda.model.TwUserProfile;
 import com.tilab.ca.sda.sda.model.keys.DateHtKey;
 import com.tilab.ca.sda.sda.model.keys.GeoLocTruncKey;
 import com.tilab.ca.sda.sda.model.keys.GeoLocTruncTimeKey;
 import java.io.File;
-import java.time.ZonedDateTime;
 import java.util.Properties;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +34,6 @@ public class GraConsumerBatchMain {
     private static final Logger log = Logger.getLogger(GraConsumerBatchMain.class);
 
     private static final String APP_NAME = "GraConsumerBatch";
-    private static final String DAO_IMPL_CONF_FILE_NAME="dao_impl.conf";
 
     public static void main(String[] args) {
 
@@ -57,7 +54,7 @@ public class GraConsumerBatchMain {
             
             GraConsumerProperties graProps=loadProps(confsPath);
             log.info("Loading Gra Consumer DAO..");
-            GraConsumerDao graDao=loadConsumerGraDao(confsPath, graProps.daoImplClass());
+            GraConsumerDao graDao=LoadUtils.loadConsumerGraDao(confsPath, graProps.daoImplClass());
             
             SparkConf conf=new SparkConf().setAppName(APP_NAME);
             
@@ -65,7 +62,7 @@ public class GraConsumerBatchMain {
             
             log.debug("Input data path is "+inputDataPath);
             log.info("Starting gra analytics..");
-            startGraAnalytics(sc, inputDataPath, graProps, graDao, arguments);
+            startGraAnalytics(sc,confsPath, inputDataPath, graProps, graDao, arguments);
             sc.stop();
             log.info("gra analytics END..");
 
@@ -74,15 +71,15 @@ public class GraConsumerBatchMain {
         }
     }
     
-    private static void startGraAnalytics(JavaSparkContext sc,String inputDataPath,GraConsumerProperties graProps,
+    private static void startGraAnalytics(JavaSparkContext sc,String confsPath,String inputDataPath,GraConsumerProperties graProps,
                                                                         GraConsumerDao graDao,Arguments arguments) throws Exception{
         JavaRDD<String> tweetsRdd=sc.textFile(inputDataPath);
         
         log.info("Setting gra configuration..");
-        GRA.GRAConfig graConf=new GRA.GRAConfig().coloursClassifierModelClass(graProps.coloursModelImplClass())
-                                              .descrClassifierModel(graProps.descrModelImplClass())
-                                              .featureExtractorImpl(graProps.featureExtractionClassImpl())
-                                              .namesGenderMapClassImpl(graProps.namesGenderMapImplClass())
+        GRA.GRAConfig graConf=new GRA.GRAConfig().coloursClassifierModel(LoadUtils.loadColourClassifierModel(confsPath, graProps.coloursModelImplClass()))
+                                              .descrClassifierModel(LoadUtils.loadDescrClassifierModel(confsPath, graProps.descrModelImplClass()))
+                                              .featureExtractor(LoadUtils.loadDescrFeatureExtraction(confsPath, graProps.featureExtractionClassImpl()))
+                                              .namesGenderMap(LoadUtils.loadNamesGenderMap(confsPath, graProps.namesGenderMapImplClass()))
                                               .trainingPath(graProps.trainingFilesPath())
                                               .numColorBitsMapping(graProps.colorAlgoReductionNumBits())
                                               .numColorBitsMapping(graProps.colorAlgoNumColorsToConsider());
@@ -114,7 +111,7 @@ public class GraConsumerBatchMain {
         getGeoAnalytics(tweetsRdd, userIdGenderPairRdd, graProps, arguments, graDao);
         
         log.info("evaluating hts analytics");
-        getHtsAnalytics(tweetsRdd, userIdGenderPairRdd, graProps, arguments, graDao);
+        getHtsAnalytics(tweetsRdd, userIdGenderPairRdd, arguments, graDao);
     }
     
     private static void getGeoAnalytics(JavaRDD<String> tweetsRdd,JavaPairRDD<Long,GenderTypes> userIdGenderPairRdd,
@@ -141,7 +138,7 @@ public class GraConsumerBatchMain {
     }
     
     private static void getHtsAnalytics(JavaRDD<String> tweetsRdd,JavaPairRDD<Long,GenderTypes> userIdGenderPairRdd,
-                                        GraConsumerProperties graProps,Arguments arguments,
+                                        Arguments arguments,
                                         GraConsumerDao graDao){
         
        JavaRDD<HtsStatus> htsStatus=tweetsRdd
@@ -171,14 +168,4 @@ public class GraConsumerBatchMain {
         return twProps;
     }
     
-    
-    private static GraConsumerDao loadConsumerGraDao(String confsPath,String implClassStr) throws Exception {
-        Properties props=Utils.Load.loadPropertiesFromPath(confsPath+File.separator+DAO_IMPL_CONF_FILE_NAME);
-        props.put(GraConsumerDao.CONF_PATH_PROPS_KEY, confsPath);
-        return Utils.Load.getClassInstFromInterface(GraConsumerDao.class, implClassStr, props);
-    }
-    
-    private static boolean areFromToValid(ZonedDateTime from, ZonedDateTime to) {
-        return from != null && to != null && to.isAfter(from);
-    }
 }

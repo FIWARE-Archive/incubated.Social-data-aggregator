@@ -2,9 +2,10 @@
 package com.tilab.ca.sda.gra_core.components;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
+import java.io.Serializable;
 
 
-public interface NamesGenderMap {
+public interface NamesGenderMap extends Serializable{
     
     public static final String CONFS_PATH="CONFS_PATH";
     /**

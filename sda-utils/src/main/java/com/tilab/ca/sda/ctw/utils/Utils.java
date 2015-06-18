@@ -108,7 +108,7 @@ public class Utils {
             }
 
             if (props == null) {
-                throw new IllegalArgumentException(String.format("cannot instantiate impl class %s. Impl class must implements %s interface", implClass, interfaceClass.getName()));
+                throw new IllegalArgumentException(String.format("cannot instantiate impl class %s. Properties not provided", implClass));
             }
 
             return (T) implClass.getConstructor(Properties.class).newInstance(props);

@@ -21,9 +21,22 @@ public class TwUserProfile implements Serializable{
         this.uid = uid;
     }
     
+    public TwUserProfile(long uid,String[] profileColors) {
+        this.uid = uid;
+        this.profileColors=profileColors;
+    }
+    
     public TwUserProfile(long uid,String description) {
         this.uid = uid;
         this.description=description;
+    }
+    
+    public TwUserProfile(long uid,String name,String screenName,String description,String[] profileColors) {
+        this.uid = uid;
+        this.description=description;
+        this.name=name;
+        this.screenName=screenName;
+        this.profileColors=profileColors;
     }
     
     public long getUid() {

@@ -108,7 +108,8 @@ public class BatchUtils {
             tup.setUid(jUser.get(ID_FIELD).getAsLong());
             tup.setName(jUser.get(USER_NAME_FIELD).getAsString());
             tup.setScreenName(jUser.get(USER_SCREEN_NAME_FIELD).getAsString());
-            tup.setDescription(jUser.get(USER_DESCRIPTION_FIELD).getAsString());
+            if(jUser.get(USER_DESCRIPTION_FIELD)!=null)
+                tup.setDescription(jUser.get(USER_DESCRIPTION_FIELD).getAsString());
             String[] colors=new String[5];
             colors[0]=jUser.get(USER_PROFILE_BACKGROUND_COLOR_FIELD).getAsString();
             colors[1]=jUser.get(USER_PROFILE_TEXT_COLOR_FIELD).getAsString();

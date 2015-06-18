@@ -1,14 +1,18 @@
 package com.tilab.ca.sda.gra_core.components;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
+import com.tilab.ca.sda.gra_core.ProfileGender;
+import com.tilab.ca.sda.sda.model.TwUserProfile;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.spark.api.java.JavaRDD;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 
-public class GenderNameSN {
+public class GenderNameSN implements Serializable{
     
     private static final Logger log = Logger.getLogger(GenderNameSN.class);
     
@@ -20,12 +24,19 @@ public class GenderNameSN {
         this.namesGenderMap=namesGenderMap;
     }
     
+    
     public GenderTypes getGenderFromNameScreenName(String name,String screenName){
         GenderTypes gender=getGenderFromName(name);
         if(gender==GenderTypes.UNKNOWN)
             gender=getGenderFromScreenName(screenName);
         return gender;
     }
+    
+    public JavaRDD<ProfileGender> getNamesGenderRDD(JavaRDD<TwUserProfile> twProfilesRdd){
+        return twProfilesRdd.map(twProfile -> 
+                new ProfileGender(twProfile,getGenderFromNameScreenName(twProfile.getName(), twProfile.getScreenName())));
+    }
+    
     
     public GenderTypes getGenderFromName(String name){
         log.debug("received name "+name);
@@ -40,6 +51,7 @@ public class GenderNameSN {
         return getGenderFromRecognList(recognList);
     }
     
+    
     public GenderTypes getGenderFromScreenName(String screenName){
         log.debug("getting gender from screenName "+screenName);
         GenderTypes gt=getGenderFromName(screenName);
@@ -49,6 +61,8 @@ public class GenderNameSN {
         log.debug("from screenName found gender "+gt.toChar());
         return gt;
     }
+    
+    
     
     private GenderTypes getGenderFromRecognList(List<GenderTypes> recognList){
         int numM=(int)recognList.stream().filter((gender)-> gender==GenderTypes.MALE).count();
@@ -103,6 +117,7 @@ public class GenderNameSN {
         return recognList.get(pos-1)==GenderTypes.UNKNOWN; 
     }
     
+    
     public static String cleanName(String name){
         name=name.replaceAll(ONLY_ALPHABET_LETTERS," ");
         if(!name.toUpperCase().equals(name)){
@@ -110,5 +125,6 @@ public class GenderNameSN {
         }    
         return name.replaceAll("( )+"," ").toLowerCase().trim();
     }
+    
 }
 

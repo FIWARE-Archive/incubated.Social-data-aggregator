@@ -12,6 +12,7 @@
         <module>gra_core</module>
         <module>gra_consumer_batch</module>
         <module>gra_consumer_dao</module>
+        <module>gra_consumer_stream</module>
     </modules>
     
     <dependencyManagement>

@@ -1,9 +1,10 @@
 package com.tilab.ca.sda.gra_core;
 
+import java.io.Serializable;
 import org.apache.spark.api.java.JavaRDD;
 
 
-public class DescrResults {
+public class DescrResults implements Serializable{
     
     private  JavaRDD<ProfileGender> profilesRecognized;
     private  JavaRDD<ProfileGender> profilesUnrecognized;

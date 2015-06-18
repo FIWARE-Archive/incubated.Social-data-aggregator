@@ -1,11 +1,13 @@
 package com.tilab.ca.sda.gra_consumer_batch.utils;
 
+import com.tilab.ca.sda.gra_core.utils.GraConstants;
 import org.aeonbits.owner.Config;
 
-
+@Config.Sources({
+	"file:${"+GraConstants.SDA_CONF_SYSTEM_PROPERTY+"}/${"+GraConstants.GRA_SYSTEM_PROPERTY+"}/GraConsumer.properties"
+})
 public interface GraConsumerProperties extends Config{
     
-    public String defaultRoundMode();
     
     @DefaultValue("3")
     public int roundPos();

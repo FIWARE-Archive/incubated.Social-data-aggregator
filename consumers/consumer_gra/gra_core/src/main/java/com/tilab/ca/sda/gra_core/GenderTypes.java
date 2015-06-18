@@ -1,6 +1,7 @@
 package com.tilab.ca.sda.gra_core;
 
-public enum GenderTypes {
+
+public enum GenderTypes{
     MALE('m',0.0),
     FEMALE('f',1.0),
     PAGE('x',2.0),

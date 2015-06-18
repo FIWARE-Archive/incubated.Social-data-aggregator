@@ -1,9 +1,7 @@
 package com.tilab.ca.sda.gra_core.components;
 
-import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.gra_core.DescrResults;
 import com.tilab.ca.sda.gra_core.GenderTypes;
-import com.tilab.ca.sda.gra_core.GenderUid;
 import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.ml.FeaturesExtraction;
 import com.tilab.ca.sda.gra_core.ml.MlModel;
@@ -37,27 +35,28 @@ public class GRA implements Serializable{
     
     public JavaRDD<ProfileGender> waterfallGraEvaluation(JavaRDD<TwUserProfile> twProfilesRdd){
         log.info("getting gender from name and screenName..");
-        JavaRDD<ProfileGender> namesGenderRDD=twProfilesRdd.map(twProfile -> 
-                new ProfileGender(twProfile,genderName.getGenderFromNameScreenName(twProfile.getName(), twProfile.getScreenName())));
+        //
+        JavaRDD<ProfileGender> namesGenderRDD=genderName.getNamesGenderRDD(twProfilesRdd);
         
         //filter profiles that are not recognized from the first algorithm
-        log.info("getting gender from description..");
         JavaRDD<ProfileGender> notReconFromGender=namesGenderRDD.filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN ||
                                                                                          profileGender.getGender()==GenderTypes.AMBIGUOUS);
+        log.info("getting gender from description..");
         DescrResults descrResults=genderUserDescr.getGendersFromTwProfiles(notReconFromGender);
         JavaRDD<ProfileGender> descrGenderRdd=descrResults.getProfilesRecognized();
                
         JavaRDD<ProfileGender> notReconFromDescr=descrResults.getProfilesUnrecognized().filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN);
         
+        
         log.info("getting gender from colors..");
         JavaRDD<ProfileGender> colorGenderRdd=genderUserColor.getGendersFromTwProfiles(notReconFromDescr);
         namesGenderRDD=namesGenderRDD.filter(profileGender -> profileGender.getGender()!=GenderTypes.UNKNOWN &&
-                                                              profileGender.getGender()!=GenderTypes.AMBIGUOUS);
+                                                               profileGender.getGender()!=GenderTypes.AMBIGUOUS);
         
         return jsc.union(namesGenderRDD,descrGenderRdd,colorGenderRdd);
     }
     
-    public static class GRAConfig{
+    public static class GRAConfig implements Serializable{
     
         private MlModel coloursModel;
         private MlModel descrModel;
@@ -67,18 +66,20 @@ public class GRA implements Serializable{
         private int numBits;
         private int numColors;
         
-        public GRAConfig coloursClassifierModelClass(String coloursModelClassImpl) throws Exception{
-            this.coloursModel=Utils.Load.getClassInstFromInterface(MlModel.class,coloursModelClassImpl,null);
+        
+        public GRAConfig coloursClassifierModel(MlModel mlModel) throws Exception{
+            this.coloursModel=mlModel;
             return this;
         }
         
-        public GRAConfig descrClassifierModel(String descrModelClassImpl) throws Exception{
-            this.descrModel=Utils.Load.getClassInstFromInterface(MlModel.class,descrModelClassImpl,null);
+        public GRAConfig descrClassifierModel(MlModel mlModel) throws Exception{
+            this.descrModel=mlModel;
             return this;
         }
         
-        public GRAConfig featureExtractorImpl(String featureExtractorClassImpl) throws Exception{
-            this.fe=Utils.Load.getClassInstFromInterface(FeaturesExtraction.class,featureExtractorClassImpl,null);
+        
+        public GRAConfig featureExtractor(FeaturesExtraction fe) throws Exception{
+            this.fe=fe;
             return this;
         }
         
@@ -87,8 +88,9 @@ public class GRA implements Serializable{
             return this;
         }
         
-        public GRAConfig namesGenderMapClassImpl(String namesGenderMapClassImpl) throws Exception{
-            this.namesGenderMap=Utils.Load.getClassInstFromInterface(NamesGenderMap.class,namesGenderMapClassImpl,null);
+        
+        public GRAConfig namesGenderMap(NamesGenderMap namesGenderMap) throws Exception{
+            this.namesGenderMap=namesGenderMap;
             return this;
         }
         
