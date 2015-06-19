@@ -32,6 +32,9 @@ public class GRA implements Serializable{
         this.jsc=jsc;
     }
     
+    public JavaRDD<ProfileGender> evaluateProfiles(JavaRDD<TwUserProfile> twProfilesRdd){
+        return waterfallGraEvaluation(twProfilesRdd);
+    }
     
     public JavaRDD<ProfileGender> waterfallGraEvaluation(JavaRDD<TwUserProfile> twProfilesRdd){
         log.info("getting gender from name and screenName..");
@@ -39,17 +42,18 @@ public class GRA implements Serializable{
         JavaRDD<ProfileGender> namesGenderRDD=genderName.getNamesGenderRDD(twProfilesRdd);
         
         //filter profiles that are not recognized from the first algorithm
-        JavaRDD<ProfileGender> notReconFromGender=namesGenderRDD.filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN ||
+        JavaRDD<ProfileGender> notReconFromName=namesGenderRDD.filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN ||
                                                                                          profileGender.getGender()==GenderTypes.AMBIGUOUS);
+        
         log.info("getting gender from description..");
-        DescrResults descrResults=genderUserDescr.getGendersFromTwProfiles(notReconFromGender);
+        DescrResults descrResults=genderUserDescr.getGendersFromTwProfiles(notReconFromName);
         JavaRDD<ProfileGender> descrGenderRdd=descrResults.getProfilesRecognized();
                
         JavaRDD<ProfileGender> notReconFromDescr=descrResults.getProfilesUnrecognized().filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN);
         
-        
         log.info("getting gender from colors..");
         JavaRDD<ProfileGender> colorGenderRdd=genderUserColor.getGendersFromTwProfiles(notReconFromDescr);
+        
         namesGenderRDD=namesGenderRDD.filter(profileGender -> profileGender.getGender()!=GenderTypes.UNKNOWN &&
                                                                profileGender.getGender()!=GenderTypes.AMBIGUOUS);
         

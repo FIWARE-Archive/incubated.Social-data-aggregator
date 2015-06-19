@@ -15,8 +15,11 @@ public class NamesGenderMapTest implements NamesGenderMap{
         testMap.put("john", GenderTypes.MALE);
         testMap.put("zach", GenderTypes.MALE);
         testMap.put("matt", GenderTypes.MALE);
+        testMap.put("ben", GenderTypes.MALE);
         testMap.put("deborah", GenderTypes.FEMALE);
+        testMap.put("anne", GenderTypes.FEMALE);
         testMap.put("news", GenderTypes.PAGE);
+        testMap.put("official", GenderTypes.PAGE);
     }
 
     @Override

@@ -8,10 +8,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.linalg.Vectors;
 import org.apache.spark.mllib.regression.LabeledPoint;
 
-/**
- *
- * @author dino
- */
+
 public class FeatureExtractorTest implements FeaturesExtraction{
 
     private final JavaRDD<LabeledPoint> lpRdd;

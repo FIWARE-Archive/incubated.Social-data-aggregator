@@ -1,10 +1,11 @@
 package com.tilab.ca.sda.gra_core;
 
 import com.tilab.ca.sda.sda.model.TwUserProfile;
+import java.io.Serializable;
 import java.util.List;
 
 
-public class ProfileDescrLst {
+public class ProfileDescrLst implements Serializable{
     
     private TwUserProfile profile;
     private List<String> descrStrLst;

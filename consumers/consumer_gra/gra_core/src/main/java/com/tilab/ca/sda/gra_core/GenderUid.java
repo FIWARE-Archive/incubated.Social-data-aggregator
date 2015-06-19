@@ -1,7 +1,9 @@
 package com.tilab.ca.sda.gra_core;
 
+import java.io.Serializable;
 
-public class GenderUid {
+
+public class GenderUid implements Serializable{
     
     private long uid;
     private GenderTypes gender;

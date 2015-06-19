@@ -8,4 +8,51 @@
     </parent>
     <artifactId>gra_consumer_stream</artifactId>
     <packaging>jar</packaging>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.10</artifactId>
+            <scope>provided</scope>			
+        </dependency>
+        
+        <dependency>
+                <groupId>com.tilab.ca.sda</groupId>
+                <artifactId>gra_consumer_dao</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.tilab.ca.sda</groupId>
+            <artifactId>consumer-utils</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.tilab.ca.sda</groupId>
+            <artifactId>gra_core</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.tilab.ca.sda</groupId>
+            <artifactId>gra_consumer_batch</artifactId>
+            <version>4.2.2.0</version>
+        </dependency>
+        
+         <dependency>
+            <groupId>org.aeonbits.owner</groupId>
+            <artifactId>owner</artifactId>
+        </dependency>
+       
+        <dependency>
+            <groupId>com.tilab.ca</groupId>
+            <artifactId>spark_test_lib</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+    </dependencies>
 </project>
