@@ -5,69 +5,84 @@ import java.io.Serializable;
 
 public class StatsGenderCount implements Serializable{
     
-    private int numTwMales = 0;
-    private int numTwFemales = 0;
-    private int numTwPages = 0;
-    private int numTwUndefined = 0;
+    private static final int TW_MATRIX_ROWS=4;
+    private static final int TW_MATRIX_COLS=3;
     
-
-    public StatsGenderCount(GenderTypes gender) {
-        switch(gender){
-            case MALE: numTwMales=1;
-                break;
-            case FEMALE: numTwFemales=1;
-                break;
-            case PAGE: numTwPages=1;
-                break;
-            default: numTwUndefined=1;
-        }
+    private int[][] twMatrix=new int[TW_MATRIX_ROWS][TW_MATRIX_COLS];
+    
+    private static final int TW_COL_POS=0;
+    private static final int RTW_COL_POS=1;
+    private static final int RPLY_COL_POS=2;
+    
+    
+  
+    public StatsGenderCount(GenderTypes gender,boolean isRetweet,boolean isReply) {
+        twMatrix[(int)gender.toLabel()][getPos(isRetweet, isReply)]=1;
     }
     
-    public StatsGenderCount(int numMales,int numFemales,int numPages,int numUndefined) {
-        this.numTwFemales=numFemales;
-        this.numTwMales=numMales;
-        this.numTwPages=numPages;
-        this.numTwUndefined=numUndefined;
+    private int getPos(boolean isRetweet,boolean isReply){
+        if(isRetweet)
+            return RTW_COL_POS;
+        else if(isReply)
+            return RPLY_COL_POS;
+        else
+            return TW_COL_POS;
     }
+    
     
     public StatsGenderCount sum(StatsGenderCount other){
-        this.numTwFemales+=other.numTwFemales;
-        this.numTwMales+=other.numTwMales;
-        this.numTwPages+=other.numTwPages;
-        this.numTwUndefined+=other.numTwUndefined;
+        for(int i=0;i<TW_MATRIX_ROWS;i++)
+            for(int t=0;i<TW_MATRIX_COLS;t++)
+                twMatrix[i][t]+=other.twMatrix[i][t];
         return this;
     }
-
+    
     public int getNumTwMales() {
-        return numTwMales;
+        return twMatrix[(int)GenderTypes.MALE.toLabel()][TW_COL_POS];
     }
-
-    public void setNumTwMales(int numTwMales) {
-        this.numTwMales = numTwMales;
+    
+    public int getNumRTwMales() {
+        return twMatrix[(int)GenderTypes.MALE.toLabel()][RTW_COL_POS];
     }
-
+    
+    public int getNumRplyMales() {
+        return twMatrix[(int)GenderTypes.MALE.toLabel()][RPLY_COL_POS];
+    }
+    
     public int getNumTwFemales() {
-        return numTwFemales;
+        return twMatrix[(int)GenderTypes.FEMALE.toLabel()][TW_COL_POS];
     }
-
-    public void setNumTwFemales(int numTwFemales) {
-        this.numTwFemales = numTwFemales;
+    
+    public int getNumRTwFemales() {
+        return twMatrix[(int)GenderTypes.FEMALE.toLabel()][RTW_COL_POS];
     }
-
+    
+    public int getNumRplyFemales() {
+        return twMatrix[(int)GenderTypes.FEMALE.toLabel()][RPLY_COL_POS];
+    }
+    
     public int getNumTwPages() {
-        return numTwPages;
+        return twMatrix[(int)GenderTypes.PAGE.toLabel()][TW_COL_POS];
     }
-
-    public void setNumTwPages(int numTwPages) {
-        this.numTwPages = numTwPages;
+    
+    public int getNumRTwPages() {
+        return twMatrix[(int)GenderTypes.PAGE.toLabel()][RTW_COL_POS];
     }
-
-    public int getNumTwUndefined() {
-        return numTwUndefined;
+    
+    public int getNumRplyPages() {
+        return twMatrix[(int)GenderTypes.PAGE.toLabel()][RPLY_COL_POS];
     }
-
-    public void setNumTwUndefined(int numTwUndefined) {
-        this.numTwUndefined = numTwUndefined;
+    
+    public int getNumTwUnknown() {
+        return twMatrix[(int)GenderTypes.UNKNOWN.toLabel()][TW_COL_POS];
+    }
+    
+    public int getNumRTwUnknown() {
+        return twMatrix[(int)GenderTypes.UNKNOWN.toLabel()][RTW_COL_POS];
+    }
+    
+    public int getNumRplyUnknown() {
+        return twMatrix[(int)GenderTypes.UNKNOWN.toLabel()][RPLY_COL_POS];
     }
 
 }

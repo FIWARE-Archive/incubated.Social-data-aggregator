@@ -43,11 +43,19 @@ public class GraResultsMapping {
         spgg.setLatTrunc(gltk.getGeoLocTruncKey().getLatTrunc());
         spgg.setLongTrunc(gltk.getGeoLocTruncKey().getLongTrunc());
         spgg.setGran(RoundManager.getGranMinFromRoundType(roundType, granMin));
-        spgg.setNumFemales(sgc.getNumTwMales());
-        spgg.setNumMales(sgc.getNumTwFemales());
-        spgg.setNumPages(sgc.getNumTwPages());
-        spgg.setNumUndefined(sgc.getNumTwUndefined());
-        
+        spgg.setNumTWMales(sgc.getNumTwMales());
+        spgg.setNumRTWMales(sgc.getNumRTwMales());
+        spgg.setNumRplyMales(sgc.getNumRplyMales());
+        spgg.setNumTWFemales(sgc.getNumTwFemales());
+        spgg.setNumRTWFemales(sgc.getNumRTwFemales());
+        spgg.setNumRplyFemales(sgc.getNumRplyFemales());
+        spgg.setNumTWPages(sgc.getNumTwPages());
+        spgg.setNumRTWPages(sgc.getNumRTwPages());
+        spgg.setNumRplyPages(sgc.getNumRplyPages());
+        spgg.setNumTWUnknown(sgc.getNumTwUnknown());
+        spgg.setNumRTWUnknown(sgc.getNumRTwUnknown());
+        spgg.setNumRplyUnknown(sgc.getNumRplyUnknown());
+  
         return spgg;
     }
     
@@ -65,10 +73,18 @@ public class GraResultsMapping {
         spgg.setTo(Utils.Time.zonedDateTime2Date(to));
         spgg.setLatTrunc(gltk.getLatTrunc());
         spgg.setLongTrunc(gltk.getLongTrunc());
-        spgg.setNumFemales(sgc.getNumTwMales());
-        spgg.setNumMales(sgc.getNumTwFemales());
-        spgg.setNumPages(sgc.getNumTwPages());
-        spgg.setNumUndefined(sgc.getNumTwUndefined());
+        spgg.setNumTWMales(sgc.getNumTwMales());
+        spgg.setNumRTWMales(sgc.getNumRTwMales());
+        spgg.setNumRplyMales(sgc.getNumRplyMales());
+        spgg.setNumTWFemales(sgc.getNumTwFemales());
+        spgg.setNumRTWFemales(sgc.getNumRTwFemales());
+        spgg.setNumRplyFemales(sgc.getNumRplyFemales());
+        spgg.setNumTWPages(sgc.getNumTwPages());
+        spgg.setNumRTWPages(sgc.getNumRTwPages());
+        spgg.setNumRplyPages(sgc.getNumRplyPages());
+        spgg.setNumTWUnknown(sgc.getNumTwUnknown());
+        spgg.setNumRTWUnknown(sgc.getNumRTwUnknown());
+        spgg.setNumRplyUnknown(sgc.getNumRplyUnknown());
         
         return spgg;
     }
@@ -86,10 +102,18 @@ public class GraResultsMapping {
         spgh.setCreatedAt(hk.getDate());
         spgh.setHt(hk.getHt());
         spgh.setGran(RoundManager.getGranMinFromRoundType(roundType, granMin));
-        spgh.setNumFemales(sgc.getNumTwMales());
-        spgh.setNumMales(sgc.getNumTwFemales());
-        spgh.setNumPages(sgc.getNumTwPages());
-        spgh.setNumUndefined(sgc.getNumTwUndefined());
+        spgh.setNumTWMales(sgc.getNumTwMales());
+        spgh.setNumRTWMales(sgc.getNumRTwMales());
+        spgh.setNumRplyMales(sgc.getNumRplyMales());
+        spgh.setNumTWFemales(sgc.getNumTwFemales());
+        spgh.setNumRTWFemales(sgc.getNumRTwFemales());
+        spgh.setNumRplyFemales(sgc.getNumRplyFemales());
+        spgh.setNumTWPages(sgc.getNumTwPages());
+        spgh.setNumRTWPages(sgc.getNumRTwPages());
+        spgh.setNumRplyPages(sgc.getNumRplyPages());
+        spgh.setNumTWUnknown(sgc.getNumTwUnknown());
+        spgh.setNumRTWUnknown(sgc.getNumRTwUnknown());
+        spgh.setNumRplyUnknown(sgc.getNumRplyUnknown());
         
         return spgh;
     }
@@ -107,10 +131,18 @@ public class GraResultsMapping {
         spghb.setFrom(Utils.Time.zonedDateTime2Date(from));
         spghb.setTo(Utils.Time.zonedDateTime2Date(to));
         spghb.setHt(ht);
-        spghb.setNumFemales(sgc.getNumTwMales());
-        spghb.setNumMales(sgc.getNumTwFemales());
-        spghb.setNumPages(sgc.getNumTwPages());
-        spghb.setNumUndefined(sgc.getNumTwUndefined());
+        spghb.setNumTWMales(sgc.getNumTwMales());
+        spghb.setNumRTWMales(sgc.getNumRTwMales());
+        spghb.setNumRplyMales(sgc.getNumRplyMales());
+        spghb.setNumTWFemales(sgc.getNumTwFemales());
+        spghb.setNumRTWFemales(sgc.getNumRTwFemales());
+        spghb.setNumRplyFemales(sgc.getNumRplyFemales());
+        spghb.setNumTWPages(sgc.getNumTwPages());
+        spghb.setNumRTWPages(sgc.getNumRTwPages());
+        spghb.setNumRplyPages(sgc.getNumRplyPages());
+        spghb.setNumTWUnknown(sgc.getNumTwUnknown());
+        spghb.setNumRTWUnknown(sgc.getNumRTwUnknown());
+        spghb.setNumRplyUnknown(sgc.getNumRplyUnknown());
         
         return spghb;
     }

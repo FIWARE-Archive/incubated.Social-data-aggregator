@@ -176,7 +176,7 @@ public class GraEvaluateAndCountTest {
         
         System.out.println("---------------------------------------");
         resultsTp2.forEach(res -> System.out.println(res._1.getDate().toString()+","+res._2.getNumTwMales()+","+
-                res._2.getNumTwFemales()+","+res._2.getNumTwPages()+","+res._2.getNumTwUndefined()));
+                res._2.getNumTwFemales()+","+res._2.getNumTwPages()+","+res._2.getNumTwUnknown()));
         
         
         assertEquals(2, resultsTp2.size());

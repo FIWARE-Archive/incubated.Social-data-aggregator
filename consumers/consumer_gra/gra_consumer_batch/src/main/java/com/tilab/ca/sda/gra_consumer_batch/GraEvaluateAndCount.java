@@ -59,12 +59,17 @@ public class GraEvaluateAndCount {
         
         JavaPairRDD<Long,GeoStatus> geoStatusesUidPairRdd=geoStatuses.mapToPair(geoStatus -> new Tuple2<>(geoStatus.getUserId(),geoStatus));
         
-        return geoStatusesUidPairRdd.join(uidGenders)
-                             .mapToPair(joinedGeoGender -> 
+        return countGeoStatuses(geoStatusesUidPairRdd.join(uidGenders), roundType, granMin);
+    }
+    
+    
+    public static JavaPairRDD<GeoLocTruncTimeKey, StatsGenderCount> countGeoStatuses(JavaPairRDD<Long,Tuple2<GeoStatus,GenderTypes>> joinedGeoGenderRdd,int roundType, Integer granMin){
+       return joinedGeoGenderRdd.mapToPair(joinedGeoGender -> 
                                         new Tuple2<>(new GeoLocTruncTimeKey(RoundManager.roundDate(joinedGeoGender._2._1.getSentTime(), 
                                                                             roundType, granMin),joinedGeoGender._2._1.getLatTrunc(), 
                                                                             joinedGeoGender._2._1.getLongTrunc()),
-                                        new StatsGenderCount(joinedGeoGender._2._2))
+                                        new StatsGenderCount(joinedGeoGender._2._2,joinedGeoGender._2._1.isRetweet(),
+                                                                                        joinedGeoGender._2._1.isReply()))
                              )
                              .reduceByKey((statGeoCounter1, statGeoCounter2) -> statGeoCounter1.sum(statGeoCounter2));
     }
@@ -83,7 +88,8 @@ public class GraEvaluateAndCount {
                 .mapToPair((joinedGeoGender)
                         -> new Tuple2<GeoLocTruncKey, StatsGenderCount>(
                                 new GeoLocTruncKey(joinedGeoGender._2._1.getLatTrunc(), joinedGeoGender._2._1.getLongTrunc()),
-                                new StatsGenderCount(joinedGeoGender._2._2))
+                                new StatsGenderCount(joinedGeoGender._2._2,joinedGeoGender._2._1.isRetweet(),
+                                                                                        joinedGeoGender._2._1.isReply()))
                 ).reduceByKey((statGeoCounter1, statGeoCounter2) -> statGeoCounter1.sum(statGeoCounter2));
     }
     
@@ -99,10 +105,17 @@ public class GraEvaluateAndCount {
         
         JavaPairRDD<Long,HtsStatus> htsStatusesUidPairRdd=htsStatuses.mapToPair(htsStatus -> new Tuple2<>(htsStatus.getUserId(),htsStatus));
         
-        return htsStatusesUidPairRdd.join(uidGenders)
+        return countHtsStatuses(htsStatusesUidPairRdd.join(uidGenders),roundType,granMin);
+                
+    }
+    
+    public static JavaPairRDD<DateHtKey, StatsGenderCount> countHtsStatuses(JavaPairRDD<Long,Tuple2<HtsStatus,GenderTypes>> joinedHtGenderRdd,int roundType, Integer granMin) {
+        
+        return joinedHtGenderRdd
                 .mapToPair(joinedHtGender -> new Tuple2<>(new DateHtKey(RoundManager.roundDate(joinedHtGender._2._1.getSentTime(), 
                                                                         roundType, granMin),joinedHtGender._2._1.getHashTag()),
-                                                          new StatsGenderCount(joinedHtGender._2._2))
+                                                          new StatsGenderCount(joinedHtGender._2._2,joinedHtGender._2._1.isRetweet(),
+                                                                                        joinedHtGender._2._1.isReply()))
                 ).reduceByKey((htCounter1, htCounter2) -> htCounter1.sum(htCounter2));
     }
 
@@ -117,7 +130,8 @@ public class GraEvaluateAndCount {
         
         return htsStatusesUidPairRdd.join(uidGenders)
                                     .mapToPair(joinedHtGender -> new Tuple2<>(joinedHtGender._2._1.getHashTag(),
-                                                                              new StatsGenderCount(joinedHtGender._2._2))
+                                                                              new StatsGenderCount(joinedHtGender._2._2,joinedHtGender._2._1.isRetweet(),
+                                                                                        joinedHtGender._2._1.isReply()))
                                     ).reduceByKey((htCounter1, htCounter2) -> htCounter1.sum(htCounter2));
     }
     

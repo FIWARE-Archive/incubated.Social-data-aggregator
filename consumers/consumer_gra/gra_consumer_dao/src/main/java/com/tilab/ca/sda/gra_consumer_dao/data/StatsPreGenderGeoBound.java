@@ -12,11 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "precuc_geo_gender_bound")
-public class StatsPreGenderGeoBound implements Serializable{
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+public class StatsPreGenderGeoBound extends StatsPreGender {
 
     @Column(name = "lat_trunc")
     private double latTrunc;
@@ -29,26 +25,8 @@ public class StatsPreGenderGeoBound implements Serializable{
 
     @Column(name = "to_time")
     private Date to = null;
-    
-    @Column(name = "num_males")
-    private int numMales;
-    
-    @Column(name = "num_females")
-    private int numFemales;
-    
-    @Column(name = "num_pages")
-    private int numPages;
-    
-    @Column(name = "num_undefined")
-    private int numUndefined;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+   
 
     public double getLatTrunc() {
         return latTrunc;
@@ -82,42 +60,14 @@ public class StatsPreGenderGeoBound implements Serializable{
         this.to = to;
     }
 
-    public int getNumMales() {
-        return numMales;
-    }
-
-    public void setNumMales(int numMales) {
-        this.numMales = numMales;
-    }
-
-    public int getNumFemales() {
-        return numFemales;
-    }
-
-    public void setNumFemales(int numFemales) {
-        this.numFemales = numFemales;
-    }
-
-    public int getNumPages() {
-        return numPages;
-    }
-
-    public void setNumPages(int numPages) {
-        this.numPages = numPages;
-    }
-
-    public int getNumUndefined() {
-        return numUndefined;
-    }
-
-    public void setNumUndefined(int numUndefined) {
-        this.numUndefined = numUndefined;
-    }
 
     @Override
-    public String toString(){
-        return String.format("%f,%f,%s,%s,%d,%d,%d,%d",latTrunc,longTrunc,Utils.Time.date2ZonedDateTime(from).toString(),
-                                Utils.Time.date2ZonedDateTime(to).toString(),
-                                numMales,numFemales,numPages,numUndefined);
+    public String toString() {
+        return String.format("%f,%f,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", latTrunc, longTrunc, Utils.Time.date2ZonedDateTime(from).toString(),
+                Utils.Time.date2ZonedDateTime(to).toString(),
+                numTWMales, numRTWMales, numRplyMales,
+                numTWFemales, numRTWFemales, numRplyFemales,
+                numTWPages, numRTWPages, numRplyPages,
+                numTWUnknown, numRTWUnknown, numRplyUnknown);
     }
 }
