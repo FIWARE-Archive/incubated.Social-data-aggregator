@@ -41,9 +41,18 @@ public class GRA implements Serializable{
         //
         JavaRDD<ProfileGender> namesGenderRDD=genderName.getNamesGenderRDD(twProfilesRdd);
         
+        System.out.println("*************************************************************");
+        namesGenderRDD.collect().forEach(pg ->System.out.println(pg.getTwProfile().getName()+" "+pg.getGender().toChar()));
+        System.out.println("*************************************************************");
+        
         //filter profiles that are not recognized from the first algorithm
         JavaRDD<ProfileGender> notReconFromName=namesGenderRDD.filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN ||
                                                                                          profileGender.getGender()==GenderTypes.AMBIGUOUS);
+        
+        System.out.println("Not recognized*************************************************************");
+        notReconFromName.collect().forEach(pg ->System.out.println(pg.getTwProfile().getName()+" "+pg.getGender().toChar()));
+        System.out.println("*************************************************************");
+        
         
         log.info("getting gender from description..");
         DescrResults descrResults=genderUserDescr.getGendersFromTwProfiles(notReconFromName);

@@ -7,9 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import org.hibernate.annotations.SQLInsert;
 
 @Entity
 @Table(name="tw_user_gender")
+@SQLInsert(sql="INSERT IGNORE INTO tw_user_gender(screen_name,gender,uid) VALUES (?,?,?)")
 public class TwGenderProfile implements Serializable{
     
     private static final String FIELDS_SEPARATOR=",";

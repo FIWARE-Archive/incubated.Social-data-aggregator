@@ -1,4 +1,4 @@
-package com.tilab.ca.sda.gra_consumer_batch.mock;
+package com.tilab.ca.sda.gra_consumer_stream.mock;
 
 import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.components.NamesGenderMap;
@@ -13,19 +13,20 @@ public class NamesGenderMapTest implements NamesGenderMap{
 
     public NamesGenderMapTest() {
         testMap.put("john", GenderTypes.MALE);
-        testMap.put("zach", GenderTypes.MALE);
         testMap.put("matt", GenderTypes.MALE);
-        testMap.put("ben", GenderTypes.MALE);
         testMap.put("deborah", GenderTypes.FEMALE);
         testMap.put("anne", GenderTypes.FEMALE);
         testMap.put("julie", GenderTypes.FEMALE);
         testMap.put("news", GenderTypes.PAGE);
-        testMap.put("official", GenderTypes.PAGE);
     }
 
     @Override
     public GenderTypes getGender(String name) {
-        return testMap.getOrDefault(name,GenderTypes.UNKNOWN);
+        //System.out.println("-------------------------------------");
+       // System.out.println("Received name **"+name+"**");
+        GenderTypes t= testMap.getOrDefault(name,GenderTypes.UNKNOWN);
+        //System.out.println("Returned **"+t.toChar()+"**");
+        return t;
     }
 
     @Override

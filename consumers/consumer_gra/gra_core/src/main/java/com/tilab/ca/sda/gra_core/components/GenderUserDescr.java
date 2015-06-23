@@ -113,7 +113,7 @@ public class GenderUserDescr implements Serializable{
         JavaRDD<ProfileGender> undefinedProfiles=profilesRDD.filter((twProfileGender) -> processDescription(twProfileGender.getTwProfile().getDescription()).isEmpty())
                                                         .map(twProfileGender -> new ProfileGender(twProfileGender.getTwProfile(),GenderTypes.UNKNOWN));
         
-       
+        
         //get only profiles with a good description and map to an intermediate state (uid,list cleaned word in description)
         JavaRDD<ProfileDescrLst> definedProfiles=profilesRDD
                 .map(twProfileGender -> new ProfileDescrLst(twProfileGender.getTwProfile(),

@@ -24,9 +24,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import scala.Tuple2;
@@ -130,22 +128,12 @@ public class GraEvaluateAndCountTest {
      * Test of countGeoStatuses method, of class GraEvaluateAndCount.
      */
     @Test
-    public void testCountGeoStatuses() throws Exception {
-        System.out.println("countGeoStatuses");
-        
-        //init gra
-        double[] predictionsDescr={};
-        double[] predictionsCols={};
-        GRA.GRAConfig graConf=new GRA.GRAConfig()
-                .coloursClassifierModel(new MlModelTest(predictionsCols))
-                .descrClassifierModel(new MlModelTest(predictionsDescr))
-                .featureExtractor(new FeatureExtractorTest(0, jsc))
-                .namesGenderMap(new NamesGenderMapTest())
-                .numColorBitsMapping(9)
-                .numColorsMapping(4)
-                .trainingPath(BASE_PATH);
+    public void testGraGeoStatuses() throws Exception {
+        System.out.println("countGeoStatuses");   
+        GRA gra = getSimpleGRA(jsc);
         
         List<String> tweetsLst=new ArrayList<>();
+        
         tweetsLst.add("{\"createdAt\":\"2014-07-08T23:16:19+02\",\"id\":1,\"inReplyToStatusId\":-1,\"geoLocation\":{\"latitude\":48.82956499,\"longitude\":2.29986439},\"hashtagEntities\":[],\"user\":{\"id\":1,\"name\":\"male1\",\"screenName\":\"john\",\"description\":\"descr\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
         tweetsLst.add("{\"createdAt\":\"2014-07-08T23:17:19+02\",\"id\":2,\"inReplyToStatusId\":-1,\"geoLocation\":{\"latitude\":48.82956499,\"longitude\":2.29986439},\"hashtagEntities\":[],\"user\":{\"id\":2,\"name\":\"male2\",\"screenName\":\"zach\",\"description\":\"descr\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
         tweetsLst.add("{\"createdAt\":\"2014-07-08T23:18:19+02\",\"id\":3,\"inReplyToStatusId\":-1,\"geoLocation\":{\"latitude\":48.82956499,\"longitude\":2.29986439},\"hashtagEntities\":[],\"user\":{\"id\":1,\"name\":\"male1\",\"screenName\":\"john\",\"description\":\"descr\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
@@ -154,12 +142,10 @@ public class GraEvaluateAndCountTest {
         tweetsLst.add("{\"createdAt\":\"2014-07-08T23:20:19+02\",\"id\":6,\"inReplyToStatusId\":-1,\"geoLocation\":{\"latitude\":49.80256499,\"longitude\":2.31986439},\"hashtagEntities\":[],\"user\":{\"id\":5,\"name\":\"page1\",\"screenName\":\"news_today\",\"description\":\"descr\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
         tweetsLst.add("{\"createdAt\":\"2014-07-08T23:21:19+02\",\"id\":7,\"inReplyToStatusId\":-1,\"geoLocation\":{\"latitude\":49.80256499,\"longitude\":2.31986439},\"hashtagEntities\":[],\"user\":{\"id\":6,\"name\":\"page2\",\"screenName\":\"official_page\",\"description\":\"descr\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
         tweetsLst.add("{\"createdAt\":\"2014-07-08T23:22:19+02\",\"id\":8,\"inReplyToStatusId\":-1,\"geoLocation\":{\"latitude\":49.80256499,\"longitude\":2.31986439},\"hashtagEntities\":[],\"user\":{\"id\":7,\"name\":\"male3\",\"screenName\":\"ben\",\"description\":\"descr\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
-        JavaRDD<String> tweetsRdd = jsc.parallelize(tweetsLst);
-        GRA gra = new GRA(graConf, jsc);
-        JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
         
-        System.out.println("profiles are :---------------------------------------");
-        resultprofileRDD.collect().forEach(p -> System.out.println(p.getTwProfile().getUid()+","+p.getGender().toChar()));
+        JavaRDD<String> tweetsRdd = jsc.parallelize(tweetsLst);
+        
+        JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
         
         JavaPairRDD<Long, GenderTypes> resPairRdd = GraEvaluateAndCount.fromProfileGenderToUserIdGenderPairRdd(resultprofileRDD);
         
@@ -168,16 +154,16 @@ public class GraEvaluateAndCountTest {
         
         int roundType = RoundType.ROUND_TYPE_MIN;
         Integer granMin = 5;
-        
+        testCountGeoStatuses(geoStatuses, resPairRdd, roundType, granMin);
+        testCountGeoStatusesFromTimeBounds(geoStatuses, resPairRdd);
+    }
+    
+    public void testCountGeoStatuses(JavaRDD<GeoStatus> geoStatuses,JavaPairRDD<Long, GenderTypes> resPairRdd,int roundType,Integer granMin){
+        System.out.println("testCountGeoStatuses");   
         JavaPairRDD<GeoLocTruncTimeKey, StatsGenderCount> resultRDD = GraEvaluateAndCount.countGeoStatuses(geoStatuses, resPairRdd, roundType, granMin);
         List<Tuple2<GeoLocTruncTimeKey, StatsGenderCount>> resultsTp2=resultRDD.collect();
         
         Collections.sort(resultsTp2, (tp1,tp2)-> tp1._1.getDate().compareTo(tp2._1.getDate()));
-        
-        System.out.println("---------------------------------------");
-        resultsTp2.forEach(res -> System.out.println(res._1.getDate().toString()+","+res._2.getNumTwMales()+","+
-                res._2.getNumTwFemales()+","+res._2.getNumTwPages()+","+res._2.getNumTwUnknown()));
-        
         
         assertEquals(2, resultsTp2.size());
         assertEquals(Utils.Time.zonedDateTime2Date(ZonedDateTime.parse("2014-07-08T23:15:00+02:00")), resultsTp2.get(0)._1.getDate());
@@ -191,57 +177,202 @@ public class GraEvaluateAndCountTest {
         assertEquals(2.319f, resultsTp2.get(1)._1.getGeoLocTruncKey().getLongTrunc(),3);
         assertEquals("expected 1 male profile for time 2014-07-08T23:20:00+02:00",1, resultsTp2.get(1)._2.getNumTwMales());
         assertEquals("expected 2 pages profiles for time 2014-07-08T23:20:00+02:00",2, resultsTp2.get(1)._2.getNumTwPages());
-        
     }
 
     /**
      * Test of countGeoStatusesFromTimeBounds method, of class GraEvaluateAndCount.
      */
-    @Test
-    public void testCountGeoStatusesFromTimeBounds() {
-        /*
+    public void testCountGeoStatusesFromTimeBounds(JavaRDD<GeoStatus> geoStatuses,JavaPairRDD<Long, GenderTypes> uidGenders) {
         System.out.println("countGeoStatusesFromTimeBounds");
-        JavaRDD<GeoStatus> geoStatuses = null;
-        JavaPairRDD<Long, GenderTypes> uidGenders = null;
-        JavaPairRDD<GeoLocTruncKey, StatsGenderCount> expResult = null;
-        JavaPairRDD<GeoLocTruncKey, StatsGenderCount> result = GraEvaluateAndCount.countGeoStatusesFromTimeBounds(geoStatuses, uidGenders);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");*/
+        
+        JavaPairRDD<GeoLocTruncKey, StatsGenderCount> resultRDD = GraEvaluateAndCount.countGeoStatusesFromTimeBounds(geoStatuses, uidGenders);
+        List<Tuple2<GeoLocTruncKey, StatsGenderCount>> resultsTp2=resultRDD.collect();
+        Collections.sort(resultsTp2, (tp1,tp2)-> {
+           int cmp1=((Double)tp1._1.getLatTrunc()).compareTo(tp2._1.getLatTrunc());
+           if(cmp1==0)
+               return ((Double)tp1._1.getLongTrunc()).compareTo(tp2._1.getLongTrunc());
+           return cmp1;
+        });
+        
+        assertEquals(2, resultsTp2.size());
+        assertEquals(48.829f, resultsTp2.get(0)._1.getLatTrunc(),3);
+        assertEquals(2.299f, resultsTp2.get(0)._1.getLongTrunc(),3);
+        assertEquals("expected 3 male profile for lt 48.829 lng 2.299",3, resultsTp2.get(0)._2.getNumTwMales());
+        assertEquals("expected 2 female profile for lt 48.829 lng 2.299",2, resultsTp2.get(0)._2.getNumTwFemales());
+        
+        assertEquals(49.802f, resultsTp2.get(1)._1.getLatTrunc(),3);
+        assertEquals(2.319f, resultsTp2.get(1)._1.getLongTrunc(),3);
+        assertEquals("expected 1 male profile for lt 49.802 lng 2.319",1, resultsTp2.get(1)._2.getNumTwMales());
+        assertEquals("expected 2 pages profile for lt 49.802 lng 2.319",2, resultsTp2.get(1)._2.getNumTwPages());
     }
 
     /**
      * Test of countHtsStatuses method, of class GraEvaluateAndCount.
      */
     @Test
-    public void testCountHtsStatuses() {
-        /*
+    public void testGraHtsStatuses() throws Exception {
         System.out.println("countHtsStatuses");
-        JavaRDD<HtsStatus> htsStatuses = null;
-        JavaPairRDD<Long, GenderTypes> uidGenders = null;
-        int roundType = 0;
-        Integer granMin = null;
-        JavaPairRDD<DateHtKey, StatsGenderCount> expResult = null;
-        JavaPairRDD<DateHtKey, StatsGenderCount> result = GraEvaluateAndCount.countHtsStatuses(htsStatuses, uidGenders, roundType, granMin);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");*/
+        GRA gra = getSimpleGRA(jsc);
+      
+        List<String> tweetsLst=new ArrayList<>();
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:16:19+02\",\"id\":1,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19},{\"text\":\"ht2\",\"start\":0,\"end\":19}],\"user\":{\"id\":1,\"name\":\"male1\",\"screenName\":\"john\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:17:19+02\",\"id\":2,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":1,\"name\":\"male1\",\"screenName\":\"john\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:16:30+02\",\"id\":3,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":2,\"name\":\"pg1\",\"screenName\":\"news_g1\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:16:42+02\",\"id\":4,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":3,\"name\":\"pg2\",\"screenName\":\"news_g2\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:16:53+02\",\"id\":5,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":4,\"name\":\"pg3\",\"screenName\":\"news_g3\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:17:19+02\",\"id\":6,\"inReplyToStatusId\":-1,\"retweetedStatus\":{},\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":5,\"name\":\"female1\",\"screenName\":\"deborah\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:18:23+02\",\"id\":7,\"inReplyToStatusId\":1221323,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":5,\"name\":\"female1\",\"screenName\":\"deborah\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:18:44+02\",\"id\":8,\"inReplyToStatusId\":1331231,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":6,\"name\":\"female2\",\"screenName\":\"anne\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:15:57+02\",\"id\":9,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht2\",\"start\":0,\"end\":19}],\"user\":{\"id\":7,\"name\":\"female3\",\"screenName\":\"julie\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:16:19+02\",\"id\":10,\"inReplyToStatusId\":-1,\"retweetedStatus\":{},\"hashtagEntities\":[{\"text\":\"ht2\",\"start\":0,\"end\":19}],\"user\":{\"id\":8,\"name\":\"pg4\",\"screenName\":\"news_g4\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:16:28+02\",\"id\":11,\"inReplyToStatusId\":-1,\"retweetedStatus\":{},\"hashtagEntities\":[{\"text\":\"ht2\",\"start\":0,\"end\":19}],\"user\":{\"id\":9,\"name\":\"pg5\",\"screenName\":\"news_g5\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:20:01+02\",\"id\":12,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":1,\"name\":\"male1\",\"screenName\":\"john\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:21:19+02\",\"id\":13,\"inReplyToStatusId\":-1,\"retweetedStatus\":{},\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":10,\"name\":\"male2\",\"screenName\":\"matt\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:22:19+02\",\"id\":14,\"inReplyToStatusId\":-1,\"retweetedStatus\":{},\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":1,\"name\":\"male1\",\"screenName\":\"john\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:23:12+02\",\"id\":15,\"inReplyToStatusId\":156231,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":5,\"name\":\"female1\",\"screenName\":\"deborah\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:23:15+02\",\"id\":16,\"inReplyToStatusId\":131231,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":6,\"name\":\"female2\",\"screenName\":\"anne\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        tweetsLst.add("{\"createdAt\":\"2014-07-08T10:24:58+02\",\"id\":17,\"inReplyToStatusId\":121332,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":5,\"name\":\"female1\",\"screenName\":\"deborah\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
+        
+        JavaRDD<String> tweetsRdd = jsc.parallelize(tweetsLst);
+        
+        JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
+        
+        JavaPairRDD<Long, GenderTypes> uidGenders = GraEvaluateAndCount.fromProfileGenderToUserIdGenderPairRdd(resultprofileRDD);
+        
+        JavaRDD<HtsStatus> htsStatuses = tweetsRdd.flatMap(BatchUtils::fromJstring2HtsStatus);
+        int roundType = RoundType.ROUND_TYPE_MIN;
+        Integer granMin = 5;
+        
+        testCountHtsStatuses(htsStatuses, uidGenders,roundType,granMin);
+        testCountHtsStatusesFromTimeBounds(htsStatuses, uidGenders);
     }
 
+    public void testCountHtsStatuses(final JavaRDD<HtsStatus> htsStatuses,final JavaPairRDD<Long, GenderTypes> uidGenders,int roundType,int granMin) {
+        System.out.println("testCountHtsStatuses");
+        JavaPairRDD<DateHtKey, StatsGenderCount> resultRDD = GraEvaluateAndCount.countHtsStatuses(htsStatuses, uidGenders, roundType, granMin);
+        List<Tuple2<DateHtKey, StatsGenderCount>> resultsTp2= resultRDD.collect();
+        Collections.sort(resultsTp2, (tp1,tp2)-> {
+            int cp1=tp1._1.getDate().compareTo(tp2._1.getDate());
+            if(cp1==0)
+                return tp1._1.getHt().compareTo(tp2._1.getHt());
+            return cp1;
+        });
+        
+        assertEquals(3, resultsTp2.size());
+        assertEquals(Utils.Time.zonedDateTime2Date(ZonedDateTime.parse("2014-07-08T10:15:00+02:00")), resultsTp2.get(0)._1.getDate());
+        assertEquals("ht1", resultsTp2.get(0)._1.getHt());
+        assertEquals(2, resultsTp2.get(0)._2.getNumTwMales());
+        assertEquals(3, resultsTp2.get(0)._2.getNumTwPages());
+        assertEquals(0, resultsTp2.get(0)._2.getNumTwFemales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumTwUnknown());
+        
+        assertEquals(0, resultsTp2.get(0)._2.getNumRTwMales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumRTwPages());
+        assertEquals(1, resultsTp2.get(0)._2.getNumRTwFemales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumRTwUnknown());
+        
+        assertEquals(0, resultsTp2.get(0)._2.getNumRplyMales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumRplyPages());
+        assertEquals(2, resultsTp2.get(0)._2.getNumRplyFemales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumRplyUnknown());
+        
+        assertEquals(Utils.Time.zonedDateTime2Date(ZonedDateTime.parse("2014-07-08T10:15:00+02:00")), resultsTp2.get(1)._1.getDate());
+        assertEquals("ht2", resultsTp2.get(1)._1.getHt());
+        
+        assertEquals(1, resultsTp2.get(1)._2.getNumTwMales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumTwPages());
+        assertEquals(1, resultsTp2.get(1)._2.getNumTwFemales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumTwUnknown());
+        
+        assertEquals(0, resultsTp2.get(1)._2.getNumRTwMales());
+        assertEquals(2, resultsTp2.get(1)._2.getNumRTwPages());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRTwFemales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRTwUnknown());
+        
+        assertEquals(0, resultsTp2.get(1)._2.getNumRplyMales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRplyPages());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRplyFemales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRplyUnknown());
+        
+        assertEquals(Utils.Time.zonedDateTime2Date(ZonedDateTime.parse("2014-07-08T10:20:00+02:00")), resultsTp2.get(2)._1.getDate());
+        assertEquals("ht1", resultsTp2.get(2)._1.getHt());
+        
+        assertEquals(1, resultsTp2.get(2)._2.getNumTwMales());
+        assertEquals(0, resultsTp2.get(2)._2.getNumTwPages());
+        assertEquals(0, resultsTp2.get(2)._2.getNumTwFemales());
+        assertEquals(0, resultsTp2.get(2)._2.getNumTwUnknown());
+        
+        assertEquals(2, resultsTp2.get(2)._2.getNumRTwMales());
+        assertEquals(0, resultsTp2.get(2)._2.getNumRTwPages());
+        assertEquals(0, resultsTp2.get(2)._2.getNumRTwFemales());
+        assertEquals(0, resultsTp2.get(2)._2.getNumRTwUnknown());
+        
+        assertEquals(0, resultsTp2.get(2)._2.getNumRplyMales());
+        assertEquals(0, resultsTp2.get(2)._2.getNumRplyPages());
+        assertEquals(3, resultsTp2.get(2)._2.getNumRplyFemales());
+        assertEquals(0, resultsTp2.get(2)._2.getNumRplyUnknown());
+    }
+    
     /**
      * Test of countHtsStatusesFromTimeBounds method, of class GraEvaluateAndCount.
      */
-    @Test
-    public void testCountHtsStatusesFromTimeBounds() {
-        /*
-        System.out.println("countHtsStatusesFromTimeBounds");
-        JavaRDD<HtsStatus> htsStatuses = null;
-        JavaPairRDD<Long, GenderTypes> uidGenders = null;
-        JavaPairRDD<String, StatsGenderCount> expResult = null;
+    public void testCountHtsStatusesFromTimeBounds(final JavaRDD<HtsStatus> htsStatuses,final JavaPairRDD<Long, GenderTypes> uidGenders) {
+        System.out.println("countHtsStatusesFromTimeBounds"); 
         JavaPairRDD<String, StatsGenderCount> result = GraEvaluateAndCount.countHtsStatusesFromTimeBounds(htsStatuses, uidGenders);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");*/
+        List<Tuple2<String, StatsGenderCount>> resultsTp2=result.collect();
+        
+        
+        Collections.sort(resultsTp2, (tp1,tp2)-> tp1._1.compareTo(tp2._1));
+        
+        assertEquals(2, resultsTp2.size());
+        assertEquals("ht1", resultsTp2.get(0)._1);
+        
+        assertEquals(3, resultsTp2.get(0)._2.getNumTwMales());
+        assertEquals(3, resultsTp2.get(0)._2.getNumTwPages());
+        assertEquals(0, resultsTp2.get(0)._2.getNumTwFemales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumTwUnknown());
+        
+        assertEquals(2, resultsTp2.get(0)._2.getNumRTwMales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumRTwPages());
+        assertEquals(1, resultsTp2.get(0)._2.getNumRTwFemales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumRTwUnknown());
+        
+        assertEquals(0, resultsTp2.get(0)._2.getNumRplyMales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumRplyPages());
+        assertEquals(5, resultsTp2.get(0)._2.getNumRplyFemales());
+        assertEquals(0, resultsTp2.get(0)._2.getNumRplyUnknown());
+        
+        assertEquals("ht2", resultsTp2.get(1)._1);
+        
+        assertEquals(1, resultsTp2.get(1)._2.getNumTwMales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumTwPages());
+        assertEquals(1, resultsTp2.get(1)._2.getNumTwFemales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumTwUnknown());
+        
+        assertEquals(0, resultsTp2.get(1)._2.getNumRTwMales());
+        assertEquals(2, resultsTp2.get(1)._2.getNumRTwPages());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRTwFemales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRTwUnknown());
+        
+        assertEquals(0, resultsTp2.get(1)._2.getNumRplyMales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRplyPages());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRplyFemales());
+        assertEquals(0, resultsTp2.get(1)._2.getNumRplyUnknown());
+    }
+    
+    private GRA getSimpleGRA(JavaSparkContext jsc) throws Exception{
+        //init gra
+        double[] predictionsDescr={};
+        double[] predictionsCols={};
+        GRA.GRAConfig graConf=new GRA.GRAConfig()
+                .coloursClassifierModel(new MlModelTest(predictionsCols))
+                .descrClassifierModel(new MlModelTest(predictionsDescr))
+                .featureExtractor(new FeatureExtractorTest(0, jsc))
+                .namesGenderMap(new NamesGenderMapTest())
+                .numColorBitsMapping(9)
+                .numColorsMapping(4)
+                .trainingPath(BASE_PATH);
+        return new GRA(graConf, jsc);
     }
     
 }

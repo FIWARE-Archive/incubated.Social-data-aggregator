@@ -17,7 +17,6 @@ import com.tilab.ca.sda.sda.model.HtsStatus;
 import com.tilab.ca.sda.sda.model.keys.DateHtKey;
 import com.tilab.ca.sda.sda.model.keys.GeoLocTruncTimeKey;
 import java.util.stream.Collectors;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -49,14 +48,27 @@ public class GraStreamConsumer {
         JavaDStream<String> rawTwDStream=busConnection.getDStreamByKey(graProps.keyRaw());
         JavaDStream<String> rawTwDStreamWindow=rawTwDStream.window(new Duration(graProps.twTotWindowDurationMillis()), 
                                                                    new Duration(graProps.twTotWindowSlidingIntervalMillis()));
+        
         //retrieve distinct user profiles and evaluate their gender with gra algorithm
-        JavaPairDStream<Long,GenderTypes> uniqueProfilesRDD=getUniqueProfilesDStream(rawTwDStreamWindow, gra);
-        uniqueProfilesRDD.cache();
+        JavaDStream<ProfileGender> uniqueProfilesGenderDStream=getUniqueProfilesDStream(rawTwDStreamWindow, gra);
+        JavaPairDStream<Long,GenderTypes> uidGenderPairsDStream=getUidGenderPairDStream(uniqueProfilesGenderDStream);
+        
+        uidGenderPairsDStream.cache();
         final int roundMode=RoundType.fromString(graProps.defaultRoundMode());
         final int granMin=graProps.granMin();
         
+        
+        //save profiles
+        uniqueProfilesGenderDStream.foreachRDD( profilePairRDD -> {
+                Logger.getLogger(GraStreamConsumer.class).info(String.format("saving %d distinct profiles on storage..",profilePairRDD.count()));
+                graDao.saveTwGenderProfiles(
+                        profilePairRDD.map(profile -> GraResultsMapping.fromProfileGender2TwGenderProfile(profile))
+                );
+                return null;
+        });
+        
         //save geo statuses
-        countGeoStatuses(graProps.keyRaw(), busConnection, graProps, uniqueProfilesRDD, roundMode, granMin)
+        countGeoStatuses(rawTwDStreamWindow, graProps, uidGenderPairsDStream, roundMode, granMin)
                 .foreachRDD(geoPairRdd ->{
                     Logger.getLogger(GraStreamConsumer.class).info(String.format("saving %d geo objects on storage..",geoPairRdd.count()));
                     graDao.saveGeoByTimeGran(
@@ -67,50 +79,47 @@ public class GraStreamConsumer {
                     return null;
                 });
         //save hts statuses
-    
+        countHtsStatuses(rawTwDStreamWindow, graProps, uidGenderPairsDStream, roundMode, granMin)
+                .foreachRDD(htPairRdd -> {
+                    Logger.getLogger(GraStreamConsumer.class).info(String.format("saving %d ht objects on storage..",htPairRdd.count()));
+                    graDao.saveHtsByTimeGran(
+                            htPairRdd.map(htPairStatus ->
+                                    GraResultsMapping.fromStatsGenderCountToStatsPreGenderHt(htPairStatus._1, 
+                                                                                             htPairStatus._2, roundMode, granMin)
+                            )
+                    );
+                    return null;
+                });
     }
     
-    public static JavaPairDStream<Long,GenderTypes> getUniqueProfilesDStream(JavaDStream<String> rawTwDStream,GRA gra){
-        return rawTwDStream.transformToPair((rawTwRdd) ->{
-           JavaRDD<ProfileGender> distinctProfiles=GraEvaluateAndCount.evaluateUniqueProfilesRdd(rawTwRdd, gra);
-           return GraEvaluateAndCount.fromProfileGenderToUserIdGenderPairRdd(distinctProfiles);
-        });
+    public static JavaDStream<ProfileGender> getUniqueProfilesDStream(JavaDStream<String> rawTwDStream,GRA gra){
+        return rawTwDStream.transform(rawTwRdd -> GraEvaluateAndCount.evaluateUniqueProfilesRdd(rawTwRdd, gra));
+    }
+    
+    public static JavaPairDStream<Long,GenderTypes> getUidGenderPairDStream(JavaDStream<ProfileGender> distinctProfiles){
+        return distinctProfiles.transformToPair(GraEvaluateAndCount::fromProfileGenderToUserIdGenderPairRdd);
     }
     
     
-    public static JavaPairDStream<GeoLocTruncTimeKey, StatsGenderCount> countGeoStatuses(String rawKey,
-            BusConsumerConnection busConsumerConnection,GraStreamProperties graProps,
-        JavaPairDStream<Long,GenderTypes> uidGenders, int roundType, Integer granMin) {
+    public static JavaPairDStream<GeoLocTruncTimeKey, StatsGenderCount> countGeoStatuses(JavaDStream<String> rawTwDStreamWindow,
+        GraStreamProperties graProps,JavaPairDStream<Long,GenderTypes> uidGenders, int roundType, Integer granMin) {
         
-        JavaDStream<String> rawTwDStream=busConsumerConnection.getDStreamByKey(rawKey);
-        
-
-        JavaPairDStream<Long,GeoStatus> uidGeoPair=rawTwDStream.mapToPair(rawTw -> {
+        JavaPairDStream<Long,GeoStatus> uidGeoPair=rawTwDStreamWindow.mapToPair(rawTw -> {
             GeoStatus gs=BatchUtils.fromJstring2GeoStatus(rawTw, graProps.roundPos());
             return new Tuple2<Long,GeoStatus>(gs.getUserId(),gs);
         });
         
-        JavaPairDStream<Long,GeoStatus> uidGeoPairWindow=uidGeoPair.window(new Duration(graProps.twTotWindowDurationMillis()), 
-                                                                   new Duration(graProps.twTotWindowSlidingIntervalMillis()));
-        
-        return uidGeoPairWindow.join(uidGenders).transformToPair(geoRdd -> GraEvaluateAndCount.countGeoStatuses(geoRdd, roundType, granMin));
+        return uidGeoPair.join(uidGenders).transformToPair(geoRdd -> GraEvaluateAndCount.countGeoStatuses(geoRdd, roundType, granMin));
     }
     
-    public static JavaPairDStream<DateHtKey, StatsGenderCount> countHtsStatuses(String rawKey,
-            BusConsumerConnection busConsumerConnection,GraStreamProperties graProps,
-        JavaPairDStream<Long,GenderTypes> uidGenders, int roundType, Integer granMin) {
+    public static JavaPairDStream<DateHtKey, StatsGenderCount> countHtsStatuses(JavaDStream<String> rawTwDStreamWindow,
+            GraStreamProperties graProps,JavaPairDStream<Long,GenderTypes> uidGenders, int roundType, Integer granMin) {
         
-        JavaDStream<String> rawTwDStream=busConsumerConnection.getDStreamByKey(rawKey);
-        
-
-        JavaPairDStream<Long,HtsStatus> uidHtPair=rawTwDStream.flatMapToPair(rawTw -> {
+        JavaPairDStream<Long,HtsStatus> uidHtPair=rawTwDStreamWindow.flatMapToPair(rawTw -> {
             return BatchUtils.fromJstring2HtsStatus(rawTw).stream().map(htStatus -> new Tuple2<Long,HtsStatus>(htStatus.getUserId(),htStatus))
                     .collect(Collectors.toList());
         });
         
-        JavaPairDStream<Long,HtsStatus> uidHtPairWindow=uidHtPair.window(new Duration(graProps.twTotWindowDurationMillis()), 
-                                                                   new Duration(graProps.twTotWindowSlidingIntervalMillis()));
-        
-        return uidHtPairWindow.join(uidGenders).transformToPair(htRdd -> GraEvaluateAndCount.countHtsStatuses(htRdd, roundType, granMin));
+        return uidHtPair.join(uidGenders).transformToPair(htRdd -> GraEvaluateAndCount.countHtsStatuses(htRdd, roundType, granMin));
     }
 }

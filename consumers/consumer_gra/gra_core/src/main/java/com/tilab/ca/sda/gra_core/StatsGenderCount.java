@@ -32,7 +32,7 @@ public class StatsGenderCount implements Serializable{
     
     public StatsGenderCount sum(StatsGenderCount other){
         for(int i=0;i<TW_MATRIX_ROWS;i++)
-            for(int t=0;i<TW_MATRIX_COLS;t++)
+            for(int t=0;t<TW_MATRIX_COLS;t++)
                 twMatrix[i][t]+=other.twMatrix[i][t];
         return this;
     }

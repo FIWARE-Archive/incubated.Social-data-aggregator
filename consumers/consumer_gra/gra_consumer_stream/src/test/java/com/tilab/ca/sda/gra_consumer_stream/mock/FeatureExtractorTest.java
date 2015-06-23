@@ -1,4 +1,4 @@
-package com.tilab.ca.sda.gra_core.components.mock;
+package com.tilab.ca.sda.gra_consumer_stream.mock;
 
 import com.tilab.ca.sda.gra_core.ml.FeaturesExtraction;
 import java.util.LinkedList;
