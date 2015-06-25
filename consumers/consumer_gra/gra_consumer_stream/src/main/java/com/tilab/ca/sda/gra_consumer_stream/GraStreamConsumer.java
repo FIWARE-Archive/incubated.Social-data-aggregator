@@ -4,6 +4,7 @@ import com.sun.istack.logging.Logger;
 import com.tilab.ca.sda.consumer.utils.BatchUtils;
 import com.tilab.ca.sda.consumer.utils.stream.BusConsumerConnection;
 import com.tilab.ca.sda.ctw.utils.RoundType;
+import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.gra_consumer_batch.GraEvaluateAndCount;
 import com.tilab.ca.sda.gra_consumer_batch.GraResultsMapping;
 import com.tilab.ca.sda.gra_consumer_batch.utils.LoadUtils;
@@ -12,6 +13,7 @@ import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.StatsGenderCount;
 import com.tilab.ca.sda.gra_core.components.GRA;
+import com.tilab.ca.sda.gra_core.components.GRAConfig;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import com.tilab.ca.sda.sda.model.keys.DateHtKey;
@@ -34,7 +36,7 @@ public class GraStreamConsumer {
         busConnection.init(jssc);
         
         //create the gra configuration setting all the sub algorithms implementations and configuration parameters
-        GRA.GRAConfig graConf=new GRA.GRAConfig().coloursClassifierModel(LoadUtils.loadColourClassifierModel(confsPath, graProps.coloursModelImplClass()))
+        GRAConfig graConf=new GRAConfig().coloursClassifierModel(LoadUtils.loadColourClassifierModel(confsPath, graProps.coloursModelImplClass()))
                                               .descrClassifierModel(LoadUtils.loadDescrClassifierModel(confsPath, graProps.descrModelImplClass()))
                                               .featureExtractor(LoadUtils.loadDescrFeatureExtraction(confsPath, graProps.featureExtractionClassImpl()))
                                               .namesGenderMap(LoadUtils.loadNamesGenderMap(confsPath, graProps.namesGenderMapImplClass()))
@@ -43,7 +45,8 @@ public class GraStreamConsumer {
                                               .numColorBitsMapping(graProps.colorAlgoNumColorsToConsider());
        
         log.info("Creating gra instance..");
-        GRA gra=new GRA(graConf, jssc.sparkContext());
+        GRA gra=Utils.Load.getClassInstFromInterface(GRA.class, graProps.graClassImpl());
+        gra.init(graConf, jssc.sparkContext());
         
         JavaDStream<String> rawTwDStream=busConnection.getDStreamByKey(graProps.keyRaw());
         JavaDStream<String> rawTwDStreamWindow=rawTwDStream.window(new Duration(graProps.twTotWindowDurationMillis()), 
@@ -68,7 +71,7 @@ public class GraStreamConsumer {
         });
         
         //save geo statuses
-        countGeoStatuses(rawTwDStreamWindow, graProps, uidGenderPairsDStream, roundMode, granMin)
+        countGeoStatuses(rawTwDStreamWindow, uidGenderPairsDStream,graProps.roundPos(), roundMode, granMin)
                 .foreachRDD(geoPairRdd ->{
                     Logger.getLogger(GraStreamConsumer.class).info(String.format("saving %d geo objects on storage..",geoPairRdd.count()));
                     graDao.saveGeoByTimeGran(
@@ -79,7 +82,7 @@ public class GraStreamConsumer {
                     return null;
                 });
         //save hts statuses
-        countHtsStatuses(rawTwDStreamWindow, graProps, uidGenderPairsDStream, roundMode, granMin)
+        countHtsStatuses(rawTwDStreamWindow,uidGenderPairsDStream, roundMode, granMin)
                 .foreachRDD(htPairRdd -> {
                     Logger.getLogger(GraStreamConsumer.class).info(String.format("saving %d ht objects on storage..",htPairRdd.count()));
                     graDao.saveHtsByTimeGran(
@@ -102,10 +105,10 @@ public class GraStreamConsumer {
     
     
     public static JavaPairDStream<GeoLocTruncTimeKey, StatsGenderCount> countGeoStatuses(JavaDStream<String> rawTwDStreamWindow,
-        GraStreamProperties graProps,JavaPairDStream<Long,GenderTypes> uidGenders, int roundType, Integer granMin) {
+        JavaPairDStream<Long,GenderTypes> uidGenders,int roundPos, int roundType, Integer granMin) {
         
         JavaPairDStream<Long,GeoStatus> uidGeoPair=rawTwDStreamWindow.mapToPair(rawTw -> {
-            GeoStatus gs=BatchUtils.fromJstring2GeoStatus(rawTw, graProps.roundPos());
+            GeoStatus gs=BatchUtils.fromJstring2GeoStatus(rawTw, roundPos);
             return new Tuple2<Long,GeoStatus>(gs.getUserId(),gs);
         });
         
@@ -113,7 +116,7 @@ public class GraStreamConsumer {
     }
     
     public static JavaPairDStream<DateHtKey, StatsGenderCount> countHtsStatuses(JavaDStream<String> rawTwDStreamWindow,
-            GraStreamProperties graProps,JavaPairDStream<Long,GenderTypes> uidGenders, int roundType, Integer granMin) {
+            JavaPairDStream<Long,GenderTypes> uidGenders, int roundType, Integer granMin) {
         
         JavaPairDStream<Long,HtsStatus> uidHtPair=rawTwDStreamWindow.flatMapToPair(rawTw -> {
             return BatchUtils.fromJstring2HtsStatus(rawTw).stream().map(htStatus -> new Tuple2<Long,HtsStatus>(htStatus.getUserId(),htStatus))

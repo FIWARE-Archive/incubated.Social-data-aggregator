@@ -12,6 +12,7 @@ public interface GraConsumerProperties extends Config{
     @DefaultValue("3")
     public int roundPos();
     
+    @DefaultValue("com.tilab.ca.sda.gra_consumer_dao.GraConsumerDaoFileImpl")
     public String daoImplClass();
     
     //implementation of colours machine learning Model (Naive Bayes,Decision Tree...)
@@ -27,6 +28,9 @@ public interface GraConsumerProperties extends Config{
     
     @DefaultValue("com.tilab.ca.sda.gra_core.ml.FeaturesExtractionTFIDF")
     public String featureExtractionClassImpl();
+    
+    @DefaultValue("com.tilab.ca.sda.gra_core.components.GRAWaterfallImpl")
+    public String graClassImpl();
     
     
     public String trainingFilesPath();

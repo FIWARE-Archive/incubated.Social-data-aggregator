@@ -3,12 +3,13 @@
     <artifactId>sda-utils</artifactId>
     <name>Social Data Aggregator Utils</name>
     <description>Utils for the Social Data Aggregator (SDA)</description>
+    <version>4.3.3.0</version>
     <packaging>jar</packaging>
   
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>social-data-aggregator</artifactId>
-        <version>4.2.2.0</version>
+        <version>4.3.3.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
   

@@ -3,13 +3,12 @@ package com.tilab.ca.sda.gra_consumer_batch;
 import com.tilab.ca.sda.consumer.utils.BatchUtils;
 import com.tilab.ca.sda.ctw.utils.RoundType;
 import com.tilab.ca.sda.ctw.utils.Utils;
-import com.tilab.ca.sda.gra_consumer_batch.mock.FeatureExtractorTest;
-import com.tilab.ca.sda.gra_consumer_batch.mock.MlModelTest;
-import com.tilab.ca.sda.gra_consumer_batch.mock.NamesGenderMapTest;
+import com.tilab.ca.sda.gra_consumer_batch.mock.GRATestImpl;
 import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.StatsGenderCount;
 import com.tilab.ca.sda.gra_core.components.GRA;
+import com.tilab.ca.sda.gra_core.components.GRAConfig;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import com.tilab.ca.sda.sda.model.keys.DateHtKey;
@@ -19,7 +18,9 @@ import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -58,18 +59,6 @@ public class GraEvaluateAndCountTest {
     @Test
     public void testEvaluateUniqueProfilesRdd() throws Exception {
         System.out.println("evaluateUniqueProfilesRdd");
-        
-        double[] predictionsDescr={2,2,2};
-        double[] predictionsCols={1,1};
-        GRA.GRAConfig graConf=new GRA.GRAConfig()
-                .coloursClassifierModel(new MlModelTest(predictionsCols))
-                .descrClassifierModel(new MlModelTest(predictionsDescr))
-                .featureExtractor(new FeatureExtractorTest(3, jsc))
-                .namesGenderMap(new NamesGenderMapTest())
-                .numColorBitsMapping(9)
-                .numColorsMapping(4)
-                .trainingPath(BASE_PATH);
-        
         List<String> tweetsLst=new ArrayList<>();
         tweetsLst.add("{\"createdAt\":\"2015-03-17T19:04:29+01\",\"id\":1,\"text\":\"text1\",\"user\":{\"id\":1,\"name\":\"Zach Miller\",\"screenName\":\"zachmiller\",\"description\":\"my descr\",\"profileBackgroundColor\":\"030A09\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"4460A6\",\"profileSidebarFillColor\":\"FFFFFF\",\"profileSidebarBorderColor\":\"000000\"}}");
         tweetsLst.add("{\"createdAt\":\"2015-03-17T19:04:29+01\",\"id\":2,\"text\":\"text2\",\"user\":{\"id\":2,\"name\":\"John Snow\",\"screenName\":\"js\",\"description\":\"my descr\",\"profileBackgroundColor\":\"030A09\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"4460A6\",\"profileSidebarFillColor\":\"FFFFFF\",\"profileSidebarBorderColor\":\"000000\"}}");
@@ -80,7 +69,15 @@ public class GraEvaluateAndCountTest {
         tweetsLst.add("{\"createdAt\":\"2015-03-17T19:04:29+01\",\"id\":7,\"text\":\"text7\",\"user\":{\"id\":6,\"name\":\"page2\",\"screenName\":\"page2\",\"description\":\"my descr\",\"profileBackgroundColor\":\"030A09\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"4460A6\",\"profileSidebarFillColor\":\"FFFFFF\",\"profileSidebarBorderColor\":\"000000\"}}");
         tweetsLst.add("{\"createdAt\":\"2015-03-17T19:04:29+01\",\"id\":8,\"text\":\"text7\",\"user\":{\"id\":7,\"name\":\"page3\",\"screenName\":\"page3\",\"description\":\"my descr\",\"profileBackgroundColor\":\"030A09\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"4460A6\",\"profileSidebarFillColor\":\"FFFFFF\",\"profileSidebarBorderColor\":\"000000\"}}");
         JavaRDD<String> tweetsRdd = jsc.parallelize(tweetsLst);
-        GRA gra = new GRA(graConf, jsc);
+        Map<Long,GenderTypes> graRespMap=new HashMap<>();
+        graRespMap.put(1L, GenderTypes.MALE);
+        graRespMap.put(2L, GenderTypes.MALE);
+        graRespMap.put(3L, GenderTypes.FEMALE);
+        graRespMap.put(4L, GenderTypes.FEMALE);
+        graRespMap.put(5L, GenderTypes.PAGE);
+        graRespMap.put(6L, GenderTypes.PAGE);
+        graRespMap.put(7L, GenderTypes.PAGE);
+        GRA gra = new GRATestImpl(graRespMap);
         JavaRDD<ProfileGender> resultRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
         List<ProfileGender> result=resultRDD.collect();
         
@@ -130,7 +127,6 @@ public class GraEvaluateAndCountTest {
     @Test
     public void testGraGeoStatuses() throws Exception {
         System.out.println("countGeoStatuses");   
-        GRA gra = getSimpleGRA(jsc);
         
         List<String> tweetsLst=new ArrayList<>();
         
@@ -144,6 +140,17 @@ public class GraEvaluateAndCountTest {
         tweetsLst.add("{\"createdAt\":\"2014-07-08T23:22:19+02\",\"id\":8,\"inReplyToStatusId\":-1,\"geoLocation\":{\"latitude\":49.80256499,\"longitude\":2.31986439},\"hashtagEntities\":[],\"user\":{\"id\":7,\"name\":\"male3\",\"screenName\":\"ben\",\"description\":\"descr\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
         
         JavaRDD<String> tweetsRdd = jsc.parallelize(tweetsLst);
+        
+        Map<Long,GenderTypes> graRespMap=new HashMap<>();
+        graRespMap.put(1L, GenderTypes.MALE);
+        graRespMap.put(2L, GenderTypes.MALE);
+        graRespMap.put(3L, GenderTypes.FEMALE);
+        graRespMap.put(4L, GenderTypes.FEMALE);
+        graRespMap.put(5L, GenderTypes.PAGE);
+        graRespMap.put(6L, GenderTypes.PAGE);
+        graRespMap.put(7L, GenderTypes.MALE);
+        
+        GRA gra = new GRATestImpl(graRespMap);
         
         JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
         
@@ -212,8 +219,7 @@ public class GraEvaluateAndCountTest {
     @Test
     public void testGraHtsStatuses() throws Exception {
         System.out.println("countHtsStatuses");
-        GRA gra = getSimpleGRA(jsc);
-      
+        
         List<String> tweetsLst=new ArrayList<>();
         tweetsLst.add("{\"createdAt\":\"2014-07-08T10:16:19+02\",\"id\":1,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19},{\"text\":\"ht2\",\"start\":0,\"end\":19}],\"user\":{\"id\":1,\"name\":\"male1\",\"screenName\":\"john\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
         tweetsLst.add("{\"createdAt\":\"2014-07-08T10:17:19+02\",\"id\":2,\"inReplyToStatusId\":-1,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":1,\"name\":\"male1\",\"screenName\":\"john\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
@@ -234,6 +240,20 @@ public class GraEvaluateAndCountTest {
         tweetsLst.add("{\"createdAt\":\"2014-07-08T10:24:58+02\",\"id\":17,\"inReplyToStatusId\":121332,\"hashtagEntities\":[{\"text\":\"ht1\",\"start\":0,\"end\":19}],\"user\":{\"id\":5,\"name\":\"female1\",\"screenName\":\"deborah\",\"profileBackgroundColor\":\"9AE4E8\",\"profileTextColor\":\"333333\",\"profileLinkColor\":\"0084B4\",\"profileSidebarFillColor\":\"DDFFCC\",\"profileSidebarBorderColor\":\"BDDCAD\"}}");
         
         JavaRDD<String> tweetsRdd = jsc.parallelize(tweetsLst);
+        
+        Map<Long,GenderTypes> graRespMap=new HashMap<>();
+        graRespMap.put(1L, GenderTypes.MALE);
+        graRespMap.put(2L, GenderTypes.PAGE);
+        graRespMap.put(3L, GenderTypes.PAGE);
+        graRespMap.put(4L, GenderTypes.PAGE);
+        graRespMap.put(5L, GenderTypes.FEMALE);
+        graRespMap.put(6L, GenderTypes.FEMALE);
+        graRespMap.put(7L, GenderTypes.FEMALE);
+        graRespMap.put(8L, GenderTypes.PAGE);
+        graRespMap.put(9L, GenderTypes.PAGE);
+        graRespMap.put(10L, GenderTypes.MALE);
+        
+        GRA gra = new GRATestImpl(graRespMap);
         
         JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
         
@@ -358,21 +378,6 @@ public class GraEvaluateAndCountTest {
         assertEquals(0, resultsTp2.get(1)._2.getNumRplyPages());
         assertEquals(0, resultsTp2.get(1)._2.getNumRplyFemales());
         assertEquals(0, resultsTp2.get(1)._2.getNumRplyUnknown());
-    }
-    
-    private GRA getSimpleGRA(JavaSparkContext jsc) throws Exception{
-        //init gra
-        double[] predictionsDescr={};
-        double[] predictionsCols={};
-        GRA.GRAConfig graConf=new GRA.GRAConfig()
-                .coloursClassifierModel(new MlModelTest(predictionsCols))
-                .descrClassifierModel(new MlModelTest(predictionsDescr))
-                .featureExtractor(new FeatureExtractorTest(0, jsc))
-                .namesGenderMap(new NamesGenderMapTest())
-                .numColorBitsMapping(9)
-                .numColorsMapping(4)
-                .trainingPath(BASE_PATH);
-        return new GRA(graConf, jsc);
     }
     
 }

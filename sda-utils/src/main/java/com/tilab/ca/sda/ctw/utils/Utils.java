@@ -113,6 +113,26 @@ public class Utils {
 
             return (T) implClass.getConstructor(Properties.class).newInstance(props);
         }
+        
+        /**
+         * Create an instance of a class passed as parameter (in its string form package.className) that implements the target interfac
+         * 
+         * @param interfaceClass the interface class that will be returned from the method 
+         * @param implClassStr the location (package.className) of the class that implements the interface
+         
+         * @return an object of the type of interface class 
+         * 
+         * @throws Exception if class does not exists or doesn't implement the interface or properties are null 
+         */
+        public static <T> T getClassInstFromInterface(Class<T> interfaceClass, String implClassStr) throws Exception {
+
+            Class<?> implClass = Class.forName(implClassStr);
+            if (!interfaceClass.isAssignableFrom(implClass)) {
+                throw new IllegalArgumentException(String.format("cannot instantiate impl class %s. Impl class must implements %s interface", implClass, interfaceClass.getName()));
+            }
+            
+            return (T) implClass.getConstructor().newInstance();
+        }
 
         /**
          * Create an instance of a class passed as parameter (in its string form package.className) that implements the target interface

@@ -34,7 +34,7 @@ public class GraEvaluateAndCount {
                          .reduceByKey((pr1,pr2) -> pr1.getLastUpdate().isAfter(pr2.getLastUpdate())?pr1:pr2) //get the most recent profile
                          .map(tuple2UserProfile -> tuple2UserProfile._2);
         log.debug("got unique profiles RDD");
-        return gra.waterfallGraEvaluation(uniqueProfilesRdd);
+        return gra.evaluateProfiles(uniqueProfilesRdd);
     }
     
     /**

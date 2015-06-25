@@ -4,9 +4,10 @@
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>social-data-aggregator</artifactId>
-        <version>4.2.2.0</version>
+        <version>4.3.3.0</version>
     </parent>
     <artifactId>sda-tools</artifactId>
+    <version>4.3.3.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>tw_user_profile_extractor</module>

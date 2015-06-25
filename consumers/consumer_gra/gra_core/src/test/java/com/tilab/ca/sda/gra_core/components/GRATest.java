@@ -1,6 +1,5 @@
 package com.tilab.ca.sda.gra_core.components;
 
-import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.components.mock.FeatureExtractorTest;
 import com.tilab.ca.sda.gra_core.components.mock.MlModelTest;
 import com.tilab.ca.sda.gra_core.components.mock.NamesGenderMapTest;
@@ -45,7 +44,7 @@ public class GRATest implements Serializable{
      */
     @Test
     public void testWaterfallGraEvaluation() throws Exception {
-        System.out.println("waterfallGraEvaluation");
+        System.out.println("waterfallGraEvaluationTest");
         
         String[] profileColors={"00CCFF","000000","111111","FFFFFF","DDCCFF","EE11FF"};
         List<TwUserProfile> twUserProfileLst=new ArrayList<>();
@@ -66,7 +65,7 @@ public class GRATest implements Serializable{
         JavaRDD<TwUserProfile> twProfilesRdd = jsc.parallelize(twUserProfileLst);
         double[] predictionsDescr={0,1,1,2};
         double[] predictionsCols={0,1,0,0,0,0,0,0,0,0,0,0};
-        GRA.GRAConfig graConf=new GRA.GRAConfig()
+        GRAConfig graConf=new GRAConfig()
                 .coloursClassifierModel(new MlModelTest(predictionsCols))
                 .descrClassifierModel(new MlModelTest(predictionsDescr))
                 .featureExtractor(new FeatureExtractorTest(4, jsc))
@@ -75,8 +74,9 @@ public class GRATest implements Serializable{
                 .numColorsMapping(4)
                 .trainingPath(BASE_PATH);
         
-        GRA instance = new GRA(graConf, jsc);
-        JavaRDD<Character> resultRDD = instance.waterfallGraEvaluation(twProfilesRdd).map(pg -> pg.getGender().toChar());
+        GRA instance = new GRAWaterfallImpl();
+        instance.init(graConf, jsc);
+        JavaRDD<Character> resultRDD = instance.evaluateProfiles(twProfilesRdd).map(pg -> pg.getGender().toChar());
         List<Character> resLst=resultRDD.collect();
         List<Character> expResult = Arrays.asList(new Character[]{'m','m','m','f','f','x','m','f','m'});
         

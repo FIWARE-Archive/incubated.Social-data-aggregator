@@ -11,6 +11,7 @@ import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.ProfileGender;
 import com.tilab.ca.sda.gra_core.StatsGenderCount;
 import com.tilab.ca.sda.gra_core.components.GRA;
+import com.tilab.ca.sda.gra_core.components.GRAConfig;
 import com.tilab.ca.sda.gra_core.utils.GraConstants;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
@@ -76,7 +77,7 @@ public class GraConsumerBatchMain {
         JavaRDD<String> tweetsRdd=sc.textFile(inputDataPath);
         
         log.info("Setting gra configuration..");
-        GRA.GRAConfig graConf=new GRA.GRAConfig().coloursClassifierModel(LoadUtils.loadColourClassifierModel(confsPath, graProps.coloursModelImplClass()))
+        GRAConfig graConf=new GRAConfig().coloursClassifierModel(LoadUtils.loadColourClassifierModel(confsPath, graProps.coloursModelImplClass()))
                                               .descrClassifierModel(LoadUtils.loadDescrClassifierModel(confsPath, graProps.descrModelImplClass()))
                                               .featureExtractor(LoadUtils.loadDescrFeatureExtraction(confsPath, graProps.featureExtractionClassImpl()))
                                               .namesGenderMap(LoadUtils.loadNamesGenderMap(confsPath, graProps.namesGenderMapImplClass()))
@@ -85,7 +86,8 @@ public class GraConsumerBatchMain {
                                               .numColorBitsMapping(graProps.colorAlgoNumColorsToConsider());
        
         log.info("Creating gra instance..");
-        GRA gra=new GRA(graConf, sc);
+        GRA gra=Utils.Load.getClassInstFromInterface(GRA.class, graProps.graClassImpl());
+        gra.init(graConf, sc);
         
         log.info(String.format("filtering data in the interval from %s -> to %s",arguments.getFrom().toString(),
                                                                                  arguments.getTo().toString()));
