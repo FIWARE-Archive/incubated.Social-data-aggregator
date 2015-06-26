@@ -1,5 +1,6 @@
 package com.tilab.ca.sda.gra_core.components;
 
+import com.sun.istack.logging.Logger;
 import com.tilab.ca.sda.gra_core.DescrResults;
 import com.tilab.ca.sda.gra_core.GenderTypes;
 import com.tilab.ca.sda.gra_core.ProfileGender;
@@ -24,13 +25,20 @@ public class GenderUserDescr implements Serializable{
     private final List<String> stopWords;
     private static final int MIN_WORD_LENGTH=2;
     
+    private static final Logger log=Logger.getLogger(GenderUserDescr.class);
+    
     
     public GenderUserDescr(MlModel cmodel,FeaturesExtraction fe,JavaSparkContext sc,String trainingPath){
         this.model=cmodel;
         this.fe=fe;
+        log.info("init ml model for user profile description..");
         model.init(fe.generateTrainingSet(sc, trainingPath+File.separator+GraConstants.DESCR_TAG+GraConstants.TRAINING_FILE_NAME));
+        
+        log.info("loading smiles file..");
         //loading allowed smiles
         smiles=sc.textFile(trainingPath+File.separator+GraConstants.DESCR_SMILES).collect();
+        
+        log.info("loading stop words file..");
         //loading stop words
         stopWords=sc.textFile(trainingPath+File.separator+GraConstants.DESCR_STOP_WORDS).collect();
     }

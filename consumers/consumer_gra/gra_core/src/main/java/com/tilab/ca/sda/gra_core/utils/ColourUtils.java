@@ -28,7 +28,7 @@ public class ColourUtils {
     public static Map<Color,Integer> generatePaletteRGB(int numBits){
        int maxChannelValue=(int)(Math.pow(2f,(double)(numBits/3)));
        Map<Color,Integer> paletteMap=new HashMap<>();
-       int index=1;
+       int index=0;
        for(int red=0;red<maxChannelValue;red++)
           for(int green=0;green<maxChannelValue;green++)
              for(int blue=0;blue<maxChannelValue;blue++)

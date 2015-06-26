@@ -19,6 +19,7 @@ import com.tilab.ca.sda.sda.model.keys.DateHtKey;
 import com.tilab.ca.sda.sda.model.keys.GeoLocTruncKey;
 import com.tilab.ca.sda.sda.model.keys.GeoLocTruncTimeKey;
 import java.io.File;
+import java.time.ZonedDateTime;
 import java.util.Properties;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -83,7 +84,7 @@ public class GraConsumerBatchMain {
                                               .namesGenderMap(LoadUtils.loadNamesGenderMap(confsPath, graProps.namesGenderMapImplClass()))
                                               .trainingPath(graProps.trainingFilesPath())
                                               .numColorBitsMapping(graProps.colorAlgoReductionNumBits())
-                                              .numColorBitsMapping(graProps.colorAlgoNumColorsToConsider());
+                                              .numColorsMapping(graProps.colorAlgoNumColorsToConsider());
        
         log.info("Creating gra instance..");
         GRA gra=Utils.Load.getClassInstFromInterface(GRA.class, graProps.graClassImpl());
@@ -91,8 +92,10 @@ public class GraConsumerBatchMain {
         
         log.info(String.format("filtering data in the interval from %s -> to %s",arguments.getFrom().toString(),
                                                                                  arguments.getTo().toString()));
+        final ZonedDateTime from=arguments.getFrom();
+        final ZonedDateTime to=arguments.getTo();
         //filter data not in the from/to interval
-        tweetsRdd=tweetsRdd.filter(rawTw -> BatchUtils.isCreatedAtInRange(rawTw, arguments.getFrom(), arguments.getTo()));
+        tweetsRdd=tweetsRdd.filter(rawTw -> BatchUtils.isCreatedAtInRange(rawTw, from, to));
         
         //caching on disk if data don't fit in RAM
         tweetsRdd.persist(StorageLevel.MEMORY_AND_DISK());
@@ -121,6 +124,10 @@ public class GraConsumerBatchMain {
                                         GraConsumerDao graDao){
         
         final int roundPos=graProps.roundPos();
+        final ZonedDateTime from = arguments.getFrom();
+        final ZonedDateTime to = arguments.getTo();
+        Integer roundMode = arguments.getRoundMode();
+        Integer granMin = arguments.getGranMin();
         
         JavaRDD<GeoStatus> geoStatus=tweetsRdd
                 .filter(BatchUtils::isGeoLocStatus)
@@ -128,14 +135,14 @@ public class GraConsumerBatchMain {
                 .filter((geo) -> geo.getPostId()>0); //filter void statuses
                 
         if(arguments.getRoundMode()!=null){
-            JavaPairRDD<GeoLocTruncTimeKey, StatsGenderCount> pairTotRDDGeoRound=GraEvaluateAndCount.countGeoStatuses(geoStatus,userIdGenderPairRdd,arguments.getRoundMode(), arguments.getGranMin());
+            JavaPairRDD<GeoLocTruncTimeKey, StatsGenderCount> pairTotRDDGeoRound=GraEvaluateAndCount.countGeoStatuses(geoStatus,userIdGenderPairRdd,roundMode, granMin);
             graDao.saveGeoByTimeGran(pairTotRDDGeoRound.map(pairGeoStats -> GraResultsMapping.fromStatsGenderCountToStatsPreGenderGeo(pairGeoStats._1, 
-                                                                                              pairGeoStats._2, arguments.getRoundMode(), arguments.getGranMin())));
+                                                                                              pairGeoStats._2, roundMode, granMin)));
             
         }else{
             JavaPairRDD<GeoLocTruncKey, StatsGenderCount>  pairTotGeoRDD=GraEvaluateAndCount.countGeoStatusesFromTimeBounds(geoStatus,userIdGenderPairRdd);
             graDao.saveGeoByTimeInterval(pairTotGeoRDD.map(pairGeoStatsBound -> GraResultsMapping.fromStatsGenderCountToStatsPreGenderGeoBound(pairGeoStatsBound._1, pairGeoStatsBound._2,
-                                                                                                    arguments.getFrom(), arguments.getTo())));
+                                                                                                    from,to)));
         }
     }
     
@@ -143,18 +150,23 @@ public class GraConsumerBatchMain {
                                         Arguments arguments,
                                         GraConsumerDao graDao){
         
-       JavaRDD<HtsStatus> htsStatus=tweetsRdd
+        JavaRDD<HtsStatus> htsStatus=tweetsRdd
                 .filter(BatchUtils::isHtsStatus)
                 .flatMap(BatchUtils::fromJstring2HtsStatus);
+       
+        final ZonedDateTime from = arguments.getFrom();
+        final ZonedDateTime to = arguments.getTo();
+        Integer roundMode = arguments.getRoundMode();
+        Integer granMin = arguments.getGranMin();
                 
         if(arguments.getRoundMode()!=null){
-            JavaPairRDD<DateHtKey, StatsGenderCount> pairTotRDDHtsRound =GraEvaluateAndCount.countHtsStatuses(htsStatus,userIdGenderPairRdd,arguments.getRoundMode(), arguments.getGranMin());
+            JavaPairRDD<DateHtKey, StatsGenderCount> pairTotRDDHtsRound =GraEvaluateAndCount.countHtsStatuses(htsStatus,userIdGenderPairRdd,roundMode, granMin);
             graDao.saveHtsByTimeGran(pairTotRDDHtsRound.map(htStats -> GraResultsMapping.fromStatsGenderCountToStatsPreGenderHt(htStats._1, htStats._2, 
-                                                                                                        arguments.getRoundMode(), arguments.getGranMin())));
+                                                                                                        roundMode, granMin)));
         }else{
             JavaPairRDD<String, StatsGenderCount>  pairTotHtsRDD=GraEvaluateAndCount.countHtsStatusesFromTimeBounds(htsStatus,userIdGenderPairRdd);
             graDao.saveHtsByTimeInterval(pairTotHtsRDD.map(htsStatsBound -> GraResultsMapping.fromStatsGenderCountToStatsPreGenderHtBound(htsStatsBound._1, 
-                                                                                        htsStatsBound._2,arguments.getFrom(), arguments.getTo())));
+                                                                                        htsStatsBound._2,from,to)));
         }
     }
     

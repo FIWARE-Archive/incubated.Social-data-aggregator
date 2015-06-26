@@ -1,13 +1,9 @@
 package com.tilab.ca.sda.gra_consumer_dao.data;
 
 import com.tilab.ca.sda.ctw.utils.Utils;
-import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity

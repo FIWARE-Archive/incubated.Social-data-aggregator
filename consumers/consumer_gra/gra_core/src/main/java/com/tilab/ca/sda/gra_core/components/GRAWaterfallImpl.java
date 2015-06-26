@@ -19,15 +19,20 @@ public class GRAWaterfallImpl implements GRA{
     private JavaSparkContext jsc;
     
     private boolean initialized=false;
-
-   
+    
+    
     @Override
     public void init(GRAConfig conf, JavaSparkContext jsc) {
         if(!conf.areMandatoryFieldsFilled())
             throw new IllegalStateException("Missing required data in GraConfig");
         //init all the sub algorithms 
-        genderUserDescr=new GenderUserDescr(conf.getDescrModel(), conf.getFe(), jsc, conf.getTrainingPathStr());
+        log.info("create gra color recognizer..");
         genderUserColor=new GenderUserColors(conf.getNumBits(), conf.getNumColors(), conf.getColoursModel(), jsc, conf.getTrainingPathStr());
+        
+        log.info("create gra description recognizer..");
+        genderUserDescr=new GenderUserDescr(conf.getDescrModel(), conf.getFe(), jsc, conf.getTrainingPathStr());
+        
+        log.info("create gra name/screenName recognizer..");
         genderName=new GenderNameSN(conf.getNamesGenderMap());
         this.jsc=jsc;
         initialized=true;
@@ -40,18 +45,13 @@ public class GRAWaterfallImpl implements GRA{
         if(!initialized)
             throw new IllegalStateException("GRA implementation not initialized. Please call init() method before evaluation.");
         
-        //
         JavaRDD<ProfileGender> namesGenderRDD=genderName.getNamesGenderRDD(twProfilesRdd);
-        
-        //System.out.println("*************************************************************");
-        //namesGenderRDD.collect().forEach(pg ->System.out.println(pg.getTwProfile().getName()+" "+pg.getGender().toChar()));
-        //System.out.println("*************************************************************");
         
         //filter profiles that are not recognized from the first algorithm
         JavaRDD<ProfileGender> notReconFromName=namesGenderRDD.filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN ||
                                                                                          profileGender.getGender()==GenderTypes.AMBIGUOUS);
         
-        //System.out.println("Not recognized*************************************************************");
+        //System.out.println("Not recognized FROM NAME*************************************************************");
         //notReconFromName.collect().forEach(pg ->System.out.println(pg.getTwProfile().getName()+" "+pg.getGender().toChar()));
         //System.out.println("*************************************************************");
         
@@ -61,6 +61,10 @@ public class GRAWaterfallImpl implements GRA{
         JavaRDD<ProfileGender> descrGenderRdd=descrResults.getProfilesRecognized();
                
         JavaRDD<ProfileGender> notReconFromDescr=descrResults.getProfilesUnrecognized().filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN);
+        
+        //System.out.println("NOT RECON FROM DESCR *************************************************************");
+        //notReconFromDescr.collect().forEach(pg ->System.out.println(pg.getTwProfile().getName()+" "+pg.getGender().toChar()));
+        //System.out.println("*************************************************************");
         
         log.info("getting gender from colors..");
         JavaRDD<ProfileGender> colorGenderRdd=genderUserColor.getGendersFromTwProfiles(notReconFromDescr);

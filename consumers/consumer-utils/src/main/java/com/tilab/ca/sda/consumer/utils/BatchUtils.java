@@ -49,7 +49,7 @@ public class BatchUtils {
     private static final String JGEO_FORMAT=String.format("\"%s\":{",GEOLOCATION_ELEM);
     private static final String JGEO_FORMAT_EMPTY=String.format("\"%s\":{}",GEOLOCATION_ELEM);
     
-    private static final Pattern CREATED_AT_DATA_PATTERN = Pattern.compile("\"createdAt\":\"(.*)\"");
+    private static final Pattern CREATED_AT_DATA_PATTERN = Pattern.compile("\"createdAt\":\"([0-9T:/+-]+)\",");
    
     public static List<HtsStatus> fromJstring2HtsStatus(String statusString) {
         log.debug("parsing status string "+statusString);

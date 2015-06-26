@@ -42,7 +42,7 @@ public class GraStreamConsumer {
                                               .namesGenderMap(LoadUtils.loadNamesGenderMap(confsPath, graProps.namesGenderMapImplClass()))
                                               .trainingPath(graProps.trainingFilesPath())
                                               .numColorBitsMapping(graProps.colorAlgoReductionNumBits())
-                                              .numColorBitsMapping(graProps.colorAlgoNumColorsToConsider());
+                                              .numColorsMapping(graProps.colorAlgoNumColorsToConsider());
        
         log.info("Creating gra instance..");
         GRA gra=Utils.Load.getClassInstFromInterface(GRA.class, graProps.graClassImpl());

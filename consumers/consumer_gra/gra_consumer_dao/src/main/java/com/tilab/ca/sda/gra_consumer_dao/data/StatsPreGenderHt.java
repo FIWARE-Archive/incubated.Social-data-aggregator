@@ -22,7 +22,7 @@ public class StatsPreGenderHt extends StatsPreGender {
 
     @Override
     public String toString() {
-        return String.format("%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", ht, Utils.Time.date2ZonedDateTime(createdAt).toString(),
+        return String.format("%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d", ht, Utils.Time.date2ZonedDateTime(createdAt).toString(),
                 numTWMales, numRTWMales, numRplyMales,
                 numTWFemales, numRTWFemales, numRplyFemales,
                 numTWPages, numRTWPages, numRplyPages,

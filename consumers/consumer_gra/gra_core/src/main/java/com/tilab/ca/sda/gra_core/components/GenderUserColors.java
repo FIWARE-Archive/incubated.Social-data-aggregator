@@ -7,6 +7,7 @@ import com.tilab.ca.sda.gra_core.utils.ColourUtils;
 import com.tilab.ca.sda.gra_core.utils.GraConstants;
 import com.tilab.ca.sda.sda.model.TwUserProfile;
 import java.awt.Color;
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +33,9 @@ public class GenderUserColors implements Serializable{
     
     
     public GenderUserColors(int numBits,int numColors,MlModel cmodel,JavaSparkContext sc,String trainingPath){
+        String trainingColoursPath=trainingPath+File.separator+GraConstants.COLOUR_TAG+GraConstants.TRAINING_FILE_NAME;
         model=cmodel;
-        model.init(sc, trainingPath+GraConstants.COLOUR_TAG+GraConstants.TRAINING_FILE_NAME);
+        model.init(sc,trainingColoursPath);
         this.numBits=numBits;
         this.numColors=numColors;
         coloursIndexMap=ColourUtils.generatePaletteRGB(numBits);
@@ -55,6 +57,8 @@ public class GenderUserColors implements Serializable{
      * @return the gender for the current profile
      */
     public GenderTypes getGenderFromProfileColours(TwUserProfile twUserProfile){
+        //System.out.println("Evaluating "+twUserProfile.getName()+" "+twUserProfile.getScreenName()+" "+twUserProfile.getUid());
+        
         //a list containing the index of each scaled color in coloursIndexMap
         List<Integer> indexLst=Arrays.asList(twUserProfile.getProfileColors())
                .subList(0, numColors)
@@ -85,7 +89,9 @@ public class GenderUserColors implements Serializable{
             occurrencies[index]=(double)mInd.get(keyIdx);
             index++;
         }
-        return Vectors.sparse(sparseVectorSize,indexes,occurrencies);
+        Vector v= Vectors.sparse(coloursIndexMap.size(),indexes,occurrencies);
+        //System.out.println("array calculated is "+v.toString());
+        return v;
     }
   
 }

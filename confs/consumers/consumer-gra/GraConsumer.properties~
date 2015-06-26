@@ -2,7 +2,7 @@
 ## COMMONS CONFIGURATIONS ##
 ############################
 roundPos 3
-daoImplClass com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDaoDefaultImpl
+daoImplClass com.tilab.ca.sda.gra_consumer_dao.GraConsumerDaoFileImpl
 
 #implementation of colours machine learning Model (Naive Bayes,Decision Tree...) 
 #coloursModelImplClass com.tilab.ca.sda.gra_core.ml.NBModel
@@ -24,6 +24,7 @@ colorAlgoNumColorsToConsider 4
 ###########################
 keyGeo geo
 keyHt ht
+keyRaw raw
 defaultRoundMode min
 granMin 
 #max number of cores that can be used for this application

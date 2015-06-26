@@ -38,14 +38,14 @@ public class ColourUtilsTest {
         System.out.println("generatePaletteRGB");
         int numBits = 3;
         Map<Color, Integer> expResult = new HashMap<>();
-        expResult.put(new Color(0,0,0), 1);
-        expResult.put(new Color(0,0,1), 2);
-        expResult.put(new Color(0,1,0), 3);
-        expResult.put(new Color(0,1,1), 4);
-        expResult.put(new Color(1,0,0), 5);
-        expResult.put(new Color(1,0,1), 6);
-        expResult.put(new Color(1,1,0), 7);
-        expResult.put(new Color(1,1,1), 8);
+        expResult.put(new Color(0,0,0), 0);
+        expResult.put(new Color(0,0,1), 1);
+        expResult.put(new Color(0,1,0), 2);
+        expResult.put(new Color(0,1,1), 3);
+        expResult.put(new Color(1,0,0), 4);
+        expResult.put(new Color(1,0,1), 5);
+        expResult.put(new Color(1,1,0), 6);
+        expResult.put(new Color(1,1,1), 7);
         
         Map<Color, Integer> result = ColourUtils.generatePaletteRGB(numBits);
         assertEquals(expResult, result);

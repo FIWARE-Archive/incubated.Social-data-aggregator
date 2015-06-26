@@ -1,5 +1,5 @@
 GRA_BATCH_MAIN_CLASS=com.tilab.ca.sda.gra_consumer_batch.GraConsumerBatchMain
-JAR_FILE_NAME_BATCH=uber-consumer-gra-batch-4.2.2.0.jar
+JAR_FILE_NAME_BATCH=uber-gra_consumer_batch-4.2.2.0.jar
 MASTER=local[2]
 SPARK_HOME=
 INPUT_DATA_PATH=
