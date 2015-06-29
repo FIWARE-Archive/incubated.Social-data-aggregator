@@ -59,6 +59,8 @@ public class TwTotConsumerBatchMain {
             
             log.debug("Input data path is "+inputDataPath);
             executeTotTwAnalysis(sc, inputDataPath, twProps, arguments, twDao);
+            sc.stop();
+            log.info("Tw tot Consumer Batch END");
         } catch (Exception ex) {
             log.error(ex);
         }

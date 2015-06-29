@@ -2,7 +2,6 @@ package com.tilab.ca.sda.consumer.tw.tot.stream;
 
 import com.tilab.ca.sda.consumer.tw.tot.core.TotTwConstants;
 import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDao;
-import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDaoDefaultImpl;
 import com.tilab.ca.sda.consumer.utils.stream.BusConsumerConnection;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.ctw.utils.stream.SparkStreamingManager;
@@ -22,7 +21,7 @@ public class TwTotConsumerStreamMain {
     private static final String APP_NAME = "twTotConsumerStream";
     
    
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception{
 
         String confsPath = Utils.Env.getConfsPathFromEnv(TotTwConstants.SDA_CONF_SYSTEM_PROPERTY, TotTwConstants.TOT_TW_SYSTEM_PROPERTY);
         String log4jPropsFilePath = confsPath + File.separator + TotTwConstants.LOG4jPROPS_FILE_NAME;
@@ -49,8 +48,10 @@ public class TwTotConsumerStreamMain {
 
             //setup spark configuration
             SparkConf sparkConf = new SparkConf().setAppName(APP_NAME)
-                    .set(SparkStreamingSystemSettings.SPARK_CLEANER_TTL_PROPERTY, ttl); // Enable meta-data cleaning in Spark (so this can run forever)
-
+                    .set(SparkStreamingSystemSettings.SPARK_CLEANER_TTL_PROPERTY, ttl) // Enable meta-data cleaning in Spark (so this can run forever)
+                    .set(SparkStreamingSystemSettings.SPARK_WORKER_CLEANUP_ENABLED,"true"); //Enable periodic cleanup of worker / application directories.
+                   
+                    
             //if there are other streaming applications running on the same cluster set this property to avoid them wait forever
             if (StringUtils.isNotBlank(twProps.numMaxCore())) {
                 log.debug(String.format("[%s] setting numMaxCore for this streaming application to %s..", TotTwConstants.TOT_TW_CONSUMER_LOG_TAG, twProps.numMaxCore()));
@@ -63,8 +64,8 @@ public class TwTotConsumerStreamMain {
             SparkStreamingManager strManager = SparkStreamingManager.$newStreamingManager()
                     .withBatchDurationMillis(twProps.sparkBatchDurationMillis())
                     .withSparkConf(sparkConf)
-                    .withCheckpointPath(twProps.checkpointDir())
-                    .setUpSparkStreaming();
+                    .withCheckpointPath(twProps.checkpointDir());
+                    
             strManager.startSparkStream((jssc) -> {
                 TotTwStreamConsumer.executeAnalysis(jssc, twDao, twProps,busConsConn);
             });

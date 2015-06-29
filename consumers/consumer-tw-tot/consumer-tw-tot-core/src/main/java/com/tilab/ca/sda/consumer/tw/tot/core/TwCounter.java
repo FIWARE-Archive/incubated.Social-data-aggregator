@@ -9,12 +9,15 @@ import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import java.time.ZonedDateTime;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import scala.Tuple2;
 
+
 public class TwCounter {
 
+     private static final Logger log=Logger.getLogger(TwCounter.class);
     /**
      * Count the number of geoStatus grouped by time (rounder following the
      * criteria passed as parameters) and an area (latitude truncated and
@@ -30,6 +33,7 @@ public class TwCounter {
      * @return a JavaPairRDD containing the tweet count by time and area
      */
     public static JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> countGeoStatuses(JavaRDD<GeoStatus> geoStatuses, int roundType, Integer granMin, ZonedDateTime from, ZonedDateTime to) {
+        log.debug("called countGeoStatuses with time bounds and gran");
         if (!areFromToValid(from, to)) {
             throw new IllegalArgumentException("From and to should be valid date and from cannot be after to");
         }
@@ -38,6 +42,7 @@ public class TwCounter {
     }
 
     public static JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> countGeoStatuses(JavaRDD<GeoStatus> geoStatuses, int roundType, Integer granMin) {
+        log.debug("called countGeoStatuses with gran");
         return geoStatuses
                 .mapToPair((geoStatus)
                         -> new Tuple2<GeoLocTruncTimeKey, StatsCounter>(
@@ -57,6 +62,7 @@ public class TwCounter {
      * @return
      */
     public static JavaPairRDD<GeoLocTruncKey, StatsCounter> countGeoStatusesFromTimeBounds(JavaRDD<GeoStatus> geoStatuses, ZonedDateTime from, ZonedDateTime to) {
+        log.debug("called countGeoStatuses with time bounds");
         if (!areFromToValid(from, to)) {
             throw new IllegalArgumentException("From and to should be valid date and from cannot be after to");
         }
@@ -81,6 +87,7 @@ public class TwCounter {
      * @return
      */
     public static JavaPairRDD<DateHtKey, StatsCounter> countHtsStatuses(JavaRDD<HtsStatus> htsStatuses, int roundType, Integer granMin, ZonedDateTime from, ZonedDateTime to) {
+        log.debug("called countHtsStatuses with time bounds and gran");
         if (!areFromToValid(from, to)) {
             throw new IllegalArgumentException("From and to should be valid date and from cannot be after to");
         }
@@ -90,6 +97,7 @@ public class TwCounter {
     }
 
     public static JavaPairRDD<DateHtKey, StatsCounter> countHtsStatuses(JavaRDD<HtsStatus> htsStatuses, int roundType, Integer granMin) {
+        log.debug("called countHtsStatuses with gran");
         return htsStatuses
                 .mapToPair((htStatus)
                         -> new Tuple2<DateHtKey, StatsCounter>(new DateHtKey(RoundManager.roundDate(htStatus.getSentTime(), roundType, granMin),
@@ -108,6 +116,7 @@ public class TwCounter {
      * @return
      */
     public static JavaPairRDD<String, StatsCounter> countHtsStatusesFromTimeBounds(JavaRDD<HtsStatus> htsStatuses, ZonedDateTime from, ZonedDateTime to) {
+        log.debug("called countHtsStatuses with time bounds");
         if (!areFromToValid(from, to)) {
             throw new IllegalArgumentException("From and to should be valid date and from cannot be after to");
         }
