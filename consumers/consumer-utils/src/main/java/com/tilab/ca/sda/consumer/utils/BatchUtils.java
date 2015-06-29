@@ -6,12 +6,15 @@ import com.google.gson.JsonParser;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
+import com.tilab.ca.sda.sda.model.TwUserProfile;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 
@@ -20,6 +23,7 @@ public class BatchUtils {
     
     private static final Logger log=Logger.getLogger(BatchUtils.class);
 
+    private static final String USER_ELEM="user";
     private static final String GEOLOCATION_ELEM="geoLocation";
     private static final String HTS_ELEM="hashtagEntities";
     private static final String HT_TEXT_FIELD="text";
@@ -31,10 +35,21 @@ public class BatchUtils {
     private static final String LATITUDE_FIELD="latitude";
     private static final String LONGITUDE_FIELD="longitude";
     
+    private static final String USER_NAME_FIELD="name";
+    private static final String USER_SCREEN_NAME_FIELD="screenName";
+    private static final String USER_DESCRIPTION_FIELD="description";
+    private static final String USER_PROFILE_BACKGROUND_COLOR_FIELD="profileBackgroundColor";
+    private static final String USER_PROFILE_TEXT_COLOR_FIELD="profileTextColor";
+    private static final String USER_PROFILE_LINK_COLOR_FIELD="profileLinkColor";
+    private static final String USER_PROFILE_SIDEBAR_FILL_COLOR_FIELD="profileSidebarFillColor";
+    private static final String USER_PROFILE_SIDEBAR_BORDER_COLOR_FIELD="profileSidebarBorderColor";
+    
     private static final String JHTS_FORMAT=String.format("\"%s\":[",HTS_ELEM);
     private static final String JHTS_FORMAT_EMPTY=String.format("\"%s\":[]",HTS_ELEM);
     private static final String JGEO_FORMAT=String.format("\"%s\":{",GEOLOCATION_ELEM);
     private static final String JGEO_FORMAT_EMPTY=String.format("\"%s\":{}",GEOLOCATION_ELEM);
+    
+    private static final Pattern CREATED_AT_DATA_PATTERN = Pattern.compile("\"createdAt\":\"([0-9T:/+-]+)\",");
    
     public static List<HtsStatus> fromJstring2HtsStatus(String statusString) {
         log.debug("parsing status string "+statusString);
@@ -84,6 +99,31 @@ public class BatchUtils {
         return geoStatus;
     }
     
+    public static TwUserProfile fromJstring2TwUserProfile(String statusString) {
+        
+        TwUserProfile tup=new TwUserProfile();
+        try{
+            JsonObject statusJsonObject = new JsonParser().parse(statusString).getAsJsonObject();
+            JsonObject jUser=statusJsonObject.getAsJsonObject(USER_ELEM);
+            tup.setUid(jUser.get(ID_FIELD).getAsLong());
+            tup.setName(jUser.get(USER_NAME_FIELD).getAsString());
+            tup.setScreenName(jUser.get(USER_SCREEN_NAME_FIELD).getAsString());
+            if(jUser.get(USER_DESCRIPTION_FIELD)!=null)
+                tup.setDescription(jUser.get(USER_DESCRIPTION_FIELD).getAsString());
+            String[] colors=new String[5];
+            colors[0]=jUser.get(USER_PROFILE_BACKGROUND_COLOR_FIELD).getAsString();
+            colors[1]=jUser.get(USER_PROFILE_TEXT_COLOR_FIELD).getAsString();
+            colors[2]=jUser.get(USER_PROFILE_LINK_COLOR_FIELD).getAsString();
+            colors[3]=jUser.get(USER_PROFILE_SIDEBAR_FILL_COLOR_FIELD).getAsString();
+            colors[4]=jUser.get(USER_PROFILE_SIDEBAR_BORDER_COLOR_FIELD).getAsString();
+            tup.setProfileColors(colors);
+            tup.setLastUpdate(Utils.Time.fromShortTimeZoneString2ZonedDateTime(statusJsonObject.get(CREATED_AT_FIELD).getAsString()));
+        }catch(Exception e){
+          log.error("failed to parse or error while processing jstring "+statusString,e);
+        }
+        return tup;
+    }
+    
     public static boolean statusContainsHashTags(JsonObject statusJsonObject) {
         log.info("calling statusContainsHashTags");
         return statusJsonObject.getAsJsonArray(HTS_ELEM)!=null && !statusJsonObject.getAsJsonArray(HTS_ELEM).isJsonNull() && statusJsonObject.getAsJsonArray(HTS_ELEM).size() >0;
@@ -115,5 +155,15 @@ public class BatchUtils {
     
     public static boolean isReply(JsonObject statusJsonObject) {
         return (statusJsonObject.get(REPLY_FIELD).getAsInt() != -1);
+    }
+    
+    public static boolean isCreatedAtInRange(String rawStatusJson,ZonedDateTime from,ZonedDateTime to){
+        Matcher m=CREATED_AT_DATA_PATTERN.matcher(rawStatusJson);
+        if (m.find()) {
+            ZonedDateTime createdAt=Utils.Time.fromShortTimeZoneString2ZonedDateTime(m.group(1));
+            return Utils.Time.isBetween(from, to, createdAt, Utils.Time.EXTREME_INCLUDED);
+        }else{
+            throw new IllegalStateException("pattern on createdAt not found as expected");
+        }
     }
 }

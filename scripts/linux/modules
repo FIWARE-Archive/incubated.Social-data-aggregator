@@ -1,2 +1,3 @@
 connector-tw connector-tw/start-tw-connector.sh
 tw-tot-stream consumer-tw-tot/start-tw-tot-stream.sh
+gra consumer-gra/start-gra-stream.sh

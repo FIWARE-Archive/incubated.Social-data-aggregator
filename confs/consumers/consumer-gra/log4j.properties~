@@ -1,0 +1,38 @@
+# Root logger option
+log4j.rootLogger=INFO, stdout
+log4j.logger.com.tilab.ca.sda.gra_consumer_batch=INFO, stdout
+log4j.logger.com.tilab.ca.sda.gra_consumer_stream=INFO, stdout
+ 
+# Direct log messages to stdout
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.Target=System.out
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+
+log4j.appender.filebatch=org.apache.log4j.RollingFileAppender
+log4j.appender.filebatch.File=${TwTotConsumerBatchLogPath}
+log4j.appender.filebatch.MaxFileSize=100MB
+log4j.appender.filebatch.MaxBackupIndex=1
+log4j.appender.filebatch.layout=org.apache.log4j.PatternLayout
+log4j.appender.filebatch.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+
+log4j.appender.filestream=org.apache.log4j.RollingFileAppender
+log4j.appender.filestream.File=${TwTotConsumerStreamLogPath}
+log4j.appender.filestream.MaxFileSize=100MB
+log4j.appender.filestream.MaxBackupIndex=1
+log4j.appender.filestream.layout=org.apache.log4j.PatternLayout
+log4j.appender.filestream.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+
+log4j.appender.filecore=org.apache.log4j.RollingFileAppender
+log4j.appender.filecore.File=${TwTotConsumerCoreLogPath}
+log4j.appender.filecore.MaxFileSize=100MB
+log4j.appender.filecore.MaxBackupIndex=1
+log4j.appender.filecore.layout=org.apache.log4j.PatternLayout
+log4j.appender.filecore.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+
+log4j.appender.sparklogger=org.apache.log4j.RollingFileAppender
+log4j.appender.sparklogger.File=${TwitterConnectorSparkLogFile}
+log4j.appender.sparklogger.MaxFileSize=200MB
+log4j.appender.sparklogger.MaxBackupIndex=1
+log4j.appender.sparklogger.layout=org.apache.log4j.PatternLayout
+log4j.appender.sparklogger.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n

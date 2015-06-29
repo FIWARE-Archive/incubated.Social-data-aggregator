@@ -1,13 +1,13 @@
 package com.tilab.ca.sda.consumer.tw.tot.core;
 
-import com.tilab.ca.sda.consumer.tw.tot.core.data.DateHtKey;
-import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncKey;
-import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncTimeKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import com.tilab.ca.sda.ctw.utils.RoundManager;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
+import com.tilab.ca.sda.sda.model.keys.DateHtKey;
+import com.tilab.ca.sda.sda.model.keys.GeoLocTruncKey;
+import com.tilab.ca.sda.sda.model.keys.GeoLocTruncTimeKey;
 import java.time.ZonedDateTime;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
