@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "precuc_ht_gender_bound")
+@Table(name = "gra_aggr_ht_gender_bound")
 public class StatsPreGenderHtBound extends StatsPreGender {
 
     @Column(name = "from_time")

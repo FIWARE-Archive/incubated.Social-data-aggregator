@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "precuc_ht_gender")
+@Table(name = "gra_aggr_ht_gender")
 public class StatsPreGenderHt extends StatsPreGender {
 
     @Column(name = "ht")

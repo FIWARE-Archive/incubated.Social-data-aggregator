@@ -4,7 +4,7 @@ import com.tilab.ca.sda.gra_core.utils.GraConstants;
 import org.aeonbits.owner.Config;
 
 @Config.Sources({
-	"file:${"+GraConstants.SDA_CONF_SYSTEM_PROPERTY+"}/${"+GraConstants.GRA_SYSTEM_PROPERTY+"}/GraConsumer.properties"
+	"file:${"+GraConstants.SDA_CONF_SYSTEM_PROPERTY+"}/${"+GraConstants.GRA_SYSTEM_PROPERTY+"}/"+GraConstants.GRA_PROPERTIES_FILE
 })
 public interface GraConsumerProperties extends Config{
     

@@ -27,6 +27,8 @@ public class GraConsumerStreamMain {
         log.info("Start Gender Recognition Algorithm Consumer Stream");
         try {
             String confsPath = Utils.Env.getConfsPathFromEnv(GraConstants.SDA_CONF_SYSTEM_PROPERTY, GraConstants.GRA_SYSTEM_PROPERTY);
+            System.out.println("Configuration path is "+confsPath);
+            log.info("Configuration path is "+confsPath);
             String log4jPropsFilePath = confsPath + File.separator + GraConstants.LOG4jPROPS_FILE_NAME;
             PropertyConfigurator.configure(log4jPropsFilePath);
             GraStreamProperties graProps = loadProps(confsPath);
@@ -35,7 +37,7 @@ public class GraConsumerStreamMain {
                     || graProps.sparkBatchDurationMillis() == null
                     || StringUtils.isBlank(graProps.checkpointDir())) {
 
-                String errMessage = "The following properties cannot be left blank:"
+                String errMessage = "The following properties cannot be left blank:\n"
                         + "sparkCleanTTL\n"
                         + "sparkBatchDurationMillis\n"
                         + "checkpointDir.\n"
@@ -77,7 +79,7 @@ public class GraConsumerStreamMain {
         GraStreamProperties twProps = ConfigFactory.create(GraStreamProperties.class);
 
         if (twProps == null) {
-            Properties props = Utils.Load.loadPropertiesFromPath(confsPath);
+            Properties props = Utils.Load.loadPropertiesFromPath(confsPath+File.separator+GraConstants.GRA_PROPERTIES_FILE);
             twProps = ConfigFactory.create(GraStreamProperties.class, props);
         }
 

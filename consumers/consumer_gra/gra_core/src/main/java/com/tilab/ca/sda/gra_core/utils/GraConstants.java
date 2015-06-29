@@ -9,6 +9,7 @@ public class GraConstants {
     public static final String DESCR_STOP_WORDS = "descr_stopwords.txt";
 
     public static final String LOG4jPROPS_FILE_NAME = "log4j.properties";
+    public static final String GRA_PROPERTIES_FILE="GraConsumer.properties";
     public static final String SDA_CONF_SYSTEM_PROPERTY = "SDA_CONF";
     public static final String GRA_SYSTEM_PROPERTY = "GRA";
 }
