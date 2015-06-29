@@ -125,7 +125,7 @@ public class BatchUtils {
     }
     
     public static boolean statusContainsHashTags(JsonObject statusJsonObject) {
-        log.info("calling statusContainsHashTags");
+        log.debug("calling statusContainsHashTags");
         return statusJsonObject.getAsJsonArray(HTS_ELEM)!=null && !statusJsonObject.getAsJsonArray(HTS_ELEM).isJsonNull() && statusJsonObject.getAsJsonArray(HTS_ELEM).size() >0;
     }
     

@@ -68,7 +68,7 @@ public class GraConsumerStreamMain {
                     .withBatchDurationMillis(graProps.sparkBatchDurationMillis())
                     .withSparkConf(sparkConf)
                     .withCheckpointPath(graProps.checkpointDir())
-                    .setUpSparkStreaming().startSparkStream(jssc -> GraStreamConsumer.start(jssc,graProps,graConsumerDao,busConsConn,confsPath));
+                    .startSparkStream(jssc -> GraStreamConsumer.start(jssc,graProps,graConsumerDao,busConsConn,confsPath));
         } catch (Exception e) {
             log.error(e);
             throw e;
