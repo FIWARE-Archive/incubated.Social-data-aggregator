@@ -9,7 +9,6 @@ import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.spark_test_lib.batch.SparkBatchTest;
 import com.tilab.ca.spark_test_lib.streaming.annotations.SparkTestConfig;
-import com.tilab.ca.spark_test_lib.streaming.interfaces.ExpectedOutputHandler;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -32,10 +31,9 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
     
     @Test
     public void simpleTestCountBound() {
-        ExpectedGeoOH goh=new ExpectedGeoOH(3);
         System.out.println("Starting Test simpleTestCountBound..");
-        $newBatchTest().expectedOutputHandler(goh)
-                .sparkJob((jsc,eoh)->{
+        $newBatchTest()
+                .sparkTest((jsc)->{
                     int numSlots=4;
                     int deltaMinutes=20;
                     int slot=deltaMinutes/numSlots;
@@ -69,11 +67,10 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
                    
                     
                     JavaPairRDD<GeoLocTruncKey, StatsCounter> geoStatusesFromTimeBoundsPairRDD= TwCounter.countGeoStatusesFromTimeBounds(geoStatusesRDD,from,to);
-                    ((ExpectedGeoOH)eoh).setGeoCountOutputList(geoStatusesFromTimeBoundsPairRDD.collect());
+                    return geoStatusesFromTimeBoundsPairRDD.collect();
                 })
-                .test((eoh) ->{
-                    ExpectedGeoOH ego=(ExpectedGeoOH)eoh;
-                    List<Tuple2<GeoLocTruncKey,StatsCounter>> gol=ego.getGeoCountOutputList();
+                .test((res) ->{
+                    List<Tuple2<GeoLocTruncKey,StatsCounter>> gol=(List<Tuple2<GeoLocTruncKey,StatsCounter>>)res;
                     Assert.assertNotNull(gol);
                     gol.sort((t1,t2) ->{
                        int comp=((Double)t1._1.getLatTrunc()).compareTo(t2._1.getLatTrunc());
@@ -103,8 +100,8 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
                     Assert.assertEquals(3,gol.get(2)._2.getNumTw());
                     Assert.assertEquals(1,gol.get(2)._2.getNumRtw());
                     Assert.assertEquals(0,gol.get(2)._2.getNumReply());   
-                })
-                .executeTest(30000);
+                }).execute();
+                
         System.out.println("simpleTestCountBound END");
     }
     
@@ -116,10 +113,8 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
     
     @Test
     public void simpleTestCountRound() {
-        ExpectedGeoRound edh=new ExpectedGeoRound(4);
-       
-        $newBatchTest().expectedOutputHandler(edh)
-                .sparkJob((jsc,eoh)->{
+        $newBatchTest()
+                .sparkTest((jsc)->{
                     int truncatePos=3;
                     
                     List<GeoStatus> geoStatusList=new LinkedList<>();
@@ -144,19 +139,19 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
                     
                     
                     JavaRDD<GeoStatus> geoStatusesRDD=jsc.parallelize(geoStatusList);
-                    ExpectedGeoRound egr=(ExpectedGeoRound)eoh;
-                    egr.addGeoCountOutputListRound(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_MIN, null).collect());
-                    egr.addGeoCountOutputListRound(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_MIN, 3).collect());
-                    egr.addGeoCountOutputListRound(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_HOUR, null).collect());
-                    egr.addGeoCountOutputListRound(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_DAY, null).collect());
-                    
+                    List<List<Tuple2<GeoLocTruncTimeKey,StatsCounter>>> geoCountOutputListRound=new LinkedList<>();
+                    geoCountOutputListRound.add(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_MIN, null).collect());
+                    geoCountOutputListRound.add(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_MIN, 3).collect());
+                    geoCountOutputListRound.add(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_HOUR, null).collect());
+                    geoCountOutputListRound.add(TwCounter.countGeoStatuses(geoStatusesRDD, RoundType.ROUND_TYPE_DAY, null).collect());
+                    return geoCountOutputListRound;
                 })
-                .test((eoh) ->{
-                    ExpectedGeoRound egr=(ExpectedGeoRound)eoh;
-                    Assert.assertEquals(4,egr.getGeoCountOutputListRound().size());
+                .test((res) ->{
+                    List<List<Tuple2<GeoLocTruncTimeKey,StatsCounter>>> egr=(List<List<Tuple2<GeoLocTruncTimeKey,StatsCounter>>>)res;
+                    Assert.assertEquals(4,egr.size());
                     
                     //check round min
-                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundMinOutputList=egr.getGeoCountOutputListRound().get(0);
+                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundMinOutputList=egr.get(0);
                     Assert.assertEquals(6,roundMinOutputList.size());
                     sortGeoTimeList(roundMinOutputList);
                     Assert.assertEquals(1.123F,roundMinOutputList.get(0)._1.getGeoLocTruncKey().getLatTrunc(),3);
@@ -209,7 +204,7 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
                     
                     //TEST ON GRAN MIN
                     
-                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundGranMinOutputList=egr.getGeoCountOutputListRound().get(1);
+                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundGranMinOutputList=egr.get(1);
                     Assert.assertEquals(6,roundGranMinOutputList.size());
                     sortGeoTimeList(roundGranMinOutputList);
                     
@@ -264,7 +259,7 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
                    
                     
                     //TEST ON ROUND HOUR
-                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundHourOutputList=egr.getGeoCountOutputListRound().get(2);
+                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundHourOutputList=egr.get(2);
                     Assert.assertEquals(5,roundHourOutputList.size());
                     sortGeoTimeList(roundHourOutputList);
                     
@@ -311,7 +306,7 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
                     
                     
                     //TEST ON ROUND DAY
-                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundDayOutputList=egr.getGeoCountOutputListRound().get(3);
+                    List<Tuple2<GeoLocTruncTimeKey,StatsCounter>> roundDayOutputList=egr.get(3);
                     Assert.assertEquals(4,roundDayOutputList.size());
                     sortGeoTimeList(roundDayOutputList);
                     
@@ -348,7 +343,7 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
                     Assert.assertEquals(1,roundDayOutputList.get(3)._2.getNumReply());
                     
                 })
-                .executeTest(30000);
+                .execute();
                 
     }
     
@@ -376,60 +371,5 @@ public class GeoCountTestCase extends SparkBatchTest implements Serializable{
         geoStatus.setUserId(userId);
   
         return geoStatus;
-    }
-    
-    public static class ExpectedGeoOH implements ExpectedOutputHandler{
-
-        private List<Tuple2<GeoLocTruncKey,StatsCounter>> geoCountOutputList;
-        private final int expectedOutputSize;
-
-        public ExpectedGeoOH(int expectedOutputSize) {
-            this.expectedOutputSize=expectedOutputSize;
-        }
-
-        public List<Tuple2<GeoLocTruncKey, StatsCounter>> getGeoCountOutputList() {
-            return geoCountOutputList;
-        }
-
-        public void setGeoCountOutputList(List<Tuple2<GeoLocTruncKey, StatsCounter>> geoCountOutputList) {
-            this.geoCountOutputList = geoCountOutputList;
-        }
-        
-
-        @Override
-        public boolean isExpectedOutputFilled() {
-            return geoCountOutputList.size()==expectedOutputSize; 
-        }
-    
-    }
-    
-    public static class ExpectedGeoRound implements ExpectedOutputHandler{
-
-        private List<List<Tuple2<GeoLocTruncTimeKey,StatsCounter>>> geoCountOutputListRound;
-        private final int expectedOutputSize;
-
-        public ExpectedGeoRound(int expectedOutputSize) {
-            this.expectedOutputSize=expectedOutputSize;
-        }
-
-        public List<List<Tuple2<GeoLocTruncTimeKey, StatsCounter>>> getGeoCountOutputListRound() {
-            return geoCountOutputListRound;
-        }
-
-        public void setGeoCountOutputListRound(List<List<Tuple2<GeoLocTruncTimeKey, StatsCounter>>> geoCountOutputListRound) {
-            this.geoCountOutputListRound = geoCountOutputListRound;
-        }
-        
-         public void addGeoCountOutputListRound(List<Tuple2<GeoLocTruncTimeKey, StatsCounter>> geoCountOutputListRound) {
-            if(this.geoCountOutputListRound==null)
-                this.geoCountOutputListRound=new LinkedList<>();
-            this.geoCountOutputListRound.add(geoCountOutputListRound);
-        }
-        
-        @Override
-        public boolean isExpectedOutputFilled() {
-            return geoCountOutputListRound.size()==expectedOutputSize; 
-        }
-    
     }
 }
