@@ -1,7 +1,7 @@
 package com.tilab.ca.sda.consumer.tw.tot.stream.test;
 
 
-import com.tilab.ca.sda.consumer.tw.tot.core.data.DateHtKey;
+import com.tilab.ca.sda.sda.model.keys.DateHtKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import com.tilab.ca.sda.consumer.tw.tot.stream.TotTwStreamConsumer;
 import com.tilab.ca.sda.consumer.tw.tot.stream.TwTotConsumerProperties;

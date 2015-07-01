@@ -4,9 +4,10 @@
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>consumers</artifactId>
-        <version>4.2.2.0</version>
+        <version>4.3.3.1</version>
     </parent>
     <artifactId>consumer-tw-tot</artifactId>
+    <version>4.2.2.0</version>
     <packaging>pom</packaging>
     
     <modules>
@@ -21,7 +22,7 @@
             <dependency>
                 <groupId>com.tilab.ca.sda</groupId>
                 <artifactId>consumer-utils</artifactId>
-                <version>4.2.2.0</version>
+                <version>4.3.3.0</version>
             </dependency>
             
             <dependency>

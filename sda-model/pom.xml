@@ -4,9 +4,11 @@
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>social-data-aggregator</artifactId>
-        <version>4.2.2.0</version>
+        <version>4.3.3.1</version>
     </parent>
+    
     <artifactId>sda-model</artifactId>
+    <version>4.3.3.0</version>
     <packaging>jar</packaging>
     
 </project>

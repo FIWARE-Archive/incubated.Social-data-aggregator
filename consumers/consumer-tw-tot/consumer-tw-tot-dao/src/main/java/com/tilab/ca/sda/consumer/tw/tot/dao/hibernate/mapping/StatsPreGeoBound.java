@@ -1,6 +1,7 @@
 package com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping;
 
-import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncKey;
+
+import com.tilab.ca.sda.sda.model.keys.GeoLocTruncKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import java.io.Serializable;
 import java.util.Date;
@@ -28,10 +29,10 @@ public class StatsPreGeoBound implements Serializable {
     @Column(name = "long_trunc")
     private double longTrunc;
 
-	@Column(name = "from_time")
+    @Column(name = "from_time")
     private Date from = null;
 
-	@Column(name = "to_time")
+    @Column(name = "to_time")
     private Date to = null;
 
     @Column(name = "num_tw")

@@ -1,8 +1,8 @@
 package com.tilab.ca.sda.consumer.tw.tot.core.test;
 
 import com.tilab.ca.sda.consumer.tw.tot.core.TwCounter;
-import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncKey;
-import com.tilab.ca.sda.consumer.tw.tot.core.data.GeoLocTruncTimeKey;
+import com.tilab.ca.sda.sda.model.keys.GeoLocTruncKey;
+import com.tilab.ca.sda.sda.model.keys.GeoLocTruncTimeKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import com.tilab.ca.sda.ctw.utils.RoundType;
 import com.tilab.ca.sda.ctw.utils.Utils;
