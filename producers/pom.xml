@@ -4,12 +4,15 @@
     
     <properties>
         <kafka.version>0.8.1.1</kafka.version>
+        <sda_utils.version>4.3.3.1</sda_utils.version>
+        <sda_model.version>4.3.3.0</sda_model.version>
     </properties>
     
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>social-data-aggregator</artifactId>
-        <version>4.3.3.0</version>
+        <relativePath>../pom.xml</relativePath>
+        <version>4.3.3.1</version>   
     </parent>
     
     <artifactId>producers</artifactId>
@@ -24,13 +27,13 @@
             <dependency>
                 <groupId>com.tilab.ca.sda</groupId>
                 <artifactId>sda-utils</artifactId>
-                <version>4.3.3.0</version>
+                <version>${sda_utils.version}</version>
             </dependency>
         
             <dependency>
                 <groupId>com.tilab.ca.sda</groupId>
                 <artifactId>sda-model</artifactId>
-                <version>4.3.3.0</version>
+                <version>${sda_model.version}</version>
             </dependency>
         
             <dependency>

@@ -7,7 +7,6 @@ import com.tilab.ca.sda.ctw.utils.RoundType;
 import com.tilab.ca.sda.sda.model.HtsStatus;
 import com.tilab.ca.spark_test_lib.batch.SparkBatchTest;
 import com.tilab.ca.spark_test_lib.streaming.annotations.SparkTestConfig;
-import com.tilab.ca.spark_test_lib.streaming.interfaces.ExpectedOutputHandler;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -29,9 +28,7 @@ public class HtCountTestCase extends SparkBatchTest implements Serializable{
     
     @Test
     public void simpleTestCountBound() {
-        ExpectedHtsOH edh=new ExpectedHtsOH(3);
-        $newBatchTest().expectedOutputHandler(edh)
-                .sparkJob((jsc,eoh)->{
+        $newBatchTest().sparkTest((jsc)->{
                     int numSlots=4;
                     int deltaMinutes=20;
                     int slot=deltaMinutes/numSlots;
@@ -61,12 +58,10 @@ public class HtCountTestCase extends SparkBatchTest implements Serializable{
                     JavaRDD<HtsStatus> htsStatuses=jsc.parallelize(htStatusList);
                    
                     JavaPairRDD<String, StatsCounter> htsStatusesFromTimeBounds= TwCounter.countHtsStatusesFromTimeBounds(htsStatuses,from,to);
-                    ((ExpectedHtsOH)eoh).setHtsCountOutputList(htsStatusesFromTimeBounds.collect());
-                    System.out.println(((ExpectedHtsOH)eoh).getHtsCountOutputList().size());
+                    return (htsStatusesFromTimeBounds.collect());
                 })
-                .test((eoh) ->{
-                    ExpectedHtsOH eho=(ExpectedHtsOH)eoh;
-                    List<Tuple2<String,StatsCounter>> lst=eho.getHtsCountOutputList();
+                .test((res) ->{
+                    List<Tuple2<String,StatsCounter>> lst=(List<Tuple2<String,StatsCounter>>)res;
                     Assert.assertNotNull(lst);
                     lst.sort((t1,t2) ->t1._1.compareTo(t2._1));
                     
@@ -87,17 +82,16 @@ public class HtCountTestCase extends SparkBatchTest implements Serializable{
                     Assert.assertEquals(1,lst.get(2)._2.getNumRtw());
                     Assert.assertEquals(0,lst.get(2)._2.getNumReply());   
                 })
-                .executeTest(30000);
+                .execute();
     }
     
     @Test
     public void simpleTestCountRound() {
-        ExpectedHtsRound edh=new ExpectedHtsRound(4);
         String startDateStr="2015-02-12T15:44:02+01:00";
         ZonedDateTime startZDate=ZonedDateTime.parse(startDateStr);
         
-        $newBatchTest().expectedOutputHandler(edh)
-                .sparkJob((jsc,eoh)->{
+        $newBatchTest()
+                .sparkTest((jsc)->{
                     
                     List<HtsStatus> htStatusList=new LinkedList<>();
                     htStatusList.add(new HtsStatus(1, 1, "h1", Date.from(startZDate.toInstant()), false, false)); 
@@ -123,23 +117,25 @@ public class HtCountTestCase extends SparkBatchTest implements Serializable{
                     htStatusList.add(new HtsStatus(16, 12, "h3", Date.from(after16Min.plusSeconds(1).toInstant()), false, true));
                     
                     JavaRDD<HtsStatus> htsStatuses=jsc.parallelize(htStatusList);
-                    ExpectedHtsRound ehr=((ExpectedHtsRound)eoh);
+                    
+                    List<List<Tuple2<DateHtKey,StatsCounter>>> htsCountOutputList=new LinkedList<>();
+                    
                     JavaPairRDD<DateHtKey, StatsCounter> htsStatusesFromTimeBounds= TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_MIN,null);
-                    ehr.addHtsCountOutputList(htsStatusesFromTimeBounds.collect());
+                    htsCountOutputList.add(htsStatusesFromTimeBounds.collect());
                     
-                    ehr.addHtsCountOutputList(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_MIN,5).collect()); //group by 5 min
+                    htsCountOutputList.add(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_MIN,5).collect()); //group by 5 min
 
-                    ehr.addHtsCountOutputList(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_HOUR,null).collect()); //group by hour
+                    htsCountOutputList.add(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_HOUR,null).collect()); //group by hour
 
-                    ehr.addHtsCountOutputList(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_DAY,null).collect()); //group by day 
+                    htsCountOutputList.add(TwCounter.countHtsStatuses(htsStatuses,RoundType.ROUND_TYPE_DAY,null).collect()); //group by day 
                 })
-                .test((eoh) ->{
-                    ExpectedHtsRound ehr=((ExpectedHtsRound)eoh);
+                .test((res) ->{
+                    List<List<Tuple2<DateHtKey,StatsCounter>>> ehr=(List<List<Tuple2<DateHtKey,StatsCounter>>>)res;
                     
-                    Assert.assertEquals(4,ehr.getHtsCountOutputList().size());
+                    Assert.assertEquals(4,ehr.size());
                     
                     //check round min
-                    List<Tuple2<DateHtKey,StatsCounter>> roundMinOutputList=ehr.getHtsCountOutputList().get(0);
+                    List<Tuple2<DateHtKey,StatsCounter>> roundMinOutputList=ehr.get(0);
                     Assert.assertEquals(5,roundMinOutputList.size());
                     roundMinOutputList.sort((t1,t2) ->{
                        int comp=t1._1.getDate().compareTo(t2._1.getDate());
@@ -184,7 +180,7 @@ public class HtCountTestCase extends SparkBatchTest implements Serializable{
                     Assert.assertEquals(2,roundMinOutputList.get(4)._2.getNumReply());
                     
                     //TEST ON GRAN MIN
-                    List<Tuple2<DateHtKey,StatsCounter>> roundMinGranOutputList=ehr.getHtsCountOutputList().get(1);
+                    List<Tuple2<DateHtKey,StatsCounter>> roundMinGranOutputList=ehr.get(1);
                     Assert.assertEquals(5,roundMinGranOutputList.size());
                     roundMinGranOutputList.sort((t1,t2) ->{
                        int comp=t1._1.getDate().compareTo(t2._1.getDate());
@@ -229,7 +225,7 @@ public class HtCountTestCase extends SparkBatchTest implements Serializable{
                     Assert.assertEquals(2,roundMinGranOutputList.get(4)._2.getNumReply());
                     
                     //TEST ON HOUR
-                    List<Tuple2<DateHtKey,StatsCounter>> roundHourOutputList=ehr.getHtsCountOutputList().get(2);
+                    List<Tuple2<DateHtKey,StatsCounter>> roundHourOutputList=ehr.get(2);
                     Assert.assertEquals(4,roundHourOutputList.size());
                     roundHourOutputList.sort((t1,t2) ->{
                        int comp=t1._1.getDate().compareTo(t2._1.getDate());
@@ -268,7 +264,7 @@ public class HtCountTestCase extends SparkBatchTest implements Serializable{
                     
                     
                     //TEST ON DAY
-                    List<Tuple2<DateHtKey,StatsCounter>> roundDayOutputList=ehr.getHtsCountOutputList().get(3);
+                    List<Tuple2<DateHtKey,StatsCounter>> roundDayOutputList=ehr.get(3);
                     Assert.assertEquals(3,roundDayOutputList.size());
                     roundDayOutputList.sort((t1,t2) ->{
                        int comp=t1._1.getDate().compareTo(t2._1.getDate());
@@ -299,65 +295,8 @@ public class HtCountTestCase extends SparkBatchTest implements Serializable{
                     Assert.assertEquals(2,roundDayOutputList.get(2)._2.getNumReply());
                     
                 })
-                .executeTest(30000);
+                .execute();
                 
     }
-    
-    
-    public static class ExpectedHtsOH implements ExpectedOutputHandler{
-
-        private List<Tuple2<String,StatsCounter>> htsCountOutputList;
-        private final int expectedOutputSize;
-
-        public ExpectedHtsOH(int expectedOutputSize) {
-            this.expectedOutputSize=expectedOutputSize;
-        }
-        
-        public List<Tuple2<String, StatsCounter>> getHtsCountOutputList() {
-            return htsCountOutputList;
-        }
-
-        public void setHtsCountOutputList(List<Tuple2<String, StatsCounter>> htsCountOutputList) {
-            this.htsCountOutputList = htsCountOutputList;
-        }
-        
-        @Override
-        public boolean isExpectedOutputFilled() {
-            return htsCountOutputList.size()==expectedOutputSize; 
-        }
-    
-    }
-    
-    public static class ExpectedHtsRound implements ExpectedOutputHandler{
-
-        private List<List<Tuple2<DateHtKey,StatsCounter>>> htsCountOutputList;
-        private final int expectedOutputSize;
-
-        public ExpectedHtsRound(int expectedOutputSize) {
-            this.expectedOutputSize=expectedOutputSize;
-        }
-
-        public List<List<Tuple2<DateHtKey, StatsCounter>>> getHtsCountOutputList() {
-            return htsCountOutputList;
-        }
-
-        public void setHtsCountOutputList(List<List<Tuple2<DateHtKey, StatsCounter>>> htsCountOutputList) {
-            this.htsCountOutputList = htsCountOutputList;
-        }
-        
-         public void addHtsCountOutputList(List<Tuple2<DateHtKey, StatsCounter>> htsCountOutputListElem) {
-            if(htsCountOutputList==null)
-                htsCountOutputList=new LinkedList<>();
-            this.htsCountOutputList.add(htsCountOutputListElem);
-        }
-        
-        @Override
-        public boolean isExpectedOutputFilled() {
-            return htsCountOutputList.size()==expectedOutputSize; 
-        }
-    
-    }
-    
-    
     
 }

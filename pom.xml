@@ -3,14 +3,15 @@
   
     <groupId>com.tilab.ca.sda</groupId>
     <artifactId>social-data-aggregator</artifactId>
-    <version>4.3.3.0</version>
+    <version>4.3.3.1</version>
     <name>Social Data Aggregator Parent POM</name>
     <packaging>pom</packaging>
 
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spark.version>1.2.1</spark.version>
+        <spark.version>1.4.0</spark.version>
+        <jetty.version>8.1.14.v20131031</jetty.version>
+        <spark_test_lib.version>1.0.0</spark_test_lib.version>
     </properties>
 
     <modules>
@@ -50,22 +51,22 @@
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-streaming-kafka_2.10</artifactId>
                 <version>${spark.version}</version>
-            </dependency>
+            </dependency>    
             
+           
             <dependency>
                 <groupId>org.apache.spark</groupId>
                 <artifactId>spark-mllib_2.10</artifactId>
                 <version>${spark.version}</version>
             </dependency>
-
-            <!--
+            
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
-                <version>9.3.0.M2</version>
+                <version>${jetty.version}</version>
             </dependency>
-            -->
-                                    
+
+            
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -112,7 +113,7 @@
             <dependency>
                 <groupId>com.tilab.ca</groupId>
                 <artifactId>spark_test_lib</artifactId>
-                <version>0.0.2</version>
+                <version>${spark_test_lib.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

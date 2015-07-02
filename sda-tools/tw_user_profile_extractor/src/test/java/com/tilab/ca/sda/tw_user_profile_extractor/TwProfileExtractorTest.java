@@ -35,14 +35,13 @@ public class TwProfileExtractorTest extends SparkBatchTest{
     @Test
     public void testExtractUsrProfiles() {
         $newBatchTest()
-             .expectedOutputHandler(new ExpectedRes(3))
-             .sparkJob((sc,eoh) -> {
+             .sparkTest((sc) -> {
                  JavaRDD<TwProfile> resRDD=TwProfileExtractor
                                               .extractUsrProfiles(sc, BASE_PATH+File.separator+"testProfileExtractorData.txt", false);
-                 ((ExpectedRes)eoh).setTwProfilesOutput(resRDD.collect());
+                 return resRDD.collect();
              })
-             .test((eoh) ->{
-                 List<TwProfile> twProfilesOutputList=((ExpectedRes)eoh).getTwProfilesOutput();
+             .test((res) ->{
+                 List<TwProfile> twProfilesOutputList=(List<TwProfile>)res;
                  assertNotNull(twProfilesOutputList);
                  assertEquals("expected 3 distinct users",3, twProfilesOutputList.size());
                  twProfilesOutputList.sort((tp1,tp2) -> ((Long)tp1.getUserId()).compareTo(tp2.getUserId()));
@@ -52,31 +51,6 @@ public class TwProfileExtractorTest extends SparkBatchTest{
                  
                  assertEquals("Expected to have the last updated description for user 1","descrUpd1", twProfilesOutputList.get(0).getDescription());
              })
-             .executeTest(10000);
+             .execute();
     }
-
-    public class ExpectedRes implements ExpectedOutputHandler{
-
-        private final int numOutputs;
-        private List<TwProfile> twProfilesOutput;
-        
-        public ExpectedRes(int numOutputs){
-            this.numOutputs=numOutputs;
-        }
-        
-        public void setTwProfilesOutput(List<TwProfile> twProfilesOutput){
-            this.twProfilesOutput=twProfilesOutput;
-        }
-        
-        public List<TwProfile> getTwProfilesOutput(){
-           return this.twProfilesOutput;
-        }
-        
-        @Override
-        public boolean isExpectedOutputFilled() {
-            return twProfilesOutput.size()==numOutputs;
-        }
-    }
-    
-    
 }

@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>social-data-aggregator</artifactId>
-        <version>4.3.3.0</version>
+        <version>4.3.3.1</version>
     </parent>
     <artifactId>sda-tools</artifactId>
     <version>4.3.3.0</version>

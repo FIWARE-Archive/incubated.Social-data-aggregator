@@ -2,6 +2,7 @@
 
 Copyright © 2014 Telecom Italia.
 
+This project is part of FIWARE [fiwarelink]
 
 What is Social Data Aggregator
 ---------------
@@ -21,3 +22,5 @@ Code for related libs can be found on [GitHub FiwareTIConsoft Group].
 [GitHub Repository]: https://github.com/FiwareTIConsoft/social-data-aggregator
 [GitHub FiwareTIConsoft Group]: https://github.com/FiwareTIConsoft
 [website]: http://www.telecomitalia.it
+[fiwarelink]: http://www.fiware.org/
+

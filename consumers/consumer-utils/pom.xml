@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>consumers</artifactId>
-        <version>4.3.3.0</version>
+        <version>4.3.3.1</version>
     </parent>
     <artifactId>consumer-utils</artifactId>
     <packaging>jar</packaging>

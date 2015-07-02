@@ -56,7 +56,7 @@ public class TwTotStreamConsumerTestCase extends SparkStreamingTest implements S
                     public JavaDStream<String> getDStreamByKey(String key) {
                         return htsStatusDStream;
                     }
-                }, RoundType.ROUND_TYPE_MIN);
+                }, RoundType.ROUND_TYPE_MIN,null);
                
                 ExpectedHtsRound ehr =((ExpectedHtsRound)eoh);
                 htsPairDStream.foreachRDD((rdd) -> {

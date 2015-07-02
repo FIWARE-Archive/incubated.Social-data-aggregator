@@ -16,6 +16,8 @@ public interface TwTotConsumerProperties extends Config{
     @DefaultValue("3")
     public int roundPos();
     
+    
+    @DefaultValue("com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDaoFileImpl")
     public String daoImplClass();
     
     @DefaultValue("1")

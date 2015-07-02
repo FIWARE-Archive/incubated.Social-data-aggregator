@@ -4,10 +4,10 @@
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>consumers</artifactId>
-        <version>4.3.3.0</version>
+        <version>4.3.3.1</version>
     </parent>
     <artifactId>consumer_gra</artifactId>
-    <version>4.3.3.0</version>
+    <version>4.3.3.1</version>
     <packaging>pom</packaging>
     <modules>
         <module>gra_core</module>
@@ -21,13 +21,13 @@
             <dependency>
                 <groupId>com.tilab.ca.sda</groupId>
                 <artifactId>gra_core</artifactId>
-                <version>4.3.3.0</version>
+                <version>4.3.3.1</version>
             </dependency>
             
             <dependency>
                 <groupId>com.tilab.ca.sda</groupId>
                 <artifactId>gra_consumer_dao</artifactId>
-                <version>4.3.3.0</version>
+                <version>4.3.3.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

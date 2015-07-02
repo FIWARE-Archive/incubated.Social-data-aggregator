@@ -3,26 +3,20 @@ package com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping;
 
 import com.tilab.ca.sda.sda.model.keys.GeoLocTruncKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
-import java.io.Serializable;
+import com.tilab.ca.sda.ctw.utils.Utils;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "ss_stats_pre_geo_bound")
-public class StatsPreGeoBound implements Serializable {
+public class StatsPreGeoBound extends StatsPre {
 
     private static final long serialVersionUID = -1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-
+   
     @Column(name = "lat_trunc")
     private double latTrunc;
 
@@ -35,17 +29,6 @@ public class StatsPreGeoBound implements Serializable {
     @Column(name = "to_time")
     private Date to = null;
 
-    @Column(name = "num_tw")
-    private int numTw = 0;
-
-    @Column(name = "num_rtw")
-    private int numRtw = 0;
-
-    @Column(name = "num_rply")
-    private int numReply = 0;
-
-    @Column(name = "tot_tw")
-    private int totTw = 0;
 
     public StatsPreGeoBound() {
     }
@@ -85,37 +68,6 @@ public class StatsPreGeoBound implements Serializable {
         this.longTrunc = longTrunc;
     }
 
-    public int getNumTw() {
-        return numTw;
-    }
-
-    public void setNumTw(int numTw) {
-        this.numTw = numTw;
-    }
-
-    public int getNumRtw() {
-        return numRtw;
-    }
-
-    public void setNumRtw(int numRtw) {
-        this.numRtw = numRtw;
-    }
-
-    public int getNumReply() {
-        return numReply;
-    }
-
-    public void setNumReply(int numReply) {
-        this.numReply = numReply;
-    }
-
-    public int getTotTw() {
-        return totTw;
-    }
-
-    public void setTotTw(int totTw) {
-        this.totTw = totTw;
-    }
 
     public Date getFrom() {
         return from;
@@ -131,6 +83,13 @@ public class StatsPreGeoBound implements Serializable {
 
     public void setTo(Date to) {
         this.to = to;
+    }
+    
+    @Override
+    public String toString(){
+        return String.format("%f,%f,%s,%s,%d,%d,%d,%d",latTrunc,longTrunc,Utils.Time.date2ZonedDateTime(from).toString(),
+                                                       Utils.Time.date2ZonedDateTime(to).toString(),
+                                                       numTw,numRtw,numReply);
     }
 
 }

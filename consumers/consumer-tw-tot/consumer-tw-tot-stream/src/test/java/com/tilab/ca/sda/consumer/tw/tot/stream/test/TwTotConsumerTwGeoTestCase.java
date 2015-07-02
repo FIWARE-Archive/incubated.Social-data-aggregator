@@ -55,7 +55,7 @@ public class TwTotConsumerTwGeoTestCase extends SparkStreamingTest implements Se
                     public JavaDStream<String> getDStreamByKey(String key) {
                         return geoStatusDStream;
                     }
-                }, RoundType.ROUND_TYPE_MIN);
+                }, RoundType.ROUND_TYPE_MIN,null);
                
                 ExpectedGeoRound egr =((ExpectedGeoRound)eoh);
                 geoPairDStream.foreachRDD((rdd) -> {

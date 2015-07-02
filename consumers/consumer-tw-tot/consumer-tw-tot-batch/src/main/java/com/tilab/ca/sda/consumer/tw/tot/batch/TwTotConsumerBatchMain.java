@@ -11,6 +11,7 @@ import com.tilab.ca.sda.sda.model.keys.GeoLocTruncKey;
 import com.tilab.ca.sda.sda.model.keys.GeoLocTruncTimeKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
 import com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDao;
+import com.tilab.ca.sda.ctw.utils.RoundManager;
 import com.tilab.ca.sda.ctw.utils.Utils;
 import com.tilab.ca.sda.sda.model.GeoStatus;
 import com.tilab.ca.sda.sda.model.HtsStatus;
@@ -77,7 +78,7 @@ public class TwTotConsumerBatchMain {
                 
         if(arguments.getRoundMode()!=null){
             JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> pairTotRDDGeoRound=TwCounter.countGeoStatuses(geoStatus, arguments.getRoundMode(), arguments.getGranMin(), arguments.getFrom(), arguments.getTo());
-            twDao.saveGeoByTimeGran(pairTotRDDGeoRound);
+            twDao.saveGeoByTimeGran(pairTotRDDGeoRound,RoundManager.getGranMinFromRoundType(arguments.getRoundMode(), arguments.getGranMin()));
         }else{
             JavaPairRDD<GeoLocTruncKey, StatsCounter>  pairTotGeoRDD=TwCounter.countGeoStatusesFromTimeBounds(geoStatus, arguments.getFrom(), arguments.getTo());
             twDao.saveGeoByTimeInterval(Utils.Time.zonedDateTime2Date(arguments.getFrom()), Utils.Time.zonedDateTime2Date(arguments.getTo()), pairTotGeoRDD);
@@ -89,7 +90,7 @@ public class TwTotConsumerBatchMain {
                     
         if(arguments.getRoundMode()!=null){
             JavaPairRDD<DateHtKey, StatsCounter> pairTotRDDHtsRound=TwCounter.countHtsStatuses(htsStatus, arguments.getRoundMode(), arguments.getGranMin(), arguments.getFrom(), arguments.getTo());
-            twDao.saveHtsByTimeGran(pairTotRDDHtsRound);
+            twDao.saveHtsByTimeGran(pairTotRDDHtsRound,RoundManager.getGranMinFromRoundType(arguments.getRoundMode(), arguments.getGranMin()));
         }else{
             JavaPairRDD<String, StatsCounter> pairTotHtsRDD=TwCounter.countHtsStatusesFromTimeBounds(htsStatus, arguments.getFrom(), arguments.getTo());
             twDao.saveHtsByTimeInterval(Utils.Time.zonedDateTime2Date(arguments.getFrom()), Utils.Time.zonedDateTime2Date(arguments.getTo()), pairTotHtsRDD);
