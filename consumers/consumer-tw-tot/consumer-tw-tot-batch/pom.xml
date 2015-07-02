@@ -4,10 +4,10 @@
     <parent>
         <groupId>com.tilab.ca.sda</groupId>
         <artifactId>consumer-tw-tot</artifactId>
-        <version>4.2.2.0</version>
+        <version>4.2.3.0</version>
     </parent>
     <artifactId>consumer-tw-tot-batch</artifactId>
-    <version>4.2.2.0</version>
+    <version>4.2.3.0</version>
     
     <packaging>jar</packaging>
     
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>com.tilab.ca.sda</groupId>
             <artifactId>consumer-tw-tot-dao</artifactId>
-            <version>4.2.2.0</version>
+            <version>4.2.3.0</version>
         </dependency>
         
         <dependency>

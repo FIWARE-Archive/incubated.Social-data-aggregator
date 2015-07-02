@@ -22,25 +22,26 @@ import org.hibernate.cfg.Configuration;
 import org.jboss.logging.Logger;
 
 
-public class ConsumerTwTotDaoDefaultImpl implements ConsumerTwTotDao{
+public class ConsumerTwTotDaoHibImpl implements ConsumerTwTotDao{
     
-    private static final Logger log=Logger.getLogger(ConsumerTwTotDaoDefaultImpl.class);
+    private static final Logger log=Logger.getLogger(ConsumerTwTotDaoHibImpl.class);
     
     private final Configuration cfg;
     
-    public ConsumerTwTotDaoDefaultImpl(Properties props){
+    public ConsumerTwTotDaoHibImpl(Properties props){
        String hibConfFilePath=props.getProperty(CONF_PATH_PROPS_KEY)+File.separator+TotTwConstants.HIBERNATE_CONF_FILE_NAME;
        cfg = new Configuration().configure(new File(hibConfFilePath));
     }
     
-    public ConsumerTwTotDaoDefaultImpl(String hibConfFilePath){
+    public ConsumerTwTotDaoHibImpl(String hibConfFilePath){
        cfg = new Configuration().configure(new File(hibConfFilePath));
     }
     
     @Override
-    public void saveGeoByTimeGran(JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> geoTimeGranRDD){
+    public void saveGeoByTimeGran(JavaPairRDD<GeoLocTruncTimeKey, StatsCounter> geoTimeGranRDD,final int gran){
         log.info("CALLED saveGeoByTimeGran");
-        JavaRDD<StatsPreGeo> preGeoRDD=geoTimeGranRDD.map((t) -> new StatsPreGeo(t._1,t._2));
+        JavaRDD<StatsPreGeo> preGeoRDD=geoTimeGranRDD.map((t) -> new StatsPreGeo(t._1,t._2,gran));
+        log.info(String.format("saving %d geo objects with gran %d",preGeoRDD.count(),gran));
         preGeoRDD.foreachPartition((spgIterator) ->{
             saveOnDb(spgIterator);
         }); 
@@ -51,16 +52,17 @@ public class ConsumerTwTotDaoDefaultImpl implements ConsumerTwTotDao{
         log.info("CALLED saveGeoByTimeInterval");       
         JavaRDD<StatsPreGeoBound> preGeoBoundRDD=geoTimeBoundRDD.map((t) -> new StatsPreGeoBound(from,to,t._1,t._2));
         
-        log.info("totGeo="+preGeoBoundRDD.count());
+        log.info(String.format("saving %d geo objects with from %s and to %s",preGeoBoundRDD.count(),from.toString(),to.toString()));
         preGeoBoundRDD.foreachPartition((spgBoundIterator) ->{
             saveOnDb(spgBoundIterator);
         });         
     }
     
     @Override
-    public void saveHtsByTimeGran(JavaPairRDD<DateHtKey, StatsCounter> htTimeGranRDD){
+    public void saveHtsByTimeGran(JavaPairRDD<DateHtKey, StatsCounter> htTimeGranRDD,final int gran){
         log.info("CALLED saveHtsByTimeGran");
-        JavaRDD<StatsPreHts> preHtsRDD=htTimeGranRDD.map((t) -> new StatsPreHts(t._1,t._2));
+        JavaRDD<StatsPreHts> preHtsRDD=htTimeGranRDD.map((t) -> new StatsPreHts(t._1,t._2,gran));
+        log.info(String.format("saving %d hts objects with gran %d",preHtsRDD.count(),gran));
         preHtsRDD.foreachPartition((sphIterator) ->{
             saveOnDb(sphIterator);
         });
@@ -70,7 +72,7 @@ public class ConsumerTwTotDaoDefaultImpl implements ConsumerTwTotDao{
     public void saveHtsByTimeInterval(Date from,Date to,JavaPairRDD<String, StatsCounter> htTimeBoundRDD){
         log.info("CALLED saveHtsByTimeInterval");
         JavaRDD<StatsPreHtsBound> preHtsRDD=htTimeBoundRDD.map((t) -> new StatsPreHtsBound(from,to,t._1,t._2));
-        log.info("totHts="+preHtsRDD.count());
+        log.info(String.format("saving %d hts objects with from %s and to %s",preHtsRDD.count(),from.toString(),to.toString()));
         preHtsRDD.foreachPartition((sphIterator) ->{
             saveOnDb(sphIterator);
         });

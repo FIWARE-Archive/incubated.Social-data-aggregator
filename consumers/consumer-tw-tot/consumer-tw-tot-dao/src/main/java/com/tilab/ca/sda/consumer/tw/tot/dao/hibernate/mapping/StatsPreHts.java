@@ -3,50 +3,33 @@ package com.tilab.ca.sda.consumer.tw.tot.dao.hibernate.mapping;
 
 import com.tilab.ca.sda.sda.model.keys.DateHtKey;
 import com.tilab.ca.sda.consumer.tw.tot.core.data.StatsCounter;
-import java.io.Serializable;
+import com.tilab.ca.sda.ctw.utils.Utils;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "ss_stats_pre_hts")
-public class StatsPreHts implements Serializable {
+public class StatsPreHts extends StatsPre {
 
     private static final long serialVersionUID = -1545245637924683920L;
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
-    private int id;
 
     @Column(name = "hash_tag")
     private String hashTag = null;
 
     @Column(name = "created_at")
     private Date createdAt = null;
+    
+    private int gran;
 
-    @Column(name = "num_tw")
-    private int numTw = 0;
-
-    @Column(name = "num_rtw")
-    private int numRtw = 0;
-
-    @Column(name = "num_rply")
-    private int numReply = 0;
-
-    @Column(name = "tot_tw")
-    private int totTw = 0;
 
     public StatsPreHts() {
         super();
     }
 
-    public StatsPreHts(DateHtKey dateHtKey, StatsCounter sgc) {
+    public StatsPreHts(DateHtKey dateHtKey, StatsCounter sgc,int gran) {
         super();
         this.hashTag = dateHtKey.getHt();
         this.createdAt = dateHtKey.getDate();
@@ -54,6 +37,7 @@ public class StatsPreHts implements Serializable {
         this.numRtw = sgc.getNumRtw();
         this.numReply = sgc.getNumReply();
         this.totTw = numTw + numRtw + numReply;
+        this.gran=gran;
     }
 
     public int getId() {
@@ -80,36 +64,18 @@ public class StatsPreHts implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public int getNumTw() {
-        return numTw;
+    public int getGran() {
+        return gran;
     }
 
-    public void setNumTw(int numTw) {
-        this.numTw = numTw;
+    public void setGran(int gran) {
+        this.gran = gran;
     }
-
-    public int getNumRtw() {
-        return numRtw;
-    }
-
-    public void setNumRtw(int numRtw) {
-        this.numRtw = numRtw;
-    }
-
-    public int getNumReply() {
-        return numReply;
-    }
-
-    public void setNumReply(int numReply) {
-        this.numReply = numReply;
-    }
-
-    public int getTotTw() {
-        return totTw;
-    }
-
-    public void setTotTw(int totTw) {
-        this.totTw = totTw;
+    
+    @Override
+    public String toString(){
+        return String.format("%s,%s,%d,%d,%d,%d,%d",hashTag,Utils.Time.date2ZonedDateTime(createdAt).toString(),
+                                                    gran,numTw,numRtw,numReply);
     }
 
 }
