@@ -49,8 +49,8 @@ public class GraStreamConsumer {
         gra.init(graConf, jssc.sparkContext());
         
         JavaDStream<String> rawTwDStream=busConnection.getDStreamByKey(graProps.keyRaw());
-        JavaDStream<String> rawTwDStreamWindow=rawTwDStream.window(new Duration(graProps.twTotWindowDurationMillis()), 
-                                                                   new Duration(graProps.twTotWindowSlidingIntervalMillis()));
+        JavaDStream<String> rawTwDStreamWindow=rawTwDStream.window(new Duration(graProps.graWindowDurationMillis()), 
+                                                                   new Duration(graProps.graWindowSlidingIntervalMillis()));
         
         //retrieve distinct user profiles and evaluate their gender with gra algorithm
         JavaDStream<ProfileGender> uniqueProfilesGenderDStream=getUniqueProfilesDStream(rawTwDStreamWindow, gra);

@@ -21,10 +21,10 @@ public interface GraStreamProperties extends GraConsumerProperties{
     
     public Integer sparkBatchDurationMillis();
 
-    public int twTotWindowDurationMillis();
+    public int graWindowDurationMillis();
 
     //sliding window interval
-    public int twTotWindowSlidingIntervalMillis();
+    public int graWindowSlidingIntervalMillis();
     
     public String keyRaw();
     
