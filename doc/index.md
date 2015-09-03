@@ -1,3 +1,12 @@
+Introduction
+============
+
+Welcome the User and Programmer Guide for the Policy Manager Generic
+Enabler. The online documents are being continuously updated and
+improved, and so will be the most appropriate place to get the most up
+to date information on using this interface.
+
+
 # OVERVIEW
 
 Over time all generations have come to embrace the changes social network has brought about. Nowadays online social media have gained astounding worldwide growth and popularity. They are generating a huge amount of records about users’ activities and also attracting attention from variety of researchers and companies worldwide. Every day data collected by social networks are gathered and feed a variety of analytics (users behavior, habits, topic trends..) which are capable of extracting significant patterns and further analisys.
