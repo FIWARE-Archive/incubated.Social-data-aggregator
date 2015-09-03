@@ -92,3 +92,16 @@ To import a sql schema on your database by command line:
 Then grant all privileges to the previously created user to this database.
 
 ### Step 5 (Optional): Install Apache Kafka 
+
+To provide near real time data to consumers the Social Data Aggregator uses an internal bus in a publish/subscribe 
+pattern. The default connector expects apache kafka as internal bus. 
+You can change the default behaviour by providing your own connector and modifying the configuration file
+*bus_impl.conf* on *confs/<connector or consumer folder>/*.
+Anyway if you want to use the default connector you need to install and configure apache kafka.
+
+#### Installation
+Please refer to http://kafka.apache.org/documentation.html#quickstart
+
+#### Configuration
+Please refer to http://kafka.apache.org/documentation.html#configuration
+
