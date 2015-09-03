@@ -1,4 +1,4 @@
-Copyright © 2014 Telecom Italia.
+Copyright 2014 Telecom Italia.
 
 This project is part of FIWARE [fiwarelink]
 
