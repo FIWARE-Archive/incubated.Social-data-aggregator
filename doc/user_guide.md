@@ -72,16 +72,16 @@ A topic can be based on:
 * hashtags 
 
 
-# SETTING UP CONNECTOR-TW
+## SETTING UP CONNECTOR-TW
 
-## CONFIGURATIONS
+### CONFIGURATIONS
 
 Under the folder *sda\confs\connector-tw* you will find 3 configuration files:
 
-### log4j.properties 
+#### log4j.properties 
 the properties for log4j. Set where you want the connector log. Edit this file following your needs.
 
-### twstats.cfg.xml
+#### twstats.cfg.xml
 configuration file for hibernate. Edit it if you compiled the GE with the DAO default implementation. If you provide a different implementation you can leave this file as is or delete it.
 Edit the following fields with your database configuration:
 ```
@@ -91,8 +91,8 @@ Edit the following fields with your database configuration:
 ```
 You can find the model of the default DAO in social-data-aggregator/data_model in the project directory.
 
-### TwStreamConnector.properties
-#### Twitter Configurations
+#### TwStreamConnector.properties
+##### Twitter Configurations
 In this section of the configuration file there are all the properties regarding the connection with Twitter:
 
 | Key Name | Optional | Description |
@@ -102,7 +102,7 @@ In this section of the configuration file there are all the properties regarding
 | twToken   | NO   | User token |
 | twTokenSecret   | NO   | User token secret |
 
-#### Node Configurations
+##### Node Configurations
 In this section of the configuration file there are the configurations regarding the node that hosts the driver:
 
 | Key Name | Optional | Description |
@@ -111,7 +111,7 @@ In this section of the configuration file there are the configurations regarding
 | proxyPort   | YES   | (Uncomment this property in case you use a proxy  for outbound connections) The proxy port |
 | proxyHost   | YES   | (Uncomment this property in case you use a proxy  for outbound connections) The proxy host |
 
-#### Spark  Configurations
+##### Spark  Configurations
 In this section of the configuration file there are the configurations regarding the spark Streaming Context:
 
 | Key Name | Optional | Description |
@@ -123,7 +123,7 @@ In this section of the configuration file there are the configurations regarding
 | twitterInserterWindowDuration   | NO   | Duration of the window. Both the window duration and the slide duration must be multiples of the batch interval. Save frequency for gathered data. |
 | twitterInserterWindowSlidingInterval   | NO   | Window sliding interval. The interval at which the window will slide or move forward. (set equal to the twitterInserterWindowDuration to avoid duplicated data saved) |
 
-#### App Configurations
+##### App Configurations
 In this section of the configuration file there are the configurations regarding the app:
 
 | Key Name | Optional | Description |
@@ -134,7 +134,7 @@ In this section of the configuration file there are the configurations regarding
 | dataRootFolder  | NO   | Root folder on which data will be saved. Example: dataOutputFolder=file://tmp/data and dataRootFolder=raw will save data on file://tmp/data/raw/... |
 | daoClass   | YES   | class for the custom dao if you don't want to use the default one |
 
-#### Kafka Configurations
+##### Kafka Configurations
 In this section of the configuration file there are the configurations regarding the kafka. If you don’t want the data sent on kafka delete or comment the following properties:
 
 | Key Name | Optional | Description |
@@ -158,24 +158,24 @@ Examples of analytics provided from the Social Data Aggregator are:
 By subscribing to a target topic and looking for a particular key, consumers can retrieve only the information that they really need, discarding any data when not relevant to their analytics. Result data can be saved on storage rather then re-injected to the internal bus to be processed from other consumers capable of other types of analytics. 
 
 
-## CONSUMER TW-TOW
+### CONSUMER TW-TOW
 
-### OVERVIEW
+#### OVERVIEW
 The consumer tw tot provide a count on tweets, retweets, reply  on geo and hashtags based criteria for a user defined time interval. 
 
 There are two versions of this module:
 * Stream
 * Batch
 
-### Configuration
+#### Configuration
 The confs/consumers/consumer-tw-tot folder contains the following files:
 
-#### dao_impl.conf
+##### dao_impl.conf
 A properties file with the properties needed from the ConsumerTwTotDao implementation. If you use the **ConsumerTwTotDaoDefaultImpl** you can leave this file blank.
 log4j.properties
 the properties for log4j. Set where you want the connector log. Edit this file following your needs.
 
-#### twstats-tot-tw.cfg.xml
+##### twstats-tot-tw.cfg.xml
 configuration file for hibernate. Edit it if you compiled the GE with the ConsumerTwTotDao default implementation. If you provide a different implementation you can leave this file as is or delete it.
 
 Edit the following fields with your database configuration:
@@ -186,28 +186,28 @@ Edit the following fields with your database configuration:
 ```
 You can find the sql code to create the consumer-tw-tot tables needed to store analytics result  in social-data-aggregator/data_model in the project directory. 
 
-#### bus_impl.conf
+##### bus_impl.conf
 This is the configuration file for the internal bus. By default is filled with apache Kafka configurations. If you want to use a different implementation please follow these steps:
 
 1. Create a Java class that  implements the BusConnection interface
 2. Set the properties you need for your implementation into the bus_impl.conf file
 3. Put the path to your implementation as the value for the property busConnImplClass into the **TwTotConsumerProps.properties** file (e.g “com.mypackage.MyImplClass”)
 
-#### TwTotConsumerProps.properties:
+##### TwTotConsumerProps.properties:
 
-##### COMMONS CONFIGURATIONS:
+###### COMMONS CONFIGURATIONS:
 | Key Name | Optional | Description |
 | -------- | -------- | -------- |
 | roundPos | NO   | Decimal position on which round the latitude and longitude provided in case of geoLoc tweet (i.e. roundPos=3 , latitude=17.87654 -> latitude=17.876) |
 | daoImplClass | NO   | Java class that implements the ConsumerTwTotDao interface for the connection to the storage (default value: com.tilab.ca.sda.consumer.tw.tot.dao.ConsumerTwTotDaoDefaultImpl) |
 
-##### BATCH CONFIGURATIONS:
+###### BATCH CONFIGURATIONS:
 | Key Name | Optional | Description |
 | -------- | -------- | -------- |
 | defaultInputDataPath| NO   | Default Folder (on distributed filesystem) that contains input data for the batch app (can be override from the command line) |
 | minPartitions | YES   | Min number of partitions for the input file (default 1) |
 
-##### STREAM CONFIGURATIONS:
+###### STREAM CONFIGURATIONS:
 | Key Name | Optional | Description |
 | -------- | -------- | -------- |
 | keyHt | NO   | topic key for statuses containing  hashTags (Default ht) |
@@ -222,9 +222,9 @@ This is the configuration file for the internal bus. By default is filled with a
 | twTotWindowSlidingIntervalMillis | NO   | Window sliding interval. The interval at which the window will slide or move forward. (set equal to the twTotWindowDurationMillis to avoid unexpected behaviour ) |
 | busConnImplClass | NO   | Java class that implements the BusConnection interface for the interconnection with the internal stream bus (default: com.tilab.ca.sda.consumer.utils.stream.BusConnectionKafkaImpl) |
 
-### DEPLOY
+#### DEPLOY
 
-#### STREAM DEPLOY:
+##### STREAM DEPLOY:
 To deploy consumer-tw-tot-stream 
 * with start-all.sh script:
   just check that on sda/scripts/module tw-tot-stream key is uncommented.
@@ -239,7 +239,7 @@ To deploy consumer-tw-tot-stream
 | with-master | MASTER | master name (eg local,spark://xxx.xxx) |
 | spark-home | SPARK_HOME| The path to spark folder |
 
-#### BATCH DEPLOY:
+##### BATCH DEPLOY:
 In order to run consumer-tw-tot batch analytics start the shell script under the folder sda/scripts/consumer-tw-tot/start-tw-tot-batch.sh after providing the following settings:
 
 * on sda/scripts/consumer-tw-tot/consumer-tw-tot-confs.cfg set the following properties:
@@ -254,7 +254,7 @@ In order to run consumer-tw-tot batch analytics start the shell script under the
 
 ```./start-tw-tot-batch.sh --help ```
 
-##### OPTIONS:
+###### OPTIONS:
 
 |OPTION NAME | DESCRIPTION |
 | -------- | -------- | 
@@ -264,9 +264,9 @@ In order to run consumer-tw-tot batch analytics start the shell script under the
 | granMin |  **valid only if round mode is min.** Granularity,if you want to group in minute intervals (e.g gran=5 will group by 5 minutes -> the number of tweets in 5 minutes) |
 
 
-## Consumer GRA (Gender Recognition Algorithm)
+### Consumer GRA (Gender Recognition Algorithm)
 
-### Introduction 
+#### Introduction 
 On Twitter the information about user gender is not specified. Nonetheless, it is interesting having such an information for analytics purposes (e.g. for marketing research or having a clue if a target event was more interesting for male or for female users could be very useful). Providing support to business analytics is the reason why of our work:  the development of a gender recognition algorithm (GRA) whose purpose is to classify the gender of twitter users.
 
 For information on how the algorithm works and results achieved check the document on **/documents/GenderRecognitionAlgorithmGRA.pdf**
@@ -280,7 +280,7 @@ There are two versions of this component:
 Both modules are based on a core module which aim is to classify the gender of a twitter user from his profile information. 
 The Gender Recognition Algorithm contains 3 sub algorithms:
 
-#### name/screenName recognition
+##### name/screenName recognition
 This sub algorithm expects key/value pairs in the form of name/gender. In its default implementation the module loads a file in the confs/consumers/consumer-gra folder called **names_gender.txt**.
 This file contains the key/value pairs in the following format:
 ```
@@ -294,16 +294,16 @@ If the new implementation need some properties (for example db connection url) t
 *names_gender_mapping_impl.conf* in the form of key/value pairs.
 
 
-#### recognize gender from profile description and colors
+##### recognize gender from profile description and colors
 
 These two sub modules use internally a classifier. The classifier class must implement the MlModel interface providing an initialization method to train the classifier and a predict method to classify the gender of the target user providing a sparse vector of features.
 GRA core provides an implementation of MlModel with Naive Bayes with the class NBModel. The user anyway is free to change this implementation with a custom one implementing a different classifier. 
 You can link the new implementation by edit *coloursModelImplClass* and *descrModelImplClass* properties in **GraConsumer.properties** file.
 
 
-#### recognize gender from profile description
+##### recognize gender from profile description
 
-##### Create the training set and save it in LIBSVM format
+###### Create the training set and save it in LIBSVM format
 Create a file containing training data with the following format:
 
 ```
@@ -330,9 +330,9 @@ Below an example of the output file in libsvm format:
 1 2091:1 33157:1 35412:1 39705:1 57535:1 70700:1 76150:1 92249:1 96011:1 104809:1 124240:1 127061:1 207234:1 249431:3
 ```
 
-#### recognize gender from profile color
+##### recognize gender from profile color
 
-##### Create the training set and save it in LIBSVM format
+###### Create the training set and save it in LIBSVM format
 Create a file containing training data with the following format:
 
 ```
@@ -365,7 +365,7 @@ Below an example of the output file in libsvm format (4 colors and 9 bits mappin
 0 1:1 66:1 147:1 302:1
 ```
 
-### GRA properties configurations
+#### GRA properties configurations
 
 | Property | Optional | Default| Description |
 | -------- | -------- | -------- |-------- |
@@ -377,22 +377,22 @@ Below an example of the output file in libsvm format (4 colors and 9 bits mappin
 | namesGenderMapImplClass| YES | com.tilab.ca.sda.gra_core.components.NamesGenderMapDefaultImpl | class that map keywords (person name or keywords to recognize pages e.g news) to gender (Default implementation is an in-memory hash map name/gender). Data for default implementation are stored under GRA configuration folder |
 | trainingFilesPath| NO | - | Path where are stored GRA training files to feed classifiers (colors and descr). Use a distributed filesystem path to avoid undesidered behaviours|
 
-### SETTING UP CONSUMER GRA
+#### SETTING UP CONSUMER GRA
 
-#### OVERVIEW
+##### OVERVIEW
 The consumer gra provides a per gender count on tweets, retweets, reply  on geo and hashtags based criteria for a user defined time interval. 
 There are two versions of this module:
 * Stream
 * Batch
 
-#### Configuration
+##### Configuration
 The confs/consumers/consumer-gra folder contains the following files:
 
-#### dao_impl.conf
+##### dao_impl.conf
 A properties file with the properties needed from the GraConsumerDao implementation. If you use the **GraConsumerDaoFileImpl** you need to provide a path on which save the data by editing the property *graOutputFilesPath*.
 If you prefere to save data on db there is a built in class implementation to save on dbms called *GraConsumerDaoHibImpl*. To switch to this implementation you need to edit the property *daoImplClass* on *GraConsumer.properties* file. In this case the *dao_impl.conf* file can be left blank but some configurations are needed on
 
-#### gender-consumer-tw.cfg.xml
+##### gender-consumer-tw.cfg.xml
 
 This file contains the configurations (connection url,username,password...) needed from *GraConsumerDaoHibImpl* to work properly.
 
@@ -415,28 +415,28 @@ This file contains the configurations (connection url,username,password...) need
 ```
 You can find the sql code to create the consumer-gra tables needed to store analytics result  in social-data-aggregator/data_model in the project directory. 
 
-#### log4j.properties
+##### log4j.properties
 the properties for log4j. Set where you want the connector log. Edit this file following your needs.
 
-#### bus_impl.conf
+##### bus_impl.conf
 This is the configuration file for the internal bus. By default is filled with apache Kafka configurations. If you want to use a different implementation please follow these steps:
 
 1. Create a Java class that  implements the BusConnection interface
 2. Set the properties you need for your implementation into the bus_impl.conf file
 3. Put the path to your implementation as the value for the property busConnImplClass into the **GraConsumer.properties** file (e.g “com.mypackage.MyImplClass”)
 
-#### GraConsumer.properties:
+##### GraConsumer.properties:
 
-##### Common configurations
+###### Common configurations
 | Key Name | Optional | Description |
 | -------- | -------- | -------- |
 | roundPos | NO   | Decimal position on which round the latitude and longitude provided in case of geoLoc tweet (i.e. roundPos=3 , latitude=17.87654 -> latitude=17.876) |
 | daoImplClass | NO   | Java class that implements the ConsumerTwTotDao interface for the connection to the storage (default value: com.tilab.ca.sda.gra_consumer_dao.GraConsumerDaoFileImpl) |
 
-##### GRA Configurations
+###### GRA Configurations
 For GRA configurations please follow the guidelines provided on wiki page **Consumer GRA**.
 
-##### STREAM CONFIGURATIONS:
+###### STREAM CONFIGURATIONS:
 
 | Key Name | Optional | Description |
 | -------- | -------- | -------- |
@@ -451,9 +451,9 @@ For GRA configurations please follow the guidelines provided on wiki page **Cons
 | twTotWindowSlidingIntervalMillis | NO   | Window sliding interval. The interval at which the window will slide or move forward. (set equal to the twTotWindowDurationMillis to avoid unexpected behaviour ) |
 | busConnImplClass | NO   | Java class that implements the BusConnection interface for the interconnection with the internal stream bus (default: com.tilab.ca.sda.consumer.utils.stream.BusConnectionKafkaImpl) |
 
-### Consumer GRA deploy
+#### Consumer GRA deploy
 
-#### STREAM DEPLOY:
+##### STREAM DEPLOY:
 To deploy consumer-gra-stream 
 * with start-all.sh script:
   just check that on sda/scripts/module gra key is uncommented.
@@ -467,7 +467,7 @@ To deploy consumer-gra-stream
 | with-master | MASTER | master name (eg local,spark://xxx.xxx) |
 | spark-home | SPARK_HOME| The path to spark folder |
 
-#### BATCH DEPLOY:
+##### BATCH DEPLOY:
 In order to run consumer-gra batch analytics start the shell script under the folder sda/scripts/consumer-gra/start-gra-batch.sh after providing the following settings:
 
 1. on sda/scripts/consumer-gra/consumer-gra-confs.cfg set the following properties:
