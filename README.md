@@ -1,6 +1,4 @@
-[![][TelecomLogo]][website]
-
-Copyright © 2014 Telecom Italia.
+Copyright Â© 2014 Telecom Italia.
 
 This project is part of FIWARE [fiwarelink]
 
