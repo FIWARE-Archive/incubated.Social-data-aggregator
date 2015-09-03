@@ -71,15 +71,24 @@ http://dev.mysql.com/downloads/mysql/
 
 You will need four packages:
 
-| ``mysql-server``
-| ``mysql-client``
-| ``mysql-shared``
-| ``mysql-devel``
+* ``mysql-server``
+* ``mysql-client``
+* ``mysql-shared``
+* ``mysql-devel``
 
-After installation, you should create a user, create database called
-'twstats' and give all privileges to the user for this database.
+After installation, you should create a user.
 
 To add a user to the server, please follow official documentation:
-http://dev.mysql.com/doc/refman/5.5/en/adding-users.html  
+http://dev.mysql.com/doc/refman/5.5/en/adding-users.html 
+
+Under **social-data-aggregator/db-data_model/** folder there are some .sql files with 
+the sql schema that contains the tables needed from the connectors and consumers. 
+Depending on your needs you can choose to import all or some of them.
+The file containing the database schema is **tw_stats_db.sql**
+To import a sql schema on your database by command line:
+
+`mysql -u root -p [DB_NAME] < tw_stats_db.sql`
+
+Then grant all privileges to the previously created user to this database.
 
 ### Step 5 (Optional): Install Apache Kafka 
