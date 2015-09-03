@@ -105,3 +105,29 @@ Please refer to http://kafka.apache.org/documentation.html#quickstart
 #### Configuration
 Please refer to http://kafka.apache.org/documentation.html#configuration
 
+### Step 6: Download and Install Social Data Aggregator
+
+Download the component by executing the following instruction:
+
+`git clone https://github.com/FiwareTIConsoft/social-data-aggregator.git`
+
+To deploy Social Data Aggregator from source go to the project main folder and launch the following command:
+
+`mvn clean package`
+ 
+Once built SocialDataAggregator with Maven, under the folder scripts/your_os_env/ there is a script called make-dist.  Run it with the following syntax (e.g. linux):
+
+`./make-dist.sh <output_folder>`
+ 
+where _output_folder is the folder inside which you want to create the SDA GE folder tree. When the script finish to run, you should see the following dir tree:
+
+```
+sda
+ |
+ | -  bin (contains all the binaries of sda in their respective folder)
+ |
+ | - confs (contains the configurations of each specific sub-component)
+ |
+ | - scripts (contains the launch scripts for each sub-component and a start-all script to start all components)
+```
+To configure and run SDA please refer to the User Guide.
