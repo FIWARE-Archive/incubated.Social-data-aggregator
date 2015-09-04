@@ -1,44 +1,33 @@
-#FIWARE Social Data Aggregator - User Guide
+FIWARE Social Data Aggregator - User Guide
+_____________________________________________________________
 
-##INSTALLATION
-
-To deploy Social Data Aggregator from source go to the project main folder and launch the following command:
-
-`mvn clean package`
- 
-Once built SocialDataAggregator with Maven, under the folder scripts/your_os_env/ there is a script called make-dist.  Run it with the following syntax (e.g. linux):
-
-`./make-dist.sh <output_folder>`
- 
-where _output_folder is the folder inside which you want to create the SDA GE folder tree. When the script finish to run, you should see the following dir tree:
-
-```
-sda
- |
- | -  bin (contains all the binaries of sda in their respective folder)
- |
- | - confs (contains the configurations of each specific sub-component)
- |
- | - scripts (contains the launch scripts for each sub-component and a start-all script to start all components)
-```
-
-# SETTING UP THE START-ALL/START-ENV SCRIPTS:
+SETTING UP THE START-ALL/START-ENV SCRIPTS:
+==================================
 
 This script launches all the modules of the real-time part of the social data aggregator. 
 
 Under the /scripts folder there are two files:
 
-* *confs.cfg.template*. Remove the .template extension and edit the file providing:
+- *confs.cfg.template*. Remove the .template extension and edit the file providing:
 
-| Property | Description |
-| -------- | -------- |
-| SPARK_HOME |the location of your spark installation |
-| SPARK_MASTER_WEBUI_PORT   | port for the web ui   | 
-| SPARK_MASTER_IP | IP of spark master  | 
-| SPARK_MASTER_PORT | spark master port   | 
-| SPARK_WORKER_INSTANCES | number of worker instance per node (default 3)  | 
-| SDA_HOME | (optional) Home of SDA (otherwise will be guessed by the script from the location of the start-all script)   | 
-* *modules:*
++------------------------+------------+
+| Property    |    Description        |
++========================+============+
+| SPARK_HOME   | the location of your spark installation|
++------------------------+------------+
+| SPARK_MASTER_WEBUI_PORT| port for the web ui       |
++------------------------+------------+
+|SPARK_MASTER_IP            | IP of spark master       |
++------------------------+------------+
+| SPARK_MASTER_PORT             | spark master port  |
++------------------------+------------+
+| SPARK_WORKER_INSTANCES             | number of worker instance per node (default 3)  |
++------------------------+------------+
+| SDA_HOME            | (optional) Home of SDA (otherwise will be guessed by the script from the location of the start-all script)        |
++------------------------+------------+
+
+
+- *modules:*
 This file contains all the modules that will be started from the start-all script. 
 Add a comment (#) on the modules you don’t need to avoid starting them.
 
