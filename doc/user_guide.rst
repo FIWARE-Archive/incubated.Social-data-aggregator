@@ -130,11 +130,11 @@ In this section of the configuration file there are the configurations regarding
 |                   |            | choose which key will be monitored       |
 |                   |            | from a target node.                      |
 +-------------------+------------+------------------------------------------+
-| proxyPort         | YES        |(Uncomment this property in case you use  |       
+| proxyPort         | YES        | (Uncomment this property in case you use |       
 |                   |            | a proxy  for outbound connections)       |
 |                   |            | The proxy port                           |
 +-------------------+------------+------------------------------------------+
-| proxyHost         | YES        |(Uncomment this property in case you use  |
+| proxyHost         | YES        | (Uncomment this property in case you use |
 |                   |            | a proxy  for outbound connections)       |
 |                   |            | The proxy host                           |
 +-------------------+------------+------------------------------------------+
