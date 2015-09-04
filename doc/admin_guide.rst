@@ -45,9 +45,9 @@ Choose:
 * If you have Hadoop already installed on your system choose the prebuild with your version of hadoop otherwise Pre-built for Hadoop 2.4 or later should be fine
 * Direct download as download type
 
-2. Configuration
+**2.Configuration**
 
-2.1. *Standalone*
+*2.1. Standalone*
 
 To launch a Spark standalone cluster with the launch scripts, you should create a file called 
 *conf/slaves* in your Spark directory, which must contain the hostnames of all the machines where 
