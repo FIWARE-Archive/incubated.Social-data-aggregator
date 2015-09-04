@@ -8,8 +8,8 @@ This script launches all the modules of the real-time part of the social data ag
 
 Under the **/scripts** folder there are two files:
 
-1.confs.cfg.template
-~~~~~~~~~~~~~~~~~~~~~~
+confs.cfg.template
+------------------
 
 Remove the *.template* extension and edit the file providing:
 
@@ -32,13 +32,14 @@ Remove the *.template* extension and edit the file providing:
 |                         | location of the start-all script)      |
 +-------------------------+----------------------------------------+
 
-2.modules
-~~~~~~~~~~~~~~~~~~~~~~
+modules
+------------------
 
 This file contains all the modules that will be started from the start-all script. 
 Add a comment (#) on the modules you don’t need to avoid starting them.
 
 The script can be ran in two ways:
+
 1. submitting the applications on an existent spark cluster:
 
 ``./start-all.sh``
@@ -49,4 +50,19 @@ The script can be ran in two ways:
 
 In both cases you need to edit the configuration file (in the first case to refer to the already existent master, in the second to know with which configurations to deploy it).
 
+CONNECTORS
+==================================
+
+Connectors are in charge to retrieve the data from Social Networks (SNs). Each connector is “specialized”: it is connected with  a specific social network and gathers data by interacting with it. The way data are retrieved can vary from SN to SN: some SNs provide stream Apis (e.g. twitter,instagram) while others that needs to be polled by the connector. 
+The connector receives live input data streams and divides the data into batches namely a specific set of data collected during a given timeframe. The content of each batch is mapped onto an internal model and then sent to the internal bus to make it available to real time consumers.
+The internal stream bus is a communication bus for a loosely-coupled interconnection between modules. It can be implemented by different technologies (apache kafka, amazon kinesis, rabbitMQ..).
+Data belonging to different batches are also collected in a window. The content of each window is saved on the storage as raw data in json format.  In this way raw data can be subsequently processed by batch consumers. 
+The storage has to be reachable from every node of the cluster, it can be implemented by a Database (Mysql, OrientDB, MongoDB..), a distributed filesystem (HDFS..), an online file storage web service (s3) or a shared disk (NFS).
+
+Each connector can expose apis that can be contacted from a *controller* in order to modify the settings or the topics being under monitoring. 
+A topic can be based on:
+* key-word(s)
+* geo location (latitute,longitude..)
+* a target user (if the social network allows user tracking)
+* hashtags 
 
