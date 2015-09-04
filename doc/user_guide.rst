@@ -84,7 +84,7 @@ the properties for log4j. Set where you want the connector log. Edit this file f
 configuration file for hibernate. Edit it if you compiled the GE with the DAO default implementation. If you provide a different implementation you can leave this file as is or delete it.
 Edit the following fields with your database configuration:
 
-:
+::
     <property name="connection.url"></property>
     
     <property name="connection.username"> </property>
