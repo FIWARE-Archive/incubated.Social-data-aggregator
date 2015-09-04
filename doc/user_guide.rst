@@ -94,13 +94,20 @@ You can find the model of the default DAO in social-data-aggregator/data_model i
 
 This is a typical paragraph.  An indented literal block follows.
 
-::
+**TwStreamConnector.properties**
 
-    for a in [5,4,3,2,1]:   # this is program code, shown as-is
-        print a
-    print "it's..."
-    # a literal block continues until the indentation ends
+*Twitter Configurations*
+In this section of the configuration file there are all the properties regarding the connection with Twitter:
 
-This text has returned to the indentation of the first paragraph,
-is outside of the literal block, and is therefore treated as an
-ordinary paragraph.
++------------------------+------------+-------------------------------------+
+|  Key Name         | Optional   | Description                              | 
++===================+============+==========================================+
+| twConsumerKey     | NO         | Consumer Key of the twitter application  | 
++-------------------+------------+------------------------------------------+
+| twConsumerSecret  | NO         |Consumer Secret of the twitter application|         
++-------------------+------------+------------------------------------------+
+| twToken           | NO         | User token                               |         
++-------------------+------------+------------------------------------------+
+| twTokenSecret     | NO         | User token secret                        |         
++-------------------+------------+------------------------------------------+
+
