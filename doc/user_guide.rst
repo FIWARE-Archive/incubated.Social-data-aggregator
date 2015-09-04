@@ -12,18 +12,11 @@ Under the **/scripts** folder there are two files:
 
 Remove the *.template* extension and edit the file providing:
 
-+------------------------+------------+
-| Property    |    Description        |
-+========================+============+
-| SPARK_HOME   | the location of your spark installation|
-+------------------------+------------+
-| SPARK_MASTER_WEBUI_PORT| port for the web ui       |
-+------------------------+------------+
-|SPARK_MASTER_IP            | IP of spark master       |
-+------------------------+------------+
-| SPARK_MASTER_PORT             | spark master port  |
-+------------------------+------------+
-| SPARK_WORKER_INSTANCES             | number of worker instance per node (default 3)  |
-+------------------------+------------+
-| SDA_HOME            | (optional) Home of SDA (otherwise will be guessed by the script from the location of the start-all script)        |
-+------------------------+------------+
++------------------------+------------+----------+----------+
+| Header row, column 1   | Header 2   | Header 3 | Header 4 |
+| (header rows optional) |            |          |          |
++========================+============+==========+==========+
+| body row 1, column 1   | column 2   | column 3 | column 4 |
++------------------------+------------+----------+----------+
+| body row 2             | ...        | ...      |          |
++------------------------+------------+----------+----------+
