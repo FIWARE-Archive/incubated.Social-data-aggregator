@@ -205,4 +205,31 @@ In this section of the configuration file there are the configurations regarding
 |                                      |            | don't want to use the default one        |
 +--------------------------------------+------------+------------------------------------------+
 
+*Kafka Configurations*
+
+In this section of the configuration file there are the configurations regarding the kafka. If you don’t want the data sent on kafka delete or comment the following properties:
+
++--------------------------------------+------------+------------------------------------------+
+|  Key Name                            | Optional   | Description                              | 
++======================================+============+==========================================+
+| brokersList                          | NO         | Kafka brokers list (separated by ,)      |
++--------------------------------------+------------+------------------------------------------+
+| kafkaSerializationClass              | NO         |Default **kafka.serializer.StringEncoder**|       
+|                                      |            | Change it if you want another serializer.|
++--------------------------------------+------------+------------------------------------------+
+| kafkaRequiredAcks                    | NO         | tells Kafka the number of acks you want  |
+|                                      |            | your Producer to require from the        |
+|                                      |            | Broker that the message was received.    |
++--------------------------------------+------------+------------------------------------------+
+| maxTotalConnections                  | NO         | number of total connections for          |
+|                                      |            | the connection pool                      |
++--------------------------------------+------------+------------------------------------------+
+| maxIdleConnections                   | YES        | number of idle connections for the       |
+|                                      |            | connection pool                          |
++--------------------------------------+------------+------------------------------------------+
+| customProducerFactoryImpl            | YES        | uncomment if needed other implementation |
+|                                      |            |for connection to bus different than kafka|
++--------------------------------------+------------+------------------------------------------+
+
+
 
