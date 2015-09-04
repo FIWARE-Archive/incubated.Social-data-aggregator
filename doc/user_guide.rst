@@ -97,6 +97,7 @@ This is a typical paragraph.  An indented literal block follows.
 **TwStreamConnector.properties**
 
 *Twitter Configurations*
+
 In this section of the configuration file there are all the properties regarding the connection with Twitter:
 
 +------------------------+------------+-------------------------------------+
@@ -109,5 +110,32 @@ In this section of the configuration file there are all the properties regarding
 | twToken           | NO         | User token                               |         
 +-------------------+------------+------------------------------------------+
 | twTokenSecret     | NO         | User token secret                        |         
++-------------------+------------+------------------------------------------+
+
+*Node Configurations*
+
+In this section of the configuration file there are the configurations regarding the node that hosts the driver:
+
++------------------------+------------+-------------------------------------+
+|  Key Name         | Optional   | Description                              | 
++===================+============+==========================================+
+| nodeName          | NO         | The name of the node (the value must be  |
+|                   |            | the same of the field                    | 
+|                   |            | monitoring_from_node in the db model in  |
+|                   |            | case you use the default DAO). This      |  
+|                   |            | property is needed in case of multiple   |
+|                   |            | instances of the collector in nodes      |
+|                   |            | that have different Public IPs but share |
+|                   |            | the same rdbms. In this way you can      |
+|                   |            | choose which key will be monitored       |
+|                   |            | from a target node.                      |
++-------------------+------------+------------------------------------------+
+| proxyPort         | YES        |(Uncomment this property in case you use  |       
+|                   |            | a proxy  for outbound connections)       |
+|                   |            | The proxy port                           |
++-------------------+------------+------------------------------------------+
+| proxyHost         | YES        |(Uncomment this property in case you use  |
+|                   |            | a proxy  for outbound connections)       |
+|                   |            | The proxy host                           |
 +-------------------+------------+------------------------------------------+
 
