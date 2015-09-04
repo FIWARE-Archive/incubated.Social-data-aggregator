@@ -61,8 +61,32 @@ The storage has to be reachable from every node of the cluster, it can be implem
 
 Each connector can expose apis that can be contacted from a *controller* in order to modify the settings or the topics being under monitoring. 
 A topic can be based on:
+
 * key-word(s)
 * geo location (latitute,longitude..)
 * a target user (if the social network allows user tracking)
 * hashtags 
 
+SETTING UP CONNECTOR-TW
+------------------
+
+CONFIGURATIONS
+~~~~~~~~~~~~~~~~~~~~~~
+
+Under the folder *sda\confs\connector-tw* you will find 3 configuration files:
+
+**log4j.properties** 
+
+the properties for log4j. Set where you want the connector log. Edit this file following your needs.
+
+**twstats.cfg.xml**
+
+configuration file for hibernate. Edit it if you compiled the GE with the DAO default implementation. If you provide a different implementation you can leave this file as is or delete it.
+Edit the following fields with your database configuration:
+
+:
+  <property name="connection.url"></property>
+  <property name="connection.username"> </property>
+  <property name="connection.password"> </property>
+
+You can find the model of the default DAO in social-data-aggregator/data_model in the project directory.
