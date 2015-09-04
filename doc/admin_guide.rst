@@ -37,10 +37,11 @@ https://maven.apache.org/download.cgi
 Step 3: Install and Configure Apache Spark
 ~~~~~~~~~~~~~~~~~~~~~~
 
-1. Download Apache Spark
+**1.Download Apache Spark**
 
 Download Apache Spark from http://spark.apache.org/downloads.html.
 Choose:
+
 * 1.4.0 as Spark Release
 * If you have Hadoop already installed on your system choose the prebuild with your version of hadoop otherwise Pre-built for Hadoop 2.4 or later should be fine
 * Direct download as download type
@@ -61,7 +62,7 @@ for each worker.
 For more information please refer to the following guide: 
 http://spark.apache.org/docs/1.4.0/spark-standalone.html
 
-2.2. Yarn
+*2.2.Yarn*
 
 If you have already an instance of yarn installed and configured please refer to the following guide
 for configuration: 
