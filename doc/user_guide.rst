@@ -177,3 +177,32 @@ In this section of the configuration file there are the configurations regarding
 |                                      |            | duplicated data saved)                   |
 +--------------------------------------+------------+------------------------------------------+
 
+
+*App Configurations*
+
+In this section of the configuration file there are the configurations regarding the app:
+
++--------------------------------------+------------+------------------------------------------+
+|  Key Name                            | Optional   | Description                              | 
++======================================+============+==========================================+
+| serverPort                           | NO         | The port on which jetty server will      |
+|                                      |            | listen. Needed to start,restart,stop     | 
+|                                      |            | the collector.                           |
++--------------------------------------+------------+------------------------------------------+
+| savePartitions                       | NO         | Number of partition to coalesce before   |       
+|                                      |            | save. Equals one will generate one file  |
+|                                      |            | containing raw tweets for window.        |
++--------------------------------------+------------+------------------------------------------+
+| dataOutputFolder                     | NO         | the folder where the raw data will be    |
+|                                      |            | saved                                    |
++--------------------------------------+------------+------------------------------------------+
+| dataRootFolder                       | NO         | Root folder on which data will be saved. |
+|                                      |            | Example: dataOutputFolder=               |
+|                                      |            | file://tmp/data and dataRootFolder=raw   |
+|                                      |            | will save data on file://tmp/data/raw/...|
++--------------------------------------+------------+------------------------------------------+
+| daoClass                             | YES        | class for the custom dao if you          |
+|                                      |            | don't want to use the default one        |
++--------------------------------------+------------+------------------------------------------+
+
+
