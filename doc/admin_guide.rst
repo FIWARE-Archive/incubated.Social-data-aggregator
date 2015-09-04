@@ -42,13 +42,13 @@ Step 3: Install and Configure Apache Spark
 Download Apache Spark from http://spark.apache.org/downloads.html.
 Choose:
 * 1.4.0 as Spark Release
-* If you have Hadoop already installed on your system choose the prebuild with
-  your version of hadoop otherwise Pre-built for Hadoop 2.4 or later should be fine
+* If you have Hadoop already installed on your system choose the prebuild with your version of hadoop otherwise Pre-built for Hadoop 2.4 or later should be fine
 * Direct download as download type
 
 2. Configuration
 
-2.1. Standalone
+2.1. *Standalone*
+
 To launch a Spark standalone cluster with the launch scripts, you should create a file called 
 *conf/slaves* in your Spark directory, which must contain the hostnames of all the machines where 
 you intend to start Spark workers, one per line. If conf/slaves does not exist, the launch scripts 
@@ -62,6 +62,7 @@ For more information please refer to the following guide:
 http://spark.apache.org/docs/1.4.0/spark-standalone.html
 
 2.2. Yarn
+
 If you have already an instance of yarn installed and configured please refer to the following guide
 for configuration: 
 http://spark.apache.org/docs/1.4.0/running-on-yarn.html
@@ -107,9 +108,11 @@ You can change the default behaviour by providing your own connector and modifyi
 Anyway if you want to use the default connector you need to install and configure apache kafka.
 
 1. Installation
+
 Please refer to http://kafka.apache.org/documentation.html#quickstart
 
 2. Configuration
+
 Please refer to http://kafka.apache.org/documentation.html#configuration
 
 Step 6: Download and Install Social Data Aggregator
