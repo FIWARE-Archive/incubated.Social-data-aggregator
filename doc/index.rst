@@ -2,7 +2,7 @@ FIWARE Social Data Aggregator - Overview
 ____________________________
 
 Introduction
-============
+------
 
 Welcome the User and Programmer Guide for the Social Data Aggregator Generic
 Enabler. The online documents are being continuously updated and
@@ -18,7 +18,7 @@ The aim of Social Data Aggregator (SDA) GE is to retrieve data from different  S
 The SDA comes with different built-in modules but custom modules can be added as well.
 
 Documentation
-=============
+------
 
 -   `User Guide <user_guide.rst>`_
 -   `Installation and Administration Guide <admin_guide.rst>`_
