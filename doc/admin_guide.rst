@@ -8,7 +8,8 @@ This guide tries to define the procedure to install the Social Data Aggregator
 in a machine, including its requirements and possible troubleshooting
 that we could find during the installation.
 
-## Requirements
+Requirements
+-------------------
 
 In order to execute the Social Data Aggregator, it is needed to have previously
 installed the following software or framework in the machine:
@@ -19,19 +20,22 @@ installed the following software or framework in the machine:
 * Apache Kafka 0.8.1 [http://kafka.apache.org/downloads.html]
 * MySQL 5.6.14 or above [http://dev.mysql.com/downloads/mysql/]
 
-### Step 1: Install Java 8 sdk
+Step 1: Install Java 8 sdk
+===========================
 
 If you do not have java 8 installed , please, follow
 instructions for your Operating System to download the correct 
 package or to install it by a packet manager.
 
-### Step 2: Install Maven
+Step 2: Install Maven
+===========================
 
 If you do not have java 8 installed , please, follow
 instructions for your Operating System or download it on
 https://maven.apache.org/download.cgi
 
-### Step 3: Install and Configure Apache Spark
+Step 3: Install and Configure Apache Spark
+===========================
 
 #### Download Apache Spark
 Download Apache Spark from http://spark.apache.org/downloads.html.
