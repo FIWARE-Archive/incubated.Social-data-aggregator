@@ -85,10 +85,9 @@ configuration file for hibernate. Edit it if you compiled the GE with the DAO de
 Edit the following fields with your database configuration:
 
 ::
+
     <property name="connection.url"></property>
-    
     <property name="connection.username"> </property>
-    
     <property name="connection.password"> </property>
 
 You can find the model of the default DAO in social-data-aggregator/data_model in the project directory.
