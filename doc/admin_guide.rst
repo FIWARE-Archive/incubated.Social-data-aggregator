@@ -95,7 +95,7 @@ Depending on your needs you can choose to import all or some of them.
 The file containing the database schema is **tw_stats_db.sql**
 To import a sql schema on your database by command line:
 
-`mysql -u root -p [DB_NAME] < tw_stats_db.sql`
+``mysql -u root -p [DB_NAME] < tw_stats_db.sql``
 
 Then grant all privileges to the previously created user to this database.
 
@@ -108,11 +108,11 @@ You can change the default behaviour by providing your own connector and modifyi
 *bus_impl.conf* on *confs/<connector or consumer folder>/*.
 Anyway if you want to use the default connector you need to install and configure apache kafka.
 
-*1.Installation*
+**1.Installation**
 
 Please refer to http://kafka.apache.org/documentation.html#quickstart
 
-*2.Configuration*
+**2.Configuration**
 
 Please refer to http://kafka.apache.org/documentation.html#configuration
 
@@ -121,20 +121,19 @@ Step 6: Download and Install Social Data Aggregator
 
 Download the component by executing the following instruction:
 
-`git clone https://github.com/FiwareTIConsoft/social-data-aggregator.git`
+``git clone https://github.com/FiwareTIConsoft/social-data-aggregator.git``
 
 To deploy Social Data Aggregator from source go to the project main folder and launch the following command:
 
-`mvn clean package`
+``mvn clean package``
  
 Once built SocialDataAggregator with Maven, under the folder scripts/your_os_env/ there is a script called make-dist.  Run it with the following syntax (e.g. linux):
 
-`./make-dist.sh <output_folder>`
+``./make-dist.sh <output_folder>``
  
 where _output_folder is the folder inside which you want to create the SDA GE folder tree. When the script finish to run, you should see the following dir tree:
 
 ::
-
 sda
  |
  | -  bin (contains all the binaries of sda in their respective folder)
@@ -142,7 +141,6 @@ sda
  | - confs (contains the configurations of each specific sub-component)
  |
  | - scripts (contains the launch scripts for each sub-component and a start-all script to start all components)
-
 ::
 
 To configure and run SDA please refer to the User Guide.
