@@ -139,3 +139,30 @@ In this section of the configuration file there are the configurations regarding
 |                   |            | The proxy host                           |
 +-------------------+------------+------------------------------------------+
 
+*Spark  Configurations*
+
+In this section of the configuration file there are the configurations regarding the spark Streaming Context:
+
++------------------------+------------+-------------------------------------+
+|  Key Name         | Optional   | Description                              | 
++===================+============+==========================================+
+| numMaxCore        | YES        | Number of cores to associate to this     |
+|                   |            |  application (in case you have to run    | 
+|                   |            |  multiple streaming application)         |
+|                   |            |            |
++-------------------+------------+------------------------------------------+
+| proxyPort         | YES        | (Uncomment this property in case you use |       
+|                   |            | a proxy  for outbound connections)       |
+|                   |            | The proxy port                           |
++-------------------+------------+------------------------------------------+
+| proxyHost         | YES        | (Uncomment this property in case you use |
+|                   |            | a proxy  for outbound connections)       |
+|                   |            | The proxy host                           |
++-------------------+------------+------------------------------------------+
+
+ If you run just the collector you can comment this property |
+| checkpointDir   | NO   | Directory where spark will save this application  checkpoints |
+| sparkBatchDurationMillis   | NO   | Duration of the batch (in milliseconds). It is the basic interval at which the system with receive the data in batches |
+| sparkCleanTTL   | NO   | Duration (seconds) of how long Spark will remember any metadata (stages generated, tasks generated, etc.). Periodic cleanups will ensure that metadata older than this duration will be forgotten. |
+| twitterInserterWindowDuration   | NO   | Duration of the window. Both the window duration and the slide duration must be multiples of the batch interval. Save frequency for gathered data. |
+| twitterInserterWindowSlidingInterval   | NO   | Window sliding interval. The interval at which the window will slide or move forward. (set equal to the twitterInserterWindowDuration to avoid duplicated data saved) |
