@@ -227,7 +227,7 @@ In this section of the configuration file there are the configurations regarding
 | maxIdleConnections                   | YES        | number of idle connections for the       |
 |                                      |            | connection pool                          |
 +--------------------------------------+------------+------------------------------------------+
-| customProducerFactoryImpl            | YES        | uncomment if needed other implementation |
+| customProducerFactoryImpl            | YES        |uncomment if needed other implementation  |
 |                                      |            |for connection to bus different than kafka|
 +--------------------------------------+------------+------------------------------------------+
 
