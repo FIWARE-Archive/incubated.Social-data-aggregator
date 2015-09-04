@@ -141,6 +141,5 @@ where _output_folder is the folder inside which you want to create the SDA GE fo
   | - confs (contains the configurations of each specific sub-component)
   |
   | - scripts (contains the launch scripts for each sub-component and a start-all script to start all components)
-::
 
 To configure and run SDA please refer to the User Guide.
