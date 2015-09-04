@@ -1,0 +1,1 @@
+project = 'Social Data Aggregator'
