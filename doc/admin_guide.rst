@@ -134,8 +134,8 @@ Once built SocialDataAggregator with Maven, under the folder scripts/your_os_env
 where _output_folder is the folder inside which you want to create the SDA GE folder tree. When the script finish to run, you should see the following dir tree:
 
 * sda
- * -  bin (contains all the binaries of sda in their respective folder)
- * - confs (contains the configurations of each specific sub-component)
- * - scripts (contains the launch scripts for each sub-component and a start-all script to start all components)
+ * bin (contains all the binaries of sda in their respective folder)
+ * confs (contains the configurations of each specific sub-component)
+ * scripts (contains the launch scripts for each sub-component and a start-all script to start all components)
 
 To configure and run SDA please refer to the User Guide.
