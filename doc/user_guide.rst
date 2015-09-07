@@ -635,42 +635,61 @@ Configuration
 
 The confs/consumers/consumer-gra folder contains the following files:
 
-##### dao_impl.conf
+**dao_impl.conf**
+
 A properties file with the properties needed from the GraConsumerDao implementation. If you use the **GraConsumerDaoFileImpl** you need to provide a path on which save the data by editing the property *graOutputFilesPath*.
 If you prefere to save data on db there is a built in class implementation to save on dbms called *GraConsumerDaoHibImpl*. To switch to this implementation you need to edit the property *daoImplClass* on *GraConsumer.properties* file. In this case the *dao_impl.conf* file can be left blank but some configurations are needed on
 
-##### gender-consumer-tw.cfg.xml
+**gender-consumer-tw.cfg.xml**
 
 This file contains the configurations (connection url,username,password...) needed from *GraConsumerDaoHibImpl* to work properly.
 
-```
-<property name="connection.url">jdbc:mysql://localhost/twstats</property>
+::
 
-        <property name="connection.username"></property>
+    <property name="connection.url">jdbc:mysql://localhost/twstats</property>
+    <property name="connection.username"></property>
+    <property name="connection.password"></property>
+    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="current_session_context_class">thread</property>
+    <property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
 
-        <property name="connection.password"></property>
 
-
-
-        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
-
-        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-
-        <property name="current_session_context_class">thread</property>
-
-        <property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
-```
 You can find the sql code to create the consumer-gra tables needed to store analytics result  in social-data-aggregator/data_model in the project directory. 
 
-##### log4j.properties
+**log4j.properties**
 the properties for log4j. Set where you want the connector log. Edit this file following your needs.
 
-##### bus_impl.conf
+**bus_impl.conf**
+
 This is the configuration file for the internal bus. By default is filled with apache Kafka configurations. If you want to use a different implementation please follow these steps:
 
 1. Create a Java class that  implements the BusConnection interface
 2. Set the properties you need for your implementation into the bus_impl.conf file
 3. Put the path to your implementation as the value for the property busConnImplClass into the **GraConsumer.properties** file (e.g “com.mypackage.MyImplClass”)
 
-##### GraConsumer.properties:
+**GraConsumer.properties:**
+
+*Common configurations*
+
++--------------------------------------+------------+------------------------------------------+
+|  Key Name                            | Optional   | Description                              | 
++======================================+============+==========================================+
+| roundPos                             | NO         | Decimal position on which round the      |
+|                                      |            | latitude and longitude provided in case  |
+|                                      |            | of geoLoc tweet (i.e. roundPos=3 ,       |
+|                                      |            | latitude=17.87654 -> latitude=17.876)    |
++--------------------------------------+------------+------------------------------------------+
+| daoImplClass                         | NO         | Java class that implements the           |
+|                                      |            | ConsumerTwTotDao interface for the       |
+|                                      |            | connection to the storage (default value:|
+|                                      |            | com.tilab.ca.sda.gra_consumer_dao        |
+|                                      |            | .GraConsumerDaoFileImpl)                 |
++--------------------------------------+------------+------------------------------------------+
+
+*GRA Configurations*
+
+For GRA configurations please follow the guidelines provided on Section **Consumer GRA**.
+
+*STREAM CONFIGURATIONS:*
 
