@@ -272,7 +272,9 @@ Edit the following fields with your database configuration:
 
 ::
     <property name="connection.url"></property>
+    
     <property name="connection.username"> </property>
+    
     <property name="connection.password"> </property>
 
 You can find the sql code to create the consumer-tw-tot tables needed to store analytics result  in social-data-aggregator/data_model in the project directory. 
