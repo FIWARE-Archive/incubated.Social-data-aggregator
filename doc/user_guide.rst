@@ -423,7 +423,9 @@ In order to run consumer-tw-tot batch analytics start the shell script under the
 
 - **start-tw-tot-batch.sh** script:
 
-``./start-tw-tot-batch.sh --help ``
+::
+
+    ./start-tw-tot-batch.sh --help 
 
 *OPTIONS:*
 
@@ -438,7 +440,7 @@ In order to run consumer-tw-tot batch analytics start the shell script under the
 +--------------------------------------+---------------------------------------------------------------+
 | roundMode                            | define the round mode on the creation time. Possible options  | 
 |                                      | are: - **min:** round on minute - **hour:**                   |
-|                                      | </b>round on hour</li> <li><b>day:</b>round on day</li></ul>  |
+|                                      | round on hour - **day:** round on day                         |
 +--------------------------------------+---------------------------------------------------------------+
 | granMin                              | **valid only if round mode is min.** Granularity,if you want  | 
 |                                      | to group in minute intervals (e.g gran=5 will group by 5      |
