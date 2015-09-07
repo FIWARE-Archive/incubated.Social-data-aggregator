@@ -290,5 +290,36 @@ This is the configuration file for the internal bus. By default is filled with a
 
 *TwTotConsumerProps.properties:*
 
+*COMMONS CONFIGURATIONS:*
+
++--------------------------------------+------------+------------------------------------------+
+|  Key Name                            | Optional   | Description                              | 
++======================================+============+==========================================+
+| roundPos                             | NO         | Decimal position on which round the      |
+|                                      |            | latitude and longitude provided in case  |
+|                                      |            |  of geoLoc tweet (i.e. roundPos=3 ,      |
+|                                      |            | latitude=17.87654 -> latitude=17.876)    |
++--------------------------------------+------------+------------------------------------------+
+| daoImplClass                         | NO         | Java class that implements the           |       
+|                                      |            | ConsumerTwTotDao interface for the       |
+|                                      |            | connection to the storage (default       |
+|                                      |            |  value: com.tilab.ca.sda.consumer.tw.tot.|
+|                                      |            |dao.ConsumerTwTotDaoDefaultImpl)          |
++--------------------------------------+------------+------------------------------------------+
+
+*BATCH CONFIGURATIONS:*
+
++--------------------------------------+------------+------------------------------------------+
+|  Key Name                            | Optional   | Description                              | 
++======================================+============+==========================================+
+| defaultInputDataPath                 | NO         | Default Folder (on distributed filesystem|
+|                                      |            | ) that contains input data for the batch |
+|                                      |            | app (can be override from the command    |
+|                                      |            | line)                                    |
++--------------------------------------+------------+------------------------------------------+
+| minPartitions                        | YES        | Min number of partitions for             |       
+|                                      |            | the input file (default 1)               |
++--------------------------------------+------------+------------------------------------------+
+
 
 
