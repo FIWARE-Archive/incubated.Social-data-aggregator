@@ -290,7 +290,7 @@ This is the configuration file for the internal bus. By default is filled with a
 
 *TwTotConsumerProps.properties:*
 
-*COMMONS CONFIGURATIONS:*
+*- COMMONS CONFIGURATIONS:*
 
 +--------------------------------------+------------+------------------------------------------+
 |  Key Name                            | Optional   | Description                              | 
@@ -307,7 +307,7 @@ This is the configuration file for the internal bus. By default is filled with a
 |                                      |            | dao.ConsumerTwTotDaoDefaultImpl)         |
 +--------------------------------------+------------+------------------------------------------+
 
-*BATCH CONFIGURATIONS:*
+*- BATCH CONFIGURATIONS:*
 
 +--------------------------------------+------------+------------------------------------------+
 |  Key Name                            | Optional   | Description                              | 
@@ -322,4 +322,26 @@ This is the configuration file for the internal bus. By default is filled with a
 +--------------------------------------+------------+------------------------------------------+
 
 
+*- STREAM CONFIGURATIONS:*
+
++--------------------------------------+------------+------------------------------------------+
+|  Key Name                            | Optional   | Description                              | 
++======================================+============+==========================================+
+| keyHt                                | NO         | topic key for statuses containing        |
+|                                      |            | hashTags (Default ht)                    |
++--------------------------------------+------------+------------------------------------------+
+| minPartitions                        | YES        | Min number of partitions for             |       
+|                                      |            | the input file (default 1)               |
++--------------------------------------+------------+------------------------------------------+
+
+| keyGeo | NO   | topic key for statuses with geo location (Default geo) |
+| defaultRoundMode | NO   | On which time field round to group values (allowed values for this property are: min,hour,day) |
+| granMin | YES | **Valid only if round mode is min.** Granularity, if you want to group tweets in minute intervals (e.g gran=5 will group by 5 minutes -> the number of tweets in 5 minutes) |
+| numMaxCore | NO   | Number of cores to associate to this application (in case you have to run multiple streaming application) |
+| checkpointDir | NO   | Directory where spark will save this application  checkpoints |
+| sparkBatchDurationMillis | NO   | Duration of the batch (in milliseconds). It is the basic interval at which the system with receive the data in batches |
+| sparkCleanTTL| NO   | Duration (seconds) of how long Spark will remember any metadata (stages generated, tasks generated, etc.). Periodic cleanups will ensure that metadata older than this duration will be forgotten. |
+| twTotWindowDurationMillis | NO   | Duration of the window. Both the window duration and the slide duration must be multiples of the batch interval. Data window on which analysis will be made. |
+| twTotWindowSlidingIntervalMillis | NO   | Window sliding interval. The interval at which the window will slide or move forward. (set equal to the twTotWindowDurationMillis to avoid unexpected behaviour ) |
+| busConnImplClass | NO   | Java class that implements the BusConnection interface for the interconnection with the internal stream bus (default: com.tilab.ca.sda.consumer.utils.stream.BusConnectionKafkaImpl) |
 
