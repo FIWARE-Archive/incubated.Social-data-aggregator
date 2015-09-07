@@ -437,7 +437,7 @@ In order to run consumer-tw-tot batch analytics start the shell script under the
 |                                      | format) e.g 2015-02-28T17:00:00+01                            |   
 +--------------------------------------+---------------------------------------------------------------+
 | roundMode                            | define the round mode on the creation time. Possible options  | 
-|                                      | are: <ul><li><b>min:</b>round on minute</li><li><b>hour:      |
+|                                      | are: - **min:** round on minute - **hour:**                   |
 |                                      | </b>round on hour</li> <li><b>day:</b>round on day</li></ul>  |
 +--------------------------------------+---------------------------------------------------------------+
 | granMin                              | **valid only if round mode is min.** Granularity,if you want  | 
