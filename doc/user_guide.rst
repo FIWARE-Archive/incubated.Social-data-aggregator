@@ -470,7 +470,7 @@ Both modules are based on a core module which aim is to classify the gender of a
 The Gender Recognition Algorithm contains 3 sub algorithms:
 
 name/screenName recognition
-`````````````
+``````````````
 
 
 
