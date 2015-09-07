@@ -386,12 +386,14 @@ This is the configuration file for the internal bus. By default is filled with a
 *STREAM DEPLOY:*
 
 To deploy consumer-tw-tot-stream 
-* with start-all.sh script:
-  just check that on sda/scripts/module tw-tot-stream key is uncommented.
 
-* Using consumer-tw-tot/start-tw-tot-stream.sh:
+- with start-all.sh script:
 
-    Provide the following options to the script or set the corrisponding environment variables:
+just check that on sda/scripts/module tw-tot-stream key is uncommented.
+
+- Using consumer-tw-tot/start-tw-tot-stream.sh:
+
+Provide the following options to the script or set the corrisponding environment variables:
 
 +--------------------------------------+------------+------------------------------------------+
 |  SCRIPT ARGUMENT                     |ENV VARIABLE| DESCRIPTION                              | 
