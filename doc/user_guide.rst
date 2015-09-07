@@ -243,28 +243,9 @@ Examples of analytics provided from the Social Data Aggregator are:
 
 By subscribing to a target topic and looking for a particular key, consumers can retrieve only the information that they really need, discarding any data when not relevant to their analytics. Result data can be saved on storage rather then re-injected to the internal bus to be processed from other consumers capable of other types of analytics. 
 
-CONSUMER TW-TOT
+
+Step 1: Install Java 8 sdk
 ~~~~~~~~~~~~~~~~~~~~~~
 
-a
-
-**OVERVIEW**
-
-The consumer tw tot provide a count on tweets, retweets, reply  on geo and hashtags based criteria for a user defined time interval. 
-
-There are two versions of this module:
-- Stream
-- Batch
-
-**Configuration**
-
-The confs/consumers/consumer-tw-tot folder contains the following files:
-
-*dao_impl.conf*
-
-A properties file with the properties needed from the ConsumerTwTotDao implementation. If you use the **ConsumerTwTotDaoDefaultImpl** you can leave this file blank.
-log4j.properties
-the properties for log4j. Set where you want the connector log. Edit this file following your needs.
-
-
+If you do not have java 8 installed , please, follow
 
