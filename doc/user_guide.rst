@@ -297,14 +297,14 @@ This is the configuration file for the internal bus. By default is filled with a
 +======================================+============+==========================================+
 | roundPos                             | NO         | Decimal position on which round the      |
 |                                      |            | latitude and longitude provided in case  |
-|                                      |            | of geoLoc tweet (i.e. roundPos=3 ,      |
+|                                      |            | of geoLoc tweet (i.e. roundPos=3 ,       |
 |                                      |            | latitude=17.87654 -> latitude=17.876)    |
 +--------------------------------------+------------+------------------------------------------+
 | daoImplClass                         | NO         | Java class that implements the           |       
 |                                      |            | ConsumerTwTotDao interface for the       |
 |                                      |            | connection to the storage (default       |
 |                                      |            | value: com.tilab.ca.sda.consumer.tw.tot. |
-|                                      |            |dao.ConsumerTwTotDaoDefaultImpl)          |
+|                                      |            | dao.ConsumerTwTotDaoDefaultImpl)         |
 +--------------------------------------+------------+------------------------------------------+
 
 *BATCH CONFIGURATIONS:*
