@@ -381,3 +381,25 @@ This is the configuration file for the internal bus. By default is filled with a
 |                                      |            |utils.stream.BusConnectionKafkaImpl)      |
 +--------------------------------------+------------+------------------------------------------+
 
+**DEPLOY**
+
+*STREAM DEPLOY:*
+
+To deploy consumer-tw-tot-stream 
+* with start-all.sh script:
+  just check that on sda/scripts/module tw-tot-stream key is uncommented.
+
+* Using consumer-tw-tot/start-tw-tot-stream.sh:
+
+    Provide the following options to the script or set the corrisponding environment variables:
+
++--------------------------------------+------------+------------------------------------------+
+|  SCRIPT ARGUMENT                     |ENV VARIABLE| DESCRIPTION                              | 
++======================================+============+==========================================+
+| sda-home                             | SDA_HOME   | The path of social-data-aggregator folder|
++--------------------------------------+------------+------------------------------------------+
+| with-master                          | MASTER     |master name (eg local,spark://xxx.xxx)    |   
++--------------------------------------+------------+------------------------------------------+
+| spark-home                           | SPARK_HOME | The path to spark folder                 |  
++--------------------------------------+------------+------------------------------------------+
+
