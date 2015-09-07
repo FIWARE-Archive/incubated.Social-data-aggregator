@@ -719,7 +719,7 @@ For GRA configurations please follow the guidelines provided on Section **Consum
 +--------------------------------------+------------+------------------------------------------------------------------+
 | twTotWindowDurationMillis            | NO         | Duration of the window. Both the window duration and the slide   |
 |                                      |            | duration must be multiples of the batch interval. Data window    |
-|                                      |            |  on which analysis will be made.                                 |
+|                                      |            | on which analysis will be made.                                  |
 +--------------------------------------+------------+------------------------------------------------------------------+
 | twTotWindowSlidingIntervalMillis     | NO         | Window sliding interval. The interval at which the window will   |
 |                                      |            | slide or move forward.                                           |
@@ -730,3 +730,76 @@ For GRA configurations please follow the guidelines provided on Section **Consum
 +--------------------------------------+------------+------------------------------------------------------------------+
 
 
+Consumer GRA deploy
+---------------------------
+
+STREAM DEPLOY:
+~~~~~~~~~~~~~~~~~~~~~~
+
+To deploy consumer-gra-stream 
+- with start-all.sh script:
+  just check that on sda/scripts/module gra key is uncommented.
+
+- Using gra/start-gra-stream.sh:
+    Provide the following options to the script or set the corrisponding environment variables:
+
++--------------------------------------+------------+------------------------------------------+
+|  SCRIPT ARGUMENT                     |ENV VARIABLE| DESCRIPTION                              | 
++======================================+============+==========================================+
+| sda-home                             | SDA_HOME   | The path of social-data-aggregator folder|
++--------------------------------------+------------+------------------------------------------+
+| with-master                          | MASTER     |master name (eg local,spark://xxx.xxx)    |   
++--------------------------------------+------------+------------------------------------------+
+| spark-home                           | SPARK_HOME | The path to spark folder                 |  
++--------------------------------------+------------+------------------------------------------+
+
+
+BATCH DEPLOY:
+~~~~~~~~~~~~~~~~~~~~~~
+
+In order to run consumer-gra batch analytics start the shell script under the folder sda/scripts/consumer-gra/start-gra-batch.sh after providing the following settings:
+
+**1. on sda/scripts/consumer-gra/consumer-gra-confs.cfg set the following properties:**
+
++--------------------------------------+------------+------------------------------------------+
+|  Key Name                            | Optional   | Description                              | 
++======================================+============+==========================================+
+| MASTER                               | NO         | Spark master address                     |
+|                                      |            | (spark://MASTER_IP:MASTER_PORT) or local |
++--------------------------------------+------------+------------------------------------------+
+| SPARK_HOME                           | NO         | absolute path to spark home              |
++--------------------------------------+------------+------------------------------------------+
+| INPUT_DATA_PATH                      | NO         | Default input data path (where raw data, |
+|                                      |            | on which analysis have to be done, are   |
+|                                      |            | stored)                                  |
++--------------------------------------+------------+------------------------------------------+
+
+
+**2.start-gra-batch.sh script:**
+
+::
+
+    ./start-gra-batch.sh --help 
+
+*OPTIONS:*
+
++--------------------------------------+---------------------------------------------------------------+
+|  OPTION NAME                         | DESCRIPTION                                                   | 
++======================================+===============================================================+
+| from                                 | time from which you want to start the analysis (ISO8601       |
+|                                      | format) e.g 2015-02-18T17:00:00+01                            |
++--------------------------------------+---------------------------------------------------------------+
+| to                                   | time to which you want to stop the analysis (ISO8601          |   
+|                                      | format) e.g 2015-02-28T17:00:00+01                            |   
++--------------------------------------+---------------------------------------------------------------+
+| roundMode                            | define the round mode on the creation time. Possible options  | 
+|                                      | are: - **min:** round on minute - **hour:**                   |
+|                                      | round on hour - **day:** round on day                         |
++--------------------------------------+---------------------------------------------------------------+
+| granMin                              | **valid only if round mode is min.** Granularity,if you want  | 
+|                                      | to group in minute intervals (e.g gran=5 will group by 5      |
+|                                      | minutes  -> the number of tweets in 5 minutes)                |
++--------------------------------------+---------------------------------------------------------------+
+| I                                    | Override the default input data path (the source where to     |   
+|                                      | read input data                                               |   
++--------------------------------------+---------------------------------------------------------------+
