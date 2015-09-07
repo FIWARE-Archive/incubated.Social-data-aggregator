@@ -495,7 +495,7 @@ GRA core provides an implementation of MlModel with Naive Bayes with the class N
 You can link the new implementation by edit *coloursModelImplClass* and *descrModelImplClass* properties in **GraConsumer.properties** file.
 
 
-** RECOGNIZE GENDER FROM PROFILE DESCRIPTION**
+**RECOGNIZE GENDER FROM PROFILE DESCRIPTION**
 
 *Create the training set and save it in LIBSVM format*
 Create a file containing training data with the following format:
@@ -539,7 +539,7 @@ Create a file containing training data with the following format:
 
     e.g.
 
-    m,9AE4E8,030202,0D0808,949B84,949B84
+    m,9AE4E8,030202,0D0808,949B84,949B84
 
 
 where FS is the field separator(, in the example). 
@@ -569,4 +569,20 @@ Below an example of the output file in libsvm format (4 colors and 9 bits mappin
 GRA properties configurations
 ~~~~~~~~~~~~~~~~~~~~~~
 
++--------------------------------+--------+--------------------------------------+--------------------------------------+
+|  Property                      |Optional| Default                              |Description                           | 
++================================+========+======================================+======================================+
+| coloursModelImplClass          | YES    | com.tilab.ca.sda.gra_core.ml.NBModel |class that implements the             |
+|                                |        |                                      |classificator for predictions from    |
+|                                |        |                                      |profile colours (Default implementatio|
+|                                |        |                                      |n uses Naive Bayes classifier)        |
++--------------------------------+--------+--------------------------------------+--------------------------------------+
+
+coloursModelImplClass| YES | com.tilab.ca.sda.gra_core.ml.NBModel |     |
+| colorAlgoReductionNumBits| YES | 9 | number of bits to which scale each profile color (from 24 original bits). It determines the number of features in input for color classification algorithm|
+| colorAlgoNumColorsToConsider| YES | 4 | The number of profile colors to consider (5 means all colors,1 just profile background color) |
+| descrModelImplClass | YES | com.tilab.ca.sda.gra_core.ml.NBModel | class that implements the classificator for predictions from profile description (Default implementation uses Naive Bayes classifier) |
+| featureExtractionClassImpl| YES | com.tilab.ca.sda.gra_core.ml.FeaturesExtractionTFIDF | class that implements the feature extraction module. Two implementation are available: *FeaturesExtractionTF*,that implements Term frequency algorithm, and *FeaturesExtractionTFIDF* (Read https://en.wikipedia.org/wiki/Tf–idf for more information)|
+| namesGenderMapImplClass| YES | com.tilab.ca.sda.gra_core.components.NamesGenderMapDefaultImpl | class that map keywords (person name or keywords to recognize pages e.g news) to gender (Default implementation is an in-memory hash map name/gender). Data for default implementation are stored under GRA configuration folder |
+| trainingFilesPath| NO | - | Path where are stored GRA training files to feed classifiers (colors and descr). Use a distributed filesystem path to avoid undesidered behaviours|
 
