@@ -603,13 +603,13 @@ GRA properties configurations
 |                                |        |                                     | https://en.wikipedia.org/wiki/Tf–idf |
 |                                |        |                                     | for more information)                |
 +--------------------------------+--------+-------------------------------------+--------------------------------------+
-| namesGenderMapImplClass        | YES    |com.tilab.ca.sda.gra_core.components.| class that map keywords (person name |
+| namesGenderMapImplClass        | YES    |com.tilab.ca.sda.gra_core.components.|class that map keywords (person name  |
 |                                |        |NamesGenderMapDefaultImpl            |or keywords to recognize pages e.g    |
-|                                |        |                                     | news) to gender (Default             |
-|                                |        |                                     | implementation is   an in-memory hash|
-|                                |        |                                     | map name/gender). Data for default   |
-|                                |        |                                     | implementation are stored under GRA  |
-|                                |        |                                     | configuration folder                 |
+|                                |        |                                     |news) to gender (Default              |
+|                                |        |                                     |implementation is   an in-memory hash |
+|                                |        |                                     |map name/gender). Data for default    |
+|                                |        |                                     |implementation are stored under GRA   |
+|                                |        |                                     |configuration folder                  |
 +--------------------------------+--------+-------------------------------------+--------------------------------------+
 | trainingFilesPath              | NO     | *-*                                 | Path where are stored GRA training   |
 |                                |        |                                     | files to feed classifiers (colors    |
