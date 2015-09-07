@@ -693,3 +693,40 @@ For GRA configurations please follow the guidelines provided on Section **Consum
 
 *STREAM CONFIGURATIONS:*
 
++--------------------------------------+------------+------------------------------------------------------------------+
+|  Key Name                            | Optional   | Description                                                      | 
++======================================+============+==================================================================+
+| keyRaw                               | NO         | topic key for statuses raw (tweets as sent from twitter)         |
++--------------------------------------+------------+------------------------------------------------------------------+
+| defaultRoundMode                     | NO         | On which time field round to group values (allowed values for    |
+|                                      |            | this property are: min,hour,day)                                 |
++--------------------------------------+------------+------------------------------------------------------------------+
+| granMin                              | NO         | Granularity in minutes (has to be the equivalent in minutes of   |
+|                                      |            | the window duration)                                             |
++--------------------------------------+------------+------------------------------------------------------------------+
+| numMaxCore                           | NO         | Number of cores to associate to this application (in case  you   |
+|                                      |            | have to run multiple streaming application)                      |
++--------------------------------------+------------+------------------------------------------------------------------+
+| checkpointDir                        | NO         | Directory where spark will save this application  checkpoints    |
++--------------------------------------+------------+------------------------------------------------------------------+
+| sparkBatchDurationMillis             | NO         | Duration of the batch (in milliseconds). It is the basic interval|
+|                                      |            | at which the system with receive the data in batches             |
++--------------------------------------+------------+------------------------------------------------------------------+
+| sparkCleanTTL                        | NO         | Duration (seconds) of how long Spark will remember any metadata  |
+|                                      |            | (stages generated, tasks generated, etc.). Periodic cleanups     |
+|                                      |            | will ensure that metadata older than this duration will be       |
+|                                      |            | forgotten.                                                       |
++--------------------------------------+------------+------------------------------------------------------------------+
+| twTotWindowDurationMillis            | NO         | Duration of the window. Both the window duration and the slide   |
+|                                      |            | duration must be multiples of the batch interval. Data window    |
+|                                      |            |  on which analysis will be made.                                 |
++--------------------------------------+------------+------------------------------------------------------------------+
+| twTotWindowSlidingIntervalMillis     | NO         | Window sliding interval. The interval at which the window will   |
+|                                      |            | slide or move forward.                                           |
++--------------------------------------+------------+------------------------------------------------------------------+
+| busConnImplClass                     | NO         | Java class that implements the BusConnection interface           |
+|                                      |            | for the interconnection with the internal stream bus (default:   |
+|                                      |            | com.tilab.ca.sda.consumer.utils.stream.BusConnectionKafkaImpl)   |
++--------------------------------------+------------+------------------------------------------------------------------+
+
+
