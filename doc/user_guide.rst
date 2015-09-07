@@ -374,10 +374,10 @@ This is the configuration file for the internal bus. By default is filled with a
 |                                      |            | twTotWindowDurationMillis to avoid       |
 |                                      |            | unexpected behaviour )                   |
 +--------------------------------------+------------+------------------------------------------+
-| busConnImplClass                     | NO         | Java class that implements the           |       
-|                                      |            | BusConnection interface for the          |
-|                                      |            | interconnection with the internal stream |
-|                                      |            | bus  (default: com.tilab.ca.sda.consumer.|
+| busConnImplClass                     | NO         |Java class that implements the            |       
+|                                      |            |BusConnection  interface for the          |
+|                                      |            |interconnection  with the internal stream |
+|                                      |            |bus   (default: com.tilab.ca.sda.consumer.|
 |                                      |            |utils.stream.BusConnectionKafkaImpl)      |
 +--------------------------------------+------------+------------------------------------------+
 
