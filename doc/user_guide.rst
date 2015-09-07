@@ -243,46 +243,6 @@ Examples of analytics provided from the Social Data Aggregator are:
 
 By subscribing to a target topic and looking for a particular key, consumers can retrieve only the information that they really need, discarding any data when not relevant to their analytics. Result data can be saved on storage rather then re-injected to the internal bus to be processed from other consumers capable of other types of analytics. 
 
-CONSUMER TW-TOW
-~~~~~~~~~~~~~~~~~~~~~~
 
-**OVERVIEW**
-
-The consumer tw tot provide a count on tweets, retweets, reply  on geo and hashtags based criteria for a user defined time interval. 
-
-There are two versions of this module:
-- Stream
-- Batch
-
-**Configuration**
-
-The confs/consumers/consumer-tw-tot folder contains the following files:
-
-*dao_impl.conf*
-
-A properties file with the properties needed from the ConsumerTwTotDao implementation. If you use the **ConsumerTwTotDaoDefaultImpl** you can leave this file blank.
-log4j.properties
-the properties for log4j. Set where you want the connector log. Edit this file following your needs.
-
-*twstats-tot-tw.cfg.xml*
-
-configuration file for hibernate. Edit it if you compiled the GE with the ConsumerTwTotDao default implementation. If you provide a different implementation you can leave this file as is or delete it.
-
-Edit the following fields with your database configuration:
-
-::
-    <property name="connection.url"></property>
-    <property name="connection.username"> </property>
-    <property name="connection.password"> </property>
-
-You can find the sql code to create the consumer-tw-tot tables needed to store analytics result  in social-data-aggregator/data_model in the project directory. 
-
-*bus_impl.conf*
-
-This is the configuration file for the internal bus. By default is filled with apache Kafka configurations. If you want to use a different implementation please follow these steps:
-
-1. Create a Java class that  implements the BusConnection interface
-2. Set the properties you need for your implementation into the bus_impl.conf file
-3. Put the path to your implementation as the value for the property busConnImplClass into the **TwTotConsumerProps.properties** file (e.g “com.mypackage.MyImplClass”)
 
 
