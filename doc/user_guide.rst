@@ -472,6 +472,22 @@ The Gender Recognition Algorithm contains 3 sub algorithms:
 name/screenName recognition
 ~~~~~~~~~~~~~~~~~~~~~~
 
+This sub algorithm expects key/value pairs in the form of name/gender. In its default implementation the module loads a file in the confs/consumers/consumer-gra folder called **names_gender.txt**.
+This file contains the key/value pairs in the following format:
 
+::
+
+    name,gender
+
+using comma as field separator. There are already some keys with the related gender.
+
+The user can change the default implementation by implementing the interface NamesGenderMap.
+Then in GraConsumer.properties the property namesGenderMapImplClass has to be valorized with the qualified name of the new implementation.
+If the new implementation need some properties (for example db connection url) these can be added into the file 
+*names_gender_mapping_impl.conf* in the form of key/value pairs.
+
+
+recognize gender from profile description and colors
+~~~~~~~~~~~~~~~~~~~~~~
 
 
