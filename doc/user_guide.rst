@@ -466,7 +466,12 @@ There are two versions of this component:
 - Batch
 
 Both modules are based on a core module which aim is to classify the gender of a twitter user from his profile information. 
+
 The Gender Recognition Algorithm contains 3 sub algorithms:
+
+name/screenName recognition
+`````````````
+
 
 
 
