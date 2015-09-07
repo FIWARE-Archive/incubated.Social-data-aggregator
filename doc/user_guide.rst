@@ -405,3 +405,45 @@ Provide the following options to the script or set the corrisponding environment
 | spark-home                           | SPARK_HOME | The path to spark folder                 |  
 +--------------------------------------+------------+------------------------------------------+
 
+**BATCH DEPLOY:**
+In order to run consumer-tw-tot batch analytics start the shell script under the folder sda/scripts/consumer-tw-tot/start-tw-tot-batch.sh after providing the following settings:
+
+- on sda/scripts/consumer-tw-tot/consumer-tw-tot-confs.cfg set the following properties:
+
++--------------------------------------+---------------------------------------------------------------+
+|  KEY NAME                            | DESCRIPTION                                                   | 
++======================================+===============================================================+
+| MASTER                               | Spark master address (spark://MASTER_IP:MASTER_PORT) or local |
++--------------------------------------+---------------------------------------------------------------+
+| SPARK_HOME                           | absolute path to spark home                                   |   
++--------------------------------------+---------------------------------------------------------------+
+| INPUT_DATA_PATH                      | Default input data path (where raw data,  on which analysis   | 
+|                                      | have to be done, are stored)                                  | 
++--------------------------------------+---------------------------------------------------------------+
+
+- **start-tw-tot-batch.sh** script:
+
+``./start-tw-tot-batch.sh --help ``
+
+*OPTIONS:*
+
++--------------------------------------+---------------------------------------------------------------+
+|  OPTION NAME                         | DESCRIPTION                                                   | 
++======================================+===============================================================+
+| from                                 | time from which you want to start the analysis (ISO8601       |
+|                                      | format) e.g 2015-02-18T17:00:00+01                            |
++--------------------------------------+---------------------------------------------------------------+
+| to                                   | time to which you want to stop the analysis (ISO8601          |   
+|                                      | format) e.g 2015-02-28T17:00:00+01                            |   
++--------------------------------------+---------------------------------------------------------------+
+| roundMode                            | define the round mode on the creation time. Possible options  | 
+|                                      | are: <ul><li><b>min:</b>round on minute</li><li><b>hour:      |
+|                                      | </b>round on hour</li> <li><b>day:</b>round on day</li></ul>  |
++--------------------------------------+---------------------------------------------------------------+
+| granMin                              | **valid only if round mode is min.** Granularity,if you want  | 
+|                                      | to group in minute intervals (e.g gran=5 will group by 5      |
+|                                      | minutes  -> the number of tweets in 5 minutes)                |
++--------------------------------------+---------------------------------------------------------------+
+
+
+
