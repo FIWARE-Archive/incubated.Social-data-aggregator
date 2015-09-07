@@ -570,7 +570,7 @@ GRA properties configurations
 ~~~~~~~~~~~~~~~~~~~~~~
 
 +--------------------------------+--------+-------------------------------------+--------------------------------------+
-|  Property                      |Optional| Default                              |Description                           | 
+|  Property                      |Optional| Default                              |Description                          | 
 +================================+========+=====================================+======================================+
 | coloursModelImplClass          | YES    | com.tilab.ca.sda.gra_core.ml.NBModel|class that implements the             |
 |                                |        |                                     |classificator for predictions from    |
@@ -611,7 +611,7 @@ GRA properties configurations
 |                                |        |                                     | implementation are stored under GRA  |
 |                                |        |                                     | configuration folder                 |
 +--------------------------------+--------+-------------------------------------+--------------------------------------+
-| trainingFilesPath              | NO     | -                                   | Path where are stored GRA training   |
+| trainingFilesPath              | NO     | *-*                                 | Path where are stored GRA training   |
 |                                |        |                                     | files to feed classifiers (colors    |
 |                                |        |                                     | and descr). Use a distributed        |
 |                                |        |                                     | filesystem path to avoid undesidered |
