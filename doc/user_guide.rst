@@ -243,7 +243,9 @@ Examples of analytics provided from the Social Data Aggregator are:
 
 By subscribing to a target topic and looking for a particular key, consumers can retrieve only the information that they really need, discarding any data when not relevant to their analytics. Result data can be saved on storage rather then re-injected to the internal bus to be processed from other consumers capable of other types of analytics. 
 
-**CONSUMER TW-TOT**
+CONSUMER TW-TOT
+~~~~~~~~~~~~~~~~~~~~~~
+
 
 **OVERVIEW**
 
