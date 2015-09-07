@@ -271,6 +271,7 @@ configuration file for hibernate. Edit it if you compiled the GE with the Consum
 Edit the following fields with your database configuration:
 
 ::
+
     <property name="connection.url"></property>
     
     <property name="connection.username"> </property>
