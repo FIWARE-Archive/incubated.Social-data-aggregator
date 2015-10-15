@@ -29,6 +29,10 @@ while (( "$#" )); do
 	   LOAD_ENV=1
 	   shift
 	  ;;
+     --clear-checkpoints)
+	   CLEAR_CHECKPOINTS=1
+	   shift
+	  ;;
     --help)
       display_usage_and_exit
       ;;
@@ -60,6 +64,12 @@ then
 	source start-spark-env.sh
 else
 	source confs.cfg #load spark configurations 
+fi
+
+if [ "x$CLEAR_CHECKPOINTS" != "x" ]
+then
+	echo "clearing old checkpoints.."
+        rm -rf $CHECKPOINTS_DIR/*
 fi
 
 export MASTER=spark://$SPARK_MASTER_IP:$SPARK_MASTER_PORT

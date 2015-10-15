@@ -9,6 +9,7 @@ package com.tilab.ca.sda.ctw.utils.stream;
 import java.util.logging.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkException;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.api.java.JavaStreamingContextFactory;
@@ -88,7 +89,7 @@ public class SparkStreamingManager {
         }
     }
     
-    private void $startSparkStream(SparkOperation operation){
+    private void $startSparkStream(SparkOperation operation) throws Exception{
             log.info(String.format("[%s] Starting streaming app...",STREAMING_MANAGER_LOG_TAG));
             
             JavaStreamingContextFactory cntxFactory=() -> {
@@ -98,7 +99,17 @@ public class SparkStreamingManager {
                     throw new RuntimeException(ex);
                 }
             };
-            jssc = JavaStreamingContext.getOrCreate(checkpointPath, cntxFactory);
+            
+            try{
+                jssc = JavaStreamingContext.getOrCreate(checkpointPath, cntxFactory);
+            }catch(Exception se){
+                if(se instanceof SparkException){
+                    log.error(String.format("[%s] Failed to read checkpoints dir ",STREAMING_MANAGER_LOG_TAG),se);
+                    jssc=createContext(operation);
+                }else{
+                    throw se;
+                }
+            }
             jssc.start();
             jssc.awaitTermination();
     }
