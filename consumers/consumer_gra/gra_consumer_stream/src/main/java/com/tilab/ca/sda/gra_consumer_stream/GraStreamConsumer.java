@@ -19,6 +19,7 @@ import com.tilab.ca.sda.sda.model.HtsStatus;
 import com.tilab.ca.sda.sda.model.keys.DateHtKey;
 import com.tilab.ca.sda.sda.model.keys.GeoLocTruncTimeKey;
 import java.util.stream.Collectors;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
@@ -48,12 +49,13 @@ public class GraStreamConsumer {
         GRA gra=Utils.Load.getClassInstFromInterface(GRA.class, graProps.graClassImpl());
         gra.init(graConf, jssc.sparkContext());
         
+        
         JavaDStream<String> rawTwDStream=busConnection.getDStreamByKey(graProps.keyRaw());
         JavaDStream<String> rawTwDStreamWindow=rawTwDStream.window(new Duration(graProps.graWindowDurationMillis()), 
                                                                    new Duration(graProps.graWindowSlidingIntervalMillis()));
         
         //retrieve distinct user profiles and evaluate their gender with gra algorithm
-        JavaDStream<ProfileGender> uniqueProfilesGenderDStream=getUniqueProfilesDStream(rawTwDStreamWindow, gra);
+        JavaDStream<ProfileGender> uniqueProfilesGenderDStream=getUniqueProfilesDStream(rawTwDStreamWindow, gra); //jssc.sparkContext()
         JavaPairDStream<Long,GenderTypes> uidGenderPairsDStream=getUidGenderPairDStream(uniqueProfilesGenderDStream);
         
         uidGenderPairsDStream.cache();
@@ -95,8 +97,8 @@ public class GraStreamConsumer {
                 });
     }
     
-    public static JavaDStream<ProfileGender> getUniqueProfilesDStream(JavaDStream<String> rawTwDStream,GRA gra){
-        return rawTwDStream.transform(rawTwRdd -> GraEvaluateAndCount.evaluateUniqueProfilesRdd(rawTwRdd, gra));
+    public static JavaDStream<ProfileGender> getUniqueProfilesDStream(JavaDStream<String> rawTwDStream,GRA gra){ //,JavaSparkContext jsc
+        return rawTwDStream.transform(rawTwRdd -> GraEvaluateAndCount.evaluateUniqueProfilesRdd(rawTwRdd, gra)); //jsc
     }
     
     public static JavaPairDStream<Long,GenderTypes> getUidGenderPairDStream(JavaDStream<ProfileGender> distinctProfiles){

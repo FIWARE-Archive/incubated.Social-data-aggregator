@@ -11,6 +11,6 @@ public interface GRA extends Serializable{
     
     public void init(GRAConfig graConf,JavaSparkContext jsc);
     
-    public JavaRDD<ProfileGender> evaluateProfiles(JavaRDD<TwUserProfile> twProfilesRdd);
+    public JavaRDD<ProfileGender> evaluateProfiles(JavaRDD<TwUserProfile> twProfilesRdd); //,JavaSparkContext jsc
     
 }

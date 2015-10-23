@@ -76,7 +76,7 @@ public class GRATest implements Serializable{
         
         GRA instance = new GRAWaterfallImpl();
         instance.init(graConf, jsc);
-        JavaRDD<Character> resultRDD = instance.evaluateProfiles(twProfilesRdd).map(pg -> pg.getGender().toChar());
+        JavaRDD<Character> resultRDD = instance.evaluateProfiles(twProfilesRdd).map(pg -> pg.getGender().toChar());//,jsc
         List<Character> resLst=resultRDD.collect();
         List<Character> expResult = Arrays.asList(new Character[]{'m','m','m','f','f','x','m','f','m'});
         

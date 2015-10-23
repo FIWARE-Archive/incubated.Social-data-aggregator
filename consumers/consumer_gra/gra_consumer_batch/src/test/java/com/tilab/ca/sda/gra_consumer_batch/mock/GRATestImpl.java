@@ -22,7 +22,7 @@ public class GRATestImpl implements GRA{
     public void init(GRAConfig graConf, JavaSparkContext jsc) {}
 
     @Override
-    public JavaRDD<ProfileGender> evaluateProfiles(JavaRDD<TwUserProfile> twProfilesRdd) {
+    public JavaRDD<ProfileGender> evaluateProfiles(JavaRDD<TwUserProfile> twProfilesRdd) { //,JavaSparkContext jsc
         return twProfilesRdd.map(twProfile -> new ProfileGender(twProfile, 
                 gtMap.getOrDefault(twProfile.getUid(), GenderTypes.UNKNOWN)));
     }

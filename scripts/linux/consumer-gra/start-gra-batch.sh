@@ -28,12 +28,12 @@ fi
 CONF_FILE=$SDA_HOME/scripts/consumer-gra/consumer-gra-confs.cfg
 source $CONF_FILE
 
-if [ "x$MASTER" == "x" ]
+if [ "x$MASTER_BATCH" == "x" ]
 then 
 	echo "Missing MASTER"
 	display_usage_and_exit	
 fi
-if [ "x$SPARK_HOME" == "x" ]
+if [ "x$SPARK_HOME_BATCH" == "x" ]
 then 
     echo "Missing SPARK_HOME"
 	display_usage_and_exit	

@@ -615,7 +615,10 @@ GRA properties configurations
 |                                |        |                                     | files to feed classifiers (colors    |
 |                                |        |                                     | and descr). Use a distributed        |
 |                                |        |                                     | filesystem path to avoid undesidered |
-|                                |        |                                     | behaviours                           |
+|                                |        |                                     | behaviours. Inside the provided      |
+|                                |        |                                     | folder is expected to find a folder  |
+|                                |        |                                     | named colours_training_set and one   |
+|                                |        |                                     | called descr_training_set            |
 +--------------------------------+--------+-------------------------------------+--------------------------------------+
 
 
@@ -684,7 +687,8 @@ This is the configuration file for the internal bus. By default is filled with a
 |                                      |            | ConsumerTwTotDao interface for the       |
 |                                      |            | connection to the storage (default value:|
 |                                      |            | com.tilab.ca.sda.gra_consumer_dao        |
-|                                      |            | .GraConsumerDaoFileImpl)                 |
+|                                      |            | .GraConsumerDaoFileImpl but also         |
+|                                      |            | GraConsumerDaoHibImpl is available)      |
 +--------------------------------------+------------+------------------------------------------+
 
 *GRA Configurations*

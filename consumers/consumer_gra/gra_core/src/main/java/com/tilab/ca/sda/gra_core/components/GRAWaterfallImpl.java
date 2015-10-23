@@ -16,7 +16,6 @@ public class GRAWaterfallImpl implements GRA{
     private GenderUserDescr genderUserDescr;
     private GenderUserColors genderUserColor;
     private GenderNameSN genderName;
-    private JavaSparkContext jsc;
     
     private boolean initialized=false;
     
@@ -34,13 +33,17 @@ public class GRAWaterfallImpl implements GRA{
         
         log.info("create gra name/screenName recognizer..");
         genderName=new GenderNameSN(conf.getNamesGenderMap());
-        this.jsc=jsc;
+       
         initialized=true;
+        log.info("GraWaterfall initialized successfully!");
     }
     
     @Override
-    public JavaRDD<ProfileGender> evaluateProfiles(JavaRDD<TwUserProfile> twProfilesRdd){
+    public JavaRDD<ProfileGender> evaluateProfiles(JavaRDD<TwUserProfile> twProfilesRdd){ //JavaSparkContext jsc
         log.info("getting gender from name and screenName..");
+        
+        JavaSparkContext jsc = JavaSparkContext.fromSparkContext(twProfilesRdd.context());
+        
         
         if(!initialized)
             throw new IllegalStateException("GRA implementation not initialized. Please call init() method before evaluation.");
@@ -51,26 +54,18 @@ public class GRAWaterfallImpl implements GRA{
         JavaRDD<ProfileGender> notReconFromName=namesGenderRDD.filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN ||
                                                                                          profileGender.getGender()==GenderTypes.AMBIGUOUS);
         
-        //System.out.println("Not recognized FROM NAME*************************************************************");
-        //notReconFromName.collect().forEach(pg ->System.out.println(pg.getTwProfile().getName()+" "+pg.getGender().toChar()));
-        //System.out.println("*************************************************************");
-        
-        
         log.info("getting gender from description..");
         DescrResults descrResults=genderUserDescr.getGendersFromTwProfiles(notReconFromName);
         JavaRDD<ProfileGender> descrGenderRdd=descrResults.getProfilesRecognized();
                
         JavaRDD<ProfileGender> notReconFromDescr=descrResults.getProfilesUnrecognized().filter(profileGender -> profileGender.getGender()==GenderTypes.UNKNOWN);
         
-        //System.out.println("NOT RECON FROM DESCR *************************************************************");
-        //notReconFromDescr.collect().forEach(pg ->System.out.println(pg.getTwProfile().getName()+" "+pg.getGender().toChar()));
-        //System.out.println("*************************************************************");
-        
         log.info("getting gender from colors..");
         JavaRDD<ProfileGender> colorGenderRdd=genderUserColor.getGendersFromTwProfiles(notReconFromDescr);
         
         namesGenderRDD=namesGenderRDD.filter(profileGender -> profileGender.getGender()!=GenderTypes.UNKNOWN &&
                                                                profileGender.getGender()!=GenderTypes.AMBIGUOUS);
+        
         
         return jsc.union(namesGenderRDD,descrGenderRdd,colorGenderRdd);
     }

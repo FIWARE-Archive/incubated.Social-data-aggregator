@@ -78,7 +78,7 @@ public class GraEvaluateAndCountTest {
         graRespMap.put(6L, GenderTypes.PAGE);
         graRespMap.put(7L, GenderTypes.PAGE);
         GRA gra = new GRATestImpl(graRespMap);
-        JavaRDD<ProfileGender> resultRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
+        JavaRDD<ProfileGender> resultRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra); //,jsc
         List<ProfileGender> result=resultRDD.collect();
         
         Collections.sort(result, (pg1,pg2)-> ((Long)pg1.getTwProfile().getUid()).compareTo(pg2.getTwProfile().getUid()));
@@ -152,7 +152,7 @@ public class GraEvaluateAndCountTest {
         
         GRA gra = new GRATestImpl(graRespMap);
         
-        JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
+        JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra); //,jsc
         
         JavaPairRDD<Long, GenderTypes> resPairRdd = GraEvaluateAndCount.fromProfileGenderToUserIdGenderPairRdd(resultprofileRDD);
         
@@ -255,7 +255,7 @@ public class GraEvaluateAndCountTest {
         
         GRA gra = new GRATestImpl(graRespMap);
         
-        JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra);
+        JavaRDD<ProfileGender> resultprofileRDD = GraEvaluateAndCount.evaluateUniqueProfilesRdd(tweetsRdd, gra); //,jsc
         
         JavaPairRDD<Long, GenderTypes> uidGenders = GraEvaluateAndCount.fromProfileGenderToUserIdGenderPairRdd(resultprofileRDD);
         

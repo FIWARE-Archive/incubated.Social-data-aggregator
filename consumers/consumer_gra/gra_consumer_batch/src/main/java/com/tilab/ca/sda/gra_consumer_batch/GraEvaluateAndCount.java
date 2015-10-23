@@ -25,16 +25,18 @@ public class GraEvaluateAndCount {
      * 
      * @param tweetsRdd
      * @param gra
+     * @param jsc
      * @return 
      */
-    public static JavaRDD<ProfileGender> evaluateUniqueProfilesRdd(JavaRDD<String> tweetsRdd,GRA gra){
-        log.debug("evaluating unique profiles RDD...");
+    public static JavaRDD<ProfileGender> evaluateUniqueProfilesRdd(JavaRDD<String> tweetsRdd,GRA gra){ //,JavaSparkContext jsc
+        log.info("evaluating unique profiles RDD...");
         JavaRDD<TwUserProfile> uniqueProfilesRdd = tweetsRdd.map(BatchUtils::fromJstring2TwUserProfile)
                          .mapToPair(twUserProfile -> new Tuple2<Long,TwUserProfile>(twUserProfile.getUid(),twUserProfile))
                          .reduceByKey((pr1,pr2) -> pr1.getLastUpdate().isAfter(pr2.getLastUpdate())?pr1:pr2) //get the most recent profile
                          .map(tuple2UserProfile -> tuple2UserProfile._2);
-        log.debug("got unique profiles RDD");
-        return gra.evaluateProfiles(uniqueProfilesRdd);
+        log.info("got unique profiles RDD");
+        log.info("starting gender profiles recognition...");
+        return gra.evaluateProfiles(uniqueProfilesRdd); //,jsc
     }
     
     /**
