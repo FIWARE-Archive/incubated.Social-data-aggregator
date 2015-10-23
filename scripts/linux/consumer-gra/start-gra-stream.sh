@@ -62,5 +62,5 @@ PATH_TO_JAR_FILE=$SDA_HOME/bin/consumers/stream/$JAR_FILE_NAME_STREAM
 export SDA_CONF=$SDA_HOME/confs
 export GRA=consumers/consumer-gra
 
-echo "Submitting consumer-tw-tot stream application..."
+echo "Submitting consumer-gra stream application..."
 nohup $SPARK_HOME/bin/spark-submit --class $GRA_STREAM_MAIN_CLASS --master $MASTER  --deploy-mode client $PATH_TO_JAR_FILE &
