@@ -24,7 +24,7 @@
      
         <mapping class="com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringGeo"/>
         <mapping class="com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringKey"/>
-	<mapping class="com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringUser"/>
+		<mapping class="com.tilab.ca.sda.ctw.hibernate.mapping.OnMonitoringUser"/>
    
     </session-factory>
 
