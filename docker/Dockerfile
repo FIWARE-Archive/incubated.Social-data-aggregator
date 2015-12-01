@@ -48,15 +48,28 @@ RUN curl -sL --retry 3 \
 ADD https://github.com/FiwareTIConsoft/social-data-aggregator/releases/download/v0.1-RELEASE/sda_v01.tar.gz /tmp
 
 #move sda to /opt folder
+ENV SDA_FOLDER_NAME sda
 RUN tar -xzf /tmp/sda_v01.tar.gz /opt
+RUN mv /opt/sda_v01 /opt/$SDA_FOLDER_NAME
+
+#make folder for twconnector data
+RUN mkdir /data
 
 #start apache kafka
-RUN /opt/kafka/bin/zookeeper-server-start.sh /opt/kafka/config/zookeeper.properties 
-RUN /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
+#RUN /opt/kafka/bin/zookeeper-server-start.sh /opt/kafka/config/zookeeper.properties 
+#RUN /opt/kafka/bin/kafka-server-start.sh /opt/kafka/config/server.properties
+
+RUN mv /TwStreamConnector.properties /opt/sda/confs/connector-tw/TwStreamConnector.properties
 
 # Expose ports
 EXPOSE 8080 7077 8089
 
 COPY ./startup_script.sh /tmp/startup_script.sh
 
-ENTRYPOINT /tmp/startup_script.sh
+#Configuring spark startup
+RUN cat /opt/sda/scripts/confs.cfg.template | sed -e "s/SPARK_MASTER_IP=/SPARK_MASTER_IP=$HOSTNAME/g" > /opt/sda/scripts/confs.cfg
+RUN head /opt/sda/scripts/modules > /opt/sda/scripts/modules
+
+#Starting spark environment and TwConnector
+CMD ["/opt/sda/scripts/start-spark-env.sh","/opt/sda/scripts/start-all.sh"]
+
