@@ -1,0 +1,29 @@
+<h1>Global Settings</h1>
+<div class="jumbotron">
+    <form class="form form-vertical" name="myForm" novalidate>
+       
+        <div class="row">
+            <div class="col-xs-10">
+                <div class="input-group">
+                    <div class="input-group-addon">{{sdaHome.label}} </div>
+                    <input type="text" class="form-control" ng-model="sdaHome.value" name="sdaHomeValue" placeholder="Sda Home Path" maxlength="100" length="100" required>
+                </div>
+            </div>
+            <div class="col-xs-1">
+                <a href data-toggle="tooltip" data-placement="bottom" title="{{sdaHome.description}}"><span class="glyphicon glyphicon-info-sign"></span></a>
+            </div>
+            <div class="col-xs-1">
+                <a href ng-show="sdaHome.required" data-toggle="tooltip" data-placement="bottom" title="This item is mandatory!"><span class="glyphicon glyphicon-warning-sign"></span></a>
+            </div>
+        </div>
+        <span style="color: red"
+              ng-show="myForm.sdaHomeValue.$dirty && myForm.sdaHomeValue.$invalid">
+            <span ng-show="myForm.sdaHomeValue.$error.required">Mandatory Field</span>
+        </span>
+        <br>
+        <div class="row">
+            <a href class="btn btn-primary" ng-click="save()">Save</a>
+            <a href class="btn btn-danger" ng-click="reset()">Reset</a>
+        </div>
+    </form>
+</div>

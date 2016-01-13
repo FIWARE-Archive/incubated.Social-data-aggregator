@@ -40,3 +40,4 @@ connector-tw/target
 connector-tw/profiles/dev/*
 connector-tw/profiles/test/*
 connector-tw/profiles/prod/*
+/sda-tools/sda_controller/src/main/resources/static/nbproject/private/

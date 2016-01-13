@@ -20,6 +20,8 @@ CONSUMERS_BIN_REL_PATH="bin/consumers"
 BATCH_FOLDER="batch"
 STREAM_FOLDER="stream"
 
+DB_DATA_MODEL_FOLDER="db_data_model"
+
 function exit_with_usage {
   echo "make-dist.sh - tool for making binary distributions of SocialDataAggregator"
   echo ""
@@ -65,6 +67,7 @@ cp $SDA_SRC_DIR/$CONSUMERS_ROOT/$CONSUMER_GRA_STREAM_PATH/$TARGET_FOLDER/uber-*.
 cp -r $SDA_SRC_DIR/$SCRIPTS_FOLDER_NAME/linux $OUTPUT_PATH/$SCRIPTS_FOLDER_NAME/
 rm -f $OUTPUT_PATH/$SCRIPTS_FOLDER_NAME/$SCRIPT_NAME
 cp -r $SDA_SRC_DIR/$CONFS_FOLDER_NAME $OUTPUT_PATH/
+cp -r $SDA_SRC_DIR/$DB_DATA_MODEL_FOLDER $OUTPUT_PATH/
 
 echo "Dist Made on path $OUTPUT_PATH"
 echo "End"

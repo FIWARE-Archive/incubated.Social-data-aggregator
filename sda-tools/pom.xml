@@ -9,7 +9,10 @@
     <artifactId>sda-tools</artifactId>
     <version>4.3.3.0</version>
     <packaging>pom</packaging>
+
+    
     <modules>
         <module>tw_user_profile_extractor</module>
+        <module>sda_controller</module>
     </modules>
 </project>

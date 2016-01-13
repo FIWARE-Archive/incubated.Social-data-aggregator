@@ -1,0 +1,47 @@
+{
+    "file": "/scripts/confs.cfg",
+    "props": [
+        {
+            "name": "SPARK_HOME",
+            "label": "Spark Home",
+            "value": "/usr/spark",
+            "description": "Spark Installation root folder",
+            "required": true
+        },
+        {
+            "name": "SPARK_MASTER_WEBUI_PORT",
+            "label": "Spark Master Web Inteface Port",
+            "value": "8080",
+            "description": "",
+            "required": false
+        },
+        {
+            "name": "SPARK_MASTER_IP",
+            "label": "Spark Master IP Address",
+            "value": "",
+            "description": "",
+            "required": true
+        },
+        {
+            "name": "SPARK_MASTER_PORT",
+            "label": "Spark Master Port",
+            "value": "7077",
+            "description": "",
+            "required": true
+        },
+        {
+            "name": "SPARK_WORKER_INSTANCES",
+            "label": "Spark Worker Instances",
+            "value": "2",
+            "description": "Number of spark worker instances",
+            "required": true
+        },
+        {
+            "name": "CHECKPOINTS_DIR",
+            "label": "Checkpoints Directory",
+            "value": "/tmp",
+            "description": "Directory where are stored Social Data Aggregator streaming modules checkpoints",
+            "required": true
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "sdaHome":{
+            "name": "sdaHome",
+            "label": "SDA Home",
+            "value": "/opt/sda",
+            "description": "Social Data Aggregator installation root folder",
+            "required": true
+    }
+}
