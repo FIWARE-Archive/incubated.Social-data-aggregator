@@ -1,31 +1,31 @@
 <h1>Startup Script Settings</h1>
-<div class="jumbotron">
-    <form class="form form-vertical" name="ssForm" novalidate>
-       
-        <div class="row top-buffer-2" ng-repeat="prop in startupScriptProps">
-            <div class="col-xs-10">
-                <div class="input-group">
-                    <div class="input-group-addon">{{prop.label}} </div>
-                    <input type="text" class="form-control" ng-model="prop.value" name="{{prop.name}}" maxlength="100" length="100" required>
+<form class="form form-vertical" name="ssForm" novalidate>
+
+    <div class="panel panel-default" ng-repeat="section in startupScriptSections">
+         <div class="panel-heading">{{section.label}}</div>
+         <div class="panel-body">
+             <div class="well" ng-show="section.description">{{section.description}}</div>
+            <div class="row top-buffer-2" ng-repeat="prop in section.props">
+                <div class="col-xs-10">
+                    <div class="input-group">
+                        <div class="input-group-addon">{{prop.label}} </div>
+                        <input type="text" class="form-control" ng-model="prop.value" name="{{prop.name}}" maxlength="100" length="100" required>
+                    </div>
+                </div>
+                <div class="col-xs-1" ng-show="prop.description">
+                    <a href data-toggle="tooltip" data-placement="bottom" title="{{prop.description}}"><span class="glyphicon glyphicon-info-sign"></span></a>
+                </div>
+                <div class="col-xs-1">
+                    <a href ng-show="prop.required" data-toggle="tooltip" data-placement="bottom" title="This item is mandatory!"><span class="glyphicon glyphicon-warning-sign"></span></a>
                 </div>
             </div>
-            <div class="col-xs-1" ng-show="prop.description">
-                <a href data-toggle="tooltip" data-placement="bottom" title="{{prop.description}}"><span class="glyphicon glyphicon-info-sign"></span></a>
-            </div>
-            <div class="col-xs-1">
-                <a href ng-show="prop.required" data-toggle="tooltip" data-placement="bottom" title="This item is mandatory!"><span class="glyphicon glyphicon-warning-sign"></span></a>
-            </div>
+         </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-xs-offset-10 col-xs-2">
+            <a href class="btn btn-primary" ng-click="save()">Save</a>
+            <a href class="btn btn-danger" ng-click="reset()">Reset</a>
         </div>
-<!--        <span style="color: red"
-              ng-show="myForm.sdaHomeValue.$dirty && myForm.sdaHomeValue.$invalid">
-            <span ng-show="myForm.sdaHomeValue.$error.required">Mandatory Field</span>
-        </span>-->
-        <br>
-        <div class="row">
-            <div class="col-xs-offset-8 col-xs-4">
-                <a href class="btn btn-primary" ng-click="save()">Save</a>
-                <a href class="btn btn-danger" ng-click="reset()">Reset</a>
-            </div>
-        </div>
-    </form>
-</div>
+    </div>
+</form>

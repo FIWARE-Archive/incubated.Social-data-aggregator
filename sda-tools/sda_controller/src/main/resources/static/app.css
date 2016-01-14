@@ -1,7 +1,12 @@
 .top-buffer { margin-top:4em; }
 .top-buffer-2 { margin-top:2em; }
 
-.jumbotron {
-    border:1px solid black;
-    background-color: white;
+.section{
+    border-color: #ddd;
+    border-width: 1px;
+    border-radius: 4px 4px 0 0;
+}
+
+.pointer{
+    cursor:pointer;
 }

@@ -7,7 +7,7 @@ public class SdaConfs {
     
     private String file;
     
-    private List<Prop> props;
+    private List<Section> sections;
 
     public String getFile() {
         return file;
@@ -17,11 +17,14 @@ public class SdaConfs {
         this.file = file;
     }
 
-    public List<Prop> getProps() {
-        return props;
+    public List<Section> getSections() {
+        return sections;
     }
 
-    public void setProps(List<Prop> props) {
-        this.props = props;
+    public void setSections(List<Section> sections) {
+        this.sections = sections;
     }
+
+    
+
 }

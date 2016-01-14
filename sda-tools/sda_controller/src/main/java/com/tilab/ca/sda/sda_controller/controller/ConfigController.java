@@ -1,8 +1,10 @@
 package com.tilab.ca.sda.sda_controller.controller;
 
 import com.tilab.ca.sda.sda_controller.model.GlobalConfs;
+import com.tilab.ca.sda.sda_controller.model.Module;
 import com.tilab.ca.sda.sda_controller.model.SdaConfs;
 import com.tilab.ca.sda.sda_controller.services.ConfigurationService;
+import java.util.List;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,11 @@ public class ConfigController {
     
     @Autowired
     private ConfigurationService configurationService;
+    
+    @RequestMapping("/modules")
+    public List<Module> getModules(){
+        return configurationService.getModules();
+    }
     
     @RequestMapping("/sdaConfig")
     public SdaConfs getSdaConfig(){

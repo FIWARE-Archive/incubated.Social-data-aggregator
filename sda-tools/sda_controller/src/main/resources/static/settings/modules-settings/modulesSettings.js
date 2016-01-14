@@ -1,25 +1,31 @@
 (function () {
 
     angular.module("sdaController.settings")
-            .controller('startupSettingsController',function($scope,$http,$log){
-                 
-                $scope.startupScriptSections=[];
-        
-                $http.get('/sdaConfig').then(function(resp){
+            .controller('modulesController',function($scope,$http,$log){
+                $scope.moduleSelected=false; 
+                $scope.modules=[];
+                $scope.sm={};
+                
+                $http.get('/modules').then(function(resp){
                     $log.debug(resp.data);
-                    $scope.startupScriptData = resp.data;
-                    $scope.startupScriptSections = $scope.startupScriptData.sections;
-                    $scope.startupScriptOldProps = angular.copy($scope.startupScriptSections);
+                    $scope.modules = resp.data;
                 },function(error){
-                    $scope.$emit('error','Failed to retrieve startup script configurations');
+                    $scope.$emit('error','Failed to retrieve modules configurations');
                     $log.error("failed to call api data for sdaConfig");
                     $log.error(error);
                 });
                 
-                $scope.reset=function(){
-                    $scope.startupScriptSections=$scope.startupScriptOldProps;
-                };
+                $scope.selectModule=function(module){
+                    $scope.sm=module;
+                    var smFileKeys=[];
+                    for(var key in module.confs)
+                        smFileKeys.push({fileName:key,active:false});
+                    $scope.smFilesList=smFileKeys;
+                    $scope.moduleSelected=true;
+                }
                 
+           
+                /*
                 $scope.save=function(){
                     $log.debug("Sending sdaConfs to update..");
                     $log.debug(JSON.stringify($scope.startupScriptData));
@@ -31,7 +37,8 @@
                              $log.error(error);
                              $scope.$emit('error','Startup Script configurations update failed');
                          });
-                };
+                };*/
+                
             });
     
 })();

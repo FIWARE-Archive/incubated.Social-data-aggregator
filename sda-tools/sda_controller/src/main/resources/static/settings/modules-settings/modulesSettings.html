@@ -1,0 +1,42 @@
+<h1>Modules</h1>
+
+<div class="row">
+    <div class="col-xs-3">
+        <div class="row" ng-repeat="module in modules">
+            <div class="col-xs-10 pointer" ng-click="selectModule(module)">{{module.name}}</div>
+            <div class="col-xs-2"><a href ><span ng-class="{'glyphicon glyphicon-remove':module.enabled,'glyphicon glyphicon-ok':!module.enabled}" ng-click="module.enabled = !module.enabled"></span></a></div>
+        </div>
+    </div>
+    <div ng-show="moduleSelected" class="col-xs-9">
+        <uib-tabset>
+            <uib-tab ng-repeat="fileKey in smFilesList" heading="{{fileKey.fileName}}" active="fileKey.active">
+                <div class="panel panel-default" ng-repeat="section in sm.confs[fileKey.fileName].sections">
+                    <div class="panel-heading">{{section.label}}</div>
+                    <div class="panel-body">
+                        <div class="well" ng-show="section.description">{{section.description}}</div>
+                        <div class="row top-buffer-2" ng-repeat="prop in section.props">
+                            <div class="col-xs-10">
+                                <div class="input-group">
+                                    <div class="input-group-addon">{{prop.label}} </div>
+                                    <input type="text" class="form-control" ng-model="prop.value" name="{{prop.name}}" maxlength="100" length="100" required>
+                                </div>
+                            </div>
+                            <div class="col-xs-1" ng-show="prop.description">
+                                <a href data-toggle="tooltip" data-placement="bottom" title="{{prop.description}}"><span class="glyphicon glyphicon-info-sign"></span></a>
+                            </div>
+                            <div class="col-xs-1">
+                                <a href ng-show="prop.required" data-toggle="tooltip" data-placement="bottom" title="This item is mandatory!"><span class="glyphicon glyphicon-warning-sign"></span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>           
+            </uib-tab>
+        </uib-tabset>
+        <div class="row">
+            <div class="col-xs-offset-10 col-xs-2">
+                <a href class="btn btn-primary" ng-click="save()">Save</a>
+            </div>
+        </div>
+    </div>
+</div>
+
