@@ -10,3 +10,17 @@
 .pointer{
     cursor:pointer;
 }
+
+.module-enabled{
+    margin-top:0.5em;
+    background-color: #24d951;
+    padding: 1em;
+    border-radius: 4px 4px 0 0;
+}
+
+.module-disabled{
+    margin-top:0.5em;
+    background-color: #b5bdc4; 
+    padding: 1em;
+    border-radius: 4px 4px 0 0;
+}

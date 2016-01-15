@@ -22,22 +22,33 @@
                         smFileKeys.push({fileName:key,active:false});
                     $scope.smFilesList=smFileKeys;
                     $scope.moduleSelected=true;
-                }
+                };
+                
+                $scope.toggleModuleEnabled=function(module){
+                    module.enabled=!module.enabled;
+                    $http.patch('/modules/'+module.id,{fieldName:"enabled",value:module.enabled})
+                            .then(null,function(error){
+                                $log.error("error on updating module "+ module.label +" enable state");
+                                $log.error(error);
+                                $scope.$emit('error','module '+module.label+' enable status update failed.'
+                                                +'Please check in your global configurations if sda home is setted properly');
+                            });
+                };
                 
            
-                /*
                 $scope.save=function(){
-                    $log.debug("Sending sdaConfs to update..");
-                    $log.debug(JSON.stringify($scope.startupScriptData));
-                    $http.put("/sdaConfig",$scope.startupScriptData)
+                    var module = $scope.sm;
+                    $log.debug("Sending module to update with id "+module.id);
+                    $log.debug(JSON.stringify(module));
+                    $http.put("/modules/"+module.id,module)
                          .then(function(resp){
-                             $scope.$emit('notification','Startup Script configurations update successfully');
-                             $scope.startupScriptOldProps = angular.copy($scope.startupScriptProps);
+                             $scope.$emit('notification','module '+module.label+' configurations update successfully');
                          },function(error){
                              $log.error(error);
-                             $scope.$emit('error','Startup Script configurations update failed');
+                             $scope.$emit('error','module '+module.label+' configurations update failed.'
+                                                +'Please check in your global configurations if sda home is setted properly');
                          });
-                };*/
+                };
                 
             });
     

@@ -11,8 +11,12 @@ import com.tilab.ca.sda.sda_controller.utils.JsonUtils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +52,10 @@ public class ConfigurationService {
     private String sdaStartupScriptConfsFilePath;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    private static final String MODULES_FILE_PATH="/scripts/modules";
+    
+    private static final String MODULE_COMMENT_CHAR="#";
     
     private static final String EQ_SEPARATOR="=";
     private static final String NEWLINE_SEPARATOR=System.getProperty("line.separator");
@@ -104,7 +112,7 @@ public class ConfigurationService {
     private String serializeSections(List<Section> sections,String propSeparator,String lineSeparator){
         return StringUtils.collectionToDelimitedString(sections.stream().map(section -> {
            
-            String sectStr = "#"+section.getName()+lineSeparator+"#"+section.getDescription();
+            String sectStr = MODULE_COMMENT_CHAR+section.getName()+lineSeparator+MODULE_COMMENT_CHAR+section.getDescription();
             return sectStr+lineSeparator+serializeProps(section.getProps(), propSeparator, lineSeparator);
         
         }).collect(Collectors.toList()),lineSeparator);
@@ -113,7 +121,11 @@ public class ConfigurationService {
     
     private String serializeProps(List<Prop> props,String propSeparator,String lineSeparator){
         return 
-               StringUtils.collectionToDelimitedString(props.stream().map(prop -> prop.getName()+propSeparator+prop.getValue())
+               StringUtils.collectionToDelimitedString(props.stream().map(prop -> {
+                            if(prop.getValue()!=null && !prop.getValue().isEmpty())
+                                return prop.getName()+propSeparator+prop.getValue();
+                            return MODULE_COMMENT_CHAR+prop.getName();
+                       })
                        .collect(Collectors.toList()),lineSeparator);
     }
     
@@ -135,10 +147,46 @@ public class ConfigurationService {
         }
     }
     
-//    public void saveSdaConfs(SdaConfs sdaConfs){
-//        String fileName = this.sdaConfs.getFile();
-//        sdaConfs.setFile(fileName);
-//        this.sdaConfs = sdaConfs;
-//    }
+    public void updateModule(Module module) throws Exception {
+        List<Module> mTempList = this.modules.stream().map(m -> m.getId()==module.getId()?module:m)
+                                            .collect(Collectors.toList());
+        
+        module.getConfs().forEach((key,propFile) -> {       
+            try {
+                saveFile(serializeSections(propFile.getSections(), EQ_SEPARATOR,NEWLINE_SEPARATOR),
+                        this.globalConfs.getSdaHome().getValue()+module.getConfsPath()+File.separator+propFile.getName());
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        
+        saveConfs(mTempList, modulesFilePath);
+        this.modules = mTempList;
+    }
+
+    public void updateModuleEnabled(int moduleId, boolean enabled) throws Exception {
+        Module module = modules.stream().filter(m -> moduleId == m.getId()).findAny()
+                                        .orElseThrow(() -> new IllegalArgumentException("provided id not found"));
+        String scriptModuleFilePath = globalConfs.getSdaHome().getValue()+MODULES_FILE_PATH;
+        try(Stream<String> lines = Files.lines(Paths.get(scriptModuleFilePath))
+                                   .map(row -> updateModuleFileRow(row, module.getName(), enabled))){
+            saveFile(StringUtils.collectionToDelimitedString(lines.collect(Collectors.toList()), NEWLINE_SEPARATOR)+NEWLINE_SEPARATOR,
+                    scriptModuleFilePath);
+            module.setEnabled(enabled);
+            saveConfs(modules, modulesFilePath);
+        }
+    }
+    
+    private String updateModuleFileRow(String row,String moduleName,boolean enabled){
+        String mNameFile = row.split(" ")[0];
+        if(moduleName.equals(mNameFile) || moduleName.equals(MODULE_COMMENT_CHAR+mNameFile)){
+            if(enabled && row.startsWith(MODULE_COMMENT_CHAR))
+                return row.replace(MODULE_COMMENT_CHAR, "");
+            if(!enabled && !row.startsWith(MODULE_COMMENT_CHAR))
+                return MODULE_COMMENT_CHAR+row;
+        }
+        
+        return row;
+    }
 
 }

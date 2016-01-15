@@ -7,7 +7,7 @@
         "imageUrl":"",
         "description":"",
         "confsPath":"/confs/connector-tw",
-        "status":"enabled",
+        "enabled":"true",
         "confs":{
             "TwStreamConnector.properties":{
                 "name":"TwStreamConnector.properties",
