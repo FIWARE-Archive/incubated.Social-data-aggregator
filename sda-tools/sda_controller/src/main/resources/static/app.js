@@ -1,9 +1,9 @@
 (function(){
     
-    var sdaControllerApp = angular.module("sdaController",['sdaController.settings']);
+    var sdaControllerApp = angular.module("sdaController",['sdaController.settings','sdaController.dashboard']);
     
     sdaControllerApp.config(function($urlRouterProvider){
-        $urlRouterProvider.otherwise("/settings");
+        $urlRouterProvider.otherwise("/dashboard");
     });
     
     sdaControllerApp.controller('sdaAppController',function($scope,$rootScope,$log){

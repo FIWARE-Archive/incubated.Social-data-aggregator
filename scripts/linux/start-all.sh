@@ -2,7 +2,7 @@ function display_usage_and_exit {
   echo "start-all.sh - "
   echo ""
   echo "usage:"
-  echo "./start-tw-connector.sh --sda-home <sda_home> --start-spark-env"
+  echo "./start-all.sh --sda-home <sda_home> --start-spark-env"
   echo ""
   echo "--sda-home -> The path of social-data-aggregator folder. Optional. Provide from command line if SDA_HOME is not setted in your environment"
   echo "--start-spark-env -> launch spark in standalone mode before submit sda realtime modules"

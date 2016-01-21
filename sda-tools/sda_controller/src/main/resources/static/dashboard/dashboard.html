@@ -1,0 +1,56 @@
+<div id="wrapper">
+    <div id="page-wrapper">
+            <div class="container-fluid">
+                
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Dashboard <small>Overview</small>
+                        </h1>
+                    </div>
+                </div>
+                
+                 <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-warning alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            <strong>Attention</strong>  Check Settings are properly valorized before starting Social Data Aggregator
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Command Panel</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div ng-switch="isStarted">
+                                    <div class="row" ng-switch-when="false">
+                                        <div class="col-xs-6">
+                                            <input type="checkbox" ng-model="ck.startWithEnv" checked="{{ck.startWithEnv}}"> start spark env         
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <a href class="btn btn-primary" ng-click="startSda()" ng-disabled="commandSent"><span class="glyphicon glyphicon-play"></span> Start</a>
+                                        </div>
+                                    </div>
+                                    <div class="row" ng-switch-when="true">
+                                        <div class="col-xs-offset-6 col-xs-6">
+                                            <a href class="btn btn-danger" ng-click="stopSda()" ng-disabled="commandSent"><span class="glyphicon glyphicon-stop"></span> Stop</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="log-output" ng-show="hideLog">
+                                    <ul ng-repeat="logRow in logRows">
+                                        <li>{{logRow}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>             
+</div>

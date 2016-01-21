@@ -3,6 +3,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Social Data Aggregator Controller</title>
         <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="dashboard/dashboard.css">
         <link rel="stylesheet" href="libs/bootstrap/css/bootstrap-theme.min.css">
         <link rel="stylesheet" href="app.css">
     </head>
@@ -18,7 +19,6 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="#">
-                        <span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span>
                         Social Data Aggregator Controller
                     </a>
                 </div>
@@ -26,6 +26,9 @@
                     <ul class="nav navbar-nav navbar-right">
                         <li><a href ui-sref="settings">
                                 <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Settings
+                            </a></li>
+                        <li><a href ui-sref="dashboard">
+                                <span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span> Dashboard
                             </a></li>
                     </ul>
                 </div>
@@ -51,5 +54,6 @@
         <script src="settings/global-settings/globalSettings.js"></script>
         <script src="settings/startup-script-settings/startupScriptSettings.js"></script>
         <script src="settings/modules-settings/modulesSettings.js"></script>
+        <script src="dashboard/dashboard.js"></script>
     </body>
 </html>

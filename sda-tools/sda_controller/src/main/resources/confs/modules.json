@@ -377,5 +377,198 @@
                 ]
             }
         }
-    }
+    },
+    {
+        "id":"2",
+        "name": "gra",
+        "label":"GRA Consumer",
+        "type":"Consumer",
+        "imageUrl":"",
+        "description":"Gender recognition algorithm consumer",
+        "confsPath":"/confs/consumers/consumer-gra",
+        "enabled":"false",
+        "confs":{
+            "GraConsumer.properties":{
+                "name":"GraConsumer.properties",
+                "sections":[
+                    {
+                        "name":"COMMON CONFIGURATIONS",
+                        "label":"Common Configurations",
+                        "description":"common configurations between stream and batch version of GRA",
+                        "props":[
+                                    {
+                                            "name": "roundPos",
+                                            "label": "roundPos",
+                                            "value": "3",
+                                            "description": "Number of decimals on which you want to round geolocation latitude and longitude doubles",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "daoImplClass",
+                                            "label": "daoImplClass",
+                                            "value": "com.tilab.ca.sda.gra_consumer_dao.GraConsumerDaoFileImpl",
+                                            "description": "Dao implementation class (available also com.tilab.ca.sda.gra_consumer_dao.GraConsumerDaoHibImpl)",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "coloursModelImplClass",
+                                            "label": "coloursModelImplClass",
+                                            "value": "com.tilab.ca.sda.gra_core.ml.NBModel",
+                                            "description": "implementation of colours machine learning Model (Naive Bayes,Decision Tree...) ",
+                                            "required": false
+                                    },
+                                    {
+                                            "name": "descrModelImplClass",
+                                            "label": "descrModelImplClass",
+                                            "value": "com.tilab.ca.sda.gra_core.ml.NBModel",
+                                            "description": "implementation of user description machine learning Model (Naive Bayes,Decision Tree...) ",
+                                            "required": false
+                                    },
+                                    {
+                                            "name": "namesGenderMapImplClass",
+                                            "label": "namesGenderMapImplClass",
+                                            "value": "com.tilab.ca.sda.gra_core.components.NamesGenderMapDefaultImpl",
+                                            "description": "implementation of user gender map ",
+                                            "required": false
+                                    },
+                                    {
+                                            "name": "featureExtractionClassImpl",
+                                            "label": "featureExtractionClassImpl",
+                                            "value": "com.tilab.ca.sda.gra_core.ml.FeaturesExtractionTFIDF",
+                                            "description": "feature extraction implementation class",
+                                            "required": false
+                                    },
+                                    {
+                                            "name": "trainingFilesPath",
+                                            "label": "trainingFilesPath",
+                                            "value": "",
+                                            "description": "training files path. Put training files on a shared fs  (hdfs,s3,nfs..)",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "colorAlgoReductionNumBits",
+                                            "label": "colorAlgoReductionNumBits",
+                                            "value": "9",
+                                            "description": "number of bits for colour reduction algorithm",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "colorAlgoNumColorsToConsider",
+                                            "label": "colorAlgoNumColorsToConsider",
+                                            "value": "4",
+                                            "description": "Number of colours to consider for gender classification through profile colours",
+                                            "required": true
+                                    }
+                        ]
+                    },
+                    {
+                        "name":"STREAM CONFIGURATIONS",
+                        "label":"Stream Configurations",
+                        "description":"Configurations for stream version of GRA",
+                        "props":[
+                                    {
+                                            "name": "keyGeo",
+                                            "label": "keyGeo",
+                                            "value": "geo",
+                                            "description": "identificative topic on the internal bus for geolocalized tweets",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "keyHt",
+                                            "label": "keyHt",
+                                            "value": "ht",
+                                            "description": "identificative topic on the internal bus for tweets containing hashtags",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "keyRaw",
+                                            "label": "keyRaw",
+                                            "value": "raw",
+                                            "description": "identificative topic on the internal bus for raw tweets (not processed)",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "defaultRoundMode",
+                                            "label": "defaultRoundMode",
+                                            "value": "min",
+                                            "description": "default round mode for grouping tweets",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "granMin",
+                                            "label": "granMin",
+                                            "value": "5",
+                                            "description": "granularity in minutes (e.g. granMin=5 counts tweets in a time slot of 5 min)",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "numMaxCore",
+                                            "label": "numMaxCore",
+                                            "value": "2",
+                                            "description": "max number of cores that can be used for this application",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "checkpointDir",
+                                            "label": "checkpointDir",
+                                            "value": "",
+                                            "description": "directory where the application will store checkpoints",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "sparkBatchDurationMillis",
+                                            "label": "sparkBatchDurationMillis",
+                                            "value": "3000",
+                                            "description": "duration of a spark batch (consider that objects will be sent on the bus for each batch)",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "sparkCleanTTL",
+                                            "label": "sparkCleanTTL",
+                                            "value": "480000",
+                                            "description": "",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "graWindowDurationMillis",
+                                            "label": "graWindowDurationMillis",
+                                            "value": "60000",
+                                            "description": "time window on which data will be saved",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "graWindowSlidingIntervalMillis",
+                                            "label": "graWindowSlidingIntervalMillis",
+                                            "value": "60000",
+                                            "description": "",
+                                            "required": true
+                                    },
+                                    {
+                                            "name": "busConnImplClass",
+                                            "label": "busConnImplClass",
+                                            "value": "com.tilab.ca.sda.consumer.utils.stream.BusConnectionKafkaImpl",
+                                            "description": "bus connector implementation class",
+                                            "required": true
+                                    }                                   
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+     {
+        "id":"3",
+        "name": "tw-tot-stream",
+        "label":"Tw tot counter",
+        "type":"Consumer",
+        "imageUrl":"",
+        "description":"Count the number of tweet, retweet and replies for a target hashTag or geo location",
+        "confsPath":"/confs/consumers/consumer-tw-tot",
+        "enabled":"true",
+        "confs":{
+        }
+     }
 ]
+
+
+ 

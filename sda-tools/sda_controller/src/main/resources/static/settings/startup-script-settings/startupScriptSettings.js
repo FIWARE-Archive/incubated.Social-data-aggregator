@@ -5,7 +5,7 @@
                  
                 $scope.startupScriptSections=[];
         
-                $http.get('/sdaConfig').then(function(resp){
+                $http.get('/config/sdaConfig').then(function(resp){
                     $log.debug(resp.data);
                     $scope.startupScriptData = resp.data;
                     $scope.startupScriptSections = $scope.startupScriptData.sections;
@@ -23,7 +23,7 @@
                 $scope.save=function(){
                     $log.debug("Sending sdaConfs to update..");
                     $log.debug(JSON.stringify($scope.startupScriptData));
-                    $http.put("/sdaConfig",$scope.startupScriptData)
+                    $http.put("/config/sdaConfig",$scope.startupScriptData)
                          .then(function(resp){
                              $scope.$emit('notification','Startup Script configurations update successfully');
                              $scope.startupScriptOldProps = angular.copy($scope.startupScriptProps);

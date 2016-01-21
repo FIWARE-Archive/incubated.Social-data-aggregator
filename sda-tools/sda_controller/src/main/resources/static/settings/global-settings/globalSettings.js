@@ -4,7 +4,7 @@
             .controller('globalSettingsController',function($scope,$http,$log){
                 $scope.sdaHome={};
         
-                $http.get('/globalConfig').then(function(resp){
+                $http.get('/config/globalConfig').then(function(resp){
                     $log.debug(resp.data);
                     $scope.globalConfs = resp.data;
                     $scope.sdaHome = $scope.globalConfs.sdaHome;
@@ -21,7 +21,7 @@
                 $scope.save=function(){
                     $log.debug("Sending globalConfs to update..");
                     $log.debug(JSON.stringify($scope.globalConfs));
-                    $http.put("/globalConfig",$scope.globalConfs)
+                    $http.put("/config/globalConfig",$scope.globalConfs)
                          .then(function(resp){
                              $log.debug("entro in resp success");
                              $scope.$emit('notification','Global configurations update successfully');

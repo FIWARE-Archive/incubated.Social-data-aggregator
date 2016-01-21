@@ -6,7 +6,7 @@
                 $scope.modules=[];
                 $scope.sm={};
                 
-                $http.get('/modules').then(function(resp){
+                $http.get('/config/modules').then(function(resp){
                     $log.debug(resp.data);
                     $scope.modules = resp.data;
                 },function(error){
@@ -26,7 +26,7 @@
                 
                 $scope.toggleModuleEnabled=function(module){
                     module.enabled=!module.enabled;
-                    $http.patch('/modules/'+module.id,{fieldName:"enabled",value:module.enabled})
+                    $http.patch('/config/modules/'+module.id,{fieldName:"enabled",value:module.enabled})
                             .then(null,function(error){
                                 $log.error("error on updating module "+ module.label +" enable state");
                                 $log.error(error);
@@ -40,7 +40,7 @@
                     var module = $scope.sm;
                     $log.debug("Sending module to update with id "+module.id);
                     $log.debug(JSON.stringify(module));
-                    $http.put("/modules/"+module.id,module)
+                    $http.put("/config/modules/"+module.id,module)
                          .then(function(resp){
                              $scope.$emit('notification','module '+module.label+' configurations update successfully');
                          },function(error){
