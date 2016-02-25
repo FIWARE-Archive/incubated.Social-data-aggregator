@@ -70,8 +70,13 @@ public class TwitterStreamConnector implements Serializable{
 
     public void executeMainOperations(JavaStreamingContext jssc) throws Exception {
         log.info(String.format("[%s] starting acquisition twitter streaming..", Constants.SDA_TW_CONNECTOR_APP_NAME));
-        JavaDStream<Status> tweetsDStream = TwitterStream.createStream(jssc, getTwitterReceiverBuilderFromConfigurations(twProps, twStatDao));
-        executeMainOperations(tweetsDStream);
+        TwitterReceiverBuilder trb = getTwitterReceiverBuilderFromConfigurations(twProps, twStatDao);
+        if(!trb.hasEmptyKeys()){
+            JavaDStream<Status> tweetsDStream = TwitterStream.createStream(jssc, trb);
+            executeMainOperations(tweetsDStream);
+        }else{
+            log.info("no keys to monitor found. Tw connector wont perform any connection with stream api. Please add some keys and restart the component through api");
+        }
     }
     
     public void executeMainOperations(JavaDStream<Status> tweetsDStream){
@@ -177,10 +182,13 @@ public class TwitterStreamConnector implements Serializable{
 
         log.info(String.format("[%s] retrieving geo keys..", Constants.SDA_TW_CONNECTOR_LOG_TAG));
         List<GeoBox> onMonGeoList = twStatDao.getOnMonGeo(twProps.nodeName());
+        
+        log.info(String.format("[%s] retrieving users to follow ids..", Constants.SDA_TW_CONNECTOR_LOG_TAG));
+        List<Long> onMonUsersList = twStatDao.getOnMonUsers(twProps.nodeName());
 
-        if (Utils.isNullOrEmpty(onMonKeyList) && Utils.isNullOrEmpty(onMonGeoList)) {
-            throw new IllegalStateException("Initialization failed: No monitoring data found on "
-                    + "OnMonitoringGeo/OnMonitoringKeys");
+        if (Utils.isNullOrEmpty(onMonKeyList) && Utils.isNullOrEmpty(onMonGeoList) && Utils.isNullOrEmpty(onMonUsersList)) {
+            log.info("No monitoring data found on OnMonitoringGeo/OnMonitoringKeys/OnMonitoringUsers. Return an empty receiverBuilder..");
+            return new TwitterReceiverBuilder().withEmptyKeys();
         }
         
         log.info(String.format("[%s] retrieved %d geokeys..", Constants.SDA_TW_CONNECTOR_LOG_TAG,onMonGeoList.size()));
@@ -195,8 +203,7 @@ public class TwitterStreamConnector implements Serializable{
                     onMonGeo.getLatitudeTo(),
                     onMonGeo.getLongitudeTo()));
         }
-        List<Long> onMonUsersList = twStatDao.getOnMonUsers(twProps.nodeName());
-        //TODO
+        
         if (!Utils.isNullOrEmpty(onMonUsersList)) {
             twRecBuilder.users2Follow(onMonUsersList);
         }

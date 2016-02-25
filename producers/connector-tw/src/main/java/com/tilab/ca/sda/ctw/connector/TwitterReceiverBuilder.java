@@ -16,6 +16,8 @@ public class TwitterReceiverBuilder implements Serializable {
     private List<String> trackFilter = null;
     private List<Double[]> locationFilter = null;
     private List<Long> user2Follow = null;
+    
+    private boolean emptyKeys = false;
 
     public TwitterReceiverBuilder() {
         trackFilter = new LinkedList<>();
@@ -75,6 +77,11 @@ public class TwitterReceiverBuilder implements Serializable {
         this.storageLevel = storageLevel;
         return this;
     }
+    
+    public TwitterReceiverBuilder withEmptyKeys(){
+        this.emptyKeys = true;
+        return this;
+    }
 
     public Configuration getTwitterConfiguration() {
         return twitterConf;
@@ -107,6 +114,10 @@ public class TwitterReceiverBuilder implements Serializable {
 
     public List<String> getTrackList() {
         return trackFilter;
+    }
+    
+    public boolean hasEmptyKeys(){
+        return emptyKeys;
     }
 
     public double[][] getLocationsArray() {
